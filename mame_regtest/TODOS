@@ -1,0 +1,140 @@
+mame_regtest
+	Features:
+		- logging of wavfiles to find sound regressions (empty files in case of no GAME_NO_SOUND flag)
+		- per-cart configuration
+		- check every game with created files (re-run after clean run)
+		- review commandline output
+		- add silent mode?
+		- add valgrind location and string as parameters
+		- add sanity checks for maximum bios, ramsize and device count
+		- add option for testing of .inp file writing/reading (-record/-playback)
+		- add "start_at" for devices
+		- use transparent crosshair?
+		- avoid duplicated slashes
+		- make pointers const (or const * const)
+		- add verbose mode (logging command-line string etc.)
+		- add "hang"/deadlock detection (-watchdog)
+		- mark the different autosave calls (load / save)
+		- multipass XPath (e.g. first select m6502 cpus and then all with autosave from those nodes)
+		- add MAME version to hack_mngwrite description (change seems to be in 0.108u5)
+		- properly handle invalid XPath expressions (check for DRIVER_ROOT / react on libxml2 errors)
+		- add more paths (like artwork and sample)
+		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
+		- change parse_mng to parse single frames
+		- test frontend functions (-listfull etc.)			
+		- multithreading mode
+		- change strcpy() to strncpy()
+		- change strcat() to strncat()
+		- rewrite configuration by using a default array and just overwrite existing nodes
+			- empty options will not properly overwrite/reset existing options to default values
+			- print config values in read function (or put in array and print function for array)
+			- cleanup post-loading code of configuration (checks, output etc.)
+		- store both output file states in case of autosave
+		- write temporary files to mrt_tmp folder 
+			- tmp_stderr
+			- tmp_stdout
+			- dummy_ini
+			- mrt_debugscript
+		- restructure static variables
+			- pair the config ones
+			- pair the static strings
+		- add macro to output files/folders for version/revsion etc.
+		- how to test system configurations
+		- how to test dipswitches
+		- attribute to disable an image entry in the XML
+		- add base folder for images in XML (could also be used for parsing a folder?)
+			- read carts from a directory?
+			- add parse flag?
+			- only use on relative path entries (x:\, /, \\, etc.)
+			- use folder node in-between to be able to switch folders
+		- proper handling for absolute paths in options
+		- add printf-format support to append_string()
+		- switch to binaries/includes from http://www.zlatkovic.com/pub/libxml/
+		- make "xpath_results.xml" configurable
+		- remove "validate_listxml" option and always do it
+		- log "validate_listxml" errors somewhere
+		- log "test_createconfig" errors somewhere
+		- change CWD to dummy_root to also get some debug files created by MAME
+		- add -log output to XMLs?
+		- run test_createconfig in dummy_root to avoid usage of existing mame.ini
+		- call -validate?
+		- calls within gdb? (can gdb be scripted?)
+		- use the following debugger commands
+			- gtime <milliseconds in hex>
+			- hardreset (causes endless restarts of MAME)
+			- snap
+		- add option to use a specific debugscript?
+		- add hack for PinMAME -listxml (strip duplicated "sampleof" attribute / has stray & in rom name)
+		- write comparison tool
+			- parse dir A and check dir B for missing file
+			- parse dir B and check dir A for new files
+		- better way to align the dummy_root INI lines
+		- read images from folder with same name as device (look for XML first / specify folder in XML?)
+		- do not run drivers with mandatory devices without an image, if a device list exists
+		- add version number to create_report and create_image_xml (0.1)
+		- rewrite config
+			- config_struct {
+				const char* name
+				int type
+				value
+			}
+			- config_init(config_struct)
+			- config_read(file, config_name)
+			- config_read(doc, config_name)
+			- config_get_int()
+			- config_get_str()
+		- use functions for lists
+			- list_create()
+			- list_next_entry()
+			- list_insert() - sorted
+			- list_append() - unsorted
+			- list_free()
+		- create config for create_report
+		- update building instructions in Wiki
+		- use more command-line options
+			- verify*
+			- list*
+		- use -aviwrite
+		- duplicated driver entry in 0.125u8 for centiped.c
+		- add soft/hardreset tests after each call like "autosave" test?
+		- use grep to diff each file
+			- regex for auto.sta "^[+-].*auto.sta"
+		- write valgrind logfiles to output folder
+		- handle whitespaces in bios names?
+		- add information about -cc and -listxml in result XMLs?
+
+	Obsolete/External:
+		- HTML report
+			- create HTML report (different variants)
+				Unexpected Returnvalues (sourcefile - driver - returncode - details [flags, stdout])
+				Untested Games (sourcefile - driver)
+				Image Comparison results (sourcefile - driver / with images links - before and after)
+				All Result Images
+			- add paging to HTML report (by letters / x entries per page)
+			- add all messages to HTML report
+			- add all options to HTML report
+			- put HTML report into a folder and copy pictures in a <html_report_name>_new/<html_report_name>_ref folder
+			- add option for main HTML report folder
+			- make HTML report work in Mozilla ( use /ref and /new links)
+		- regression detection (compare different versions and tell between which it did change)
+		- extract differing frames (also for HTML report)
+		- show PNG differences (use Aaron's code)
+
+	Linux:
+		- add a signal handler for linux?
+
+	Known Issues:
+		- not everything is properly encoded by xmlEncodeEntitiesReentrant()
+		- using autosave will overwrite the initial valgrind log-file for the driver (well..not really, it adds the pid - still you want to differ them easily)
+
+	Test TODOs:
+		- test release and debug builds of MAME and MESS
+		- test 32-bit compile on 64-bit OS (windows and linux)
+		- test 64-bit compile
+		- test with SDLMAME/SDLMESS
+		- test on PPC
+
+	Misc:
+		- create patch to write show_ui() in a file
+		- MAME patches
+			- add "exit"/"run-and-hide" command to debugger

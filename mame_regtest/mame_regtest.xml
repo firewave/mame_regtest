@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<mame_regtest>
+	<global>
+		<!-- input options -->
+		<option name='executable' value='mame.exe'/>
+		<option name='listxml_file' value=''/>
+		<option name='validate_listxml' value=''/>
+		
+		<!-- environment options -->
+		<option name='rompath' value=''/>
+		<option name='osdprocessors' value='1'/>
+
+		<!-- comparsion options -->		
+		<option name='write_mng' value=''/>
+
+		<!-- processing options -->
+		<option name='pause_interval' value='0'/>
+		<option name='use_devices' value=''/>
+		<option name='use_nonrunnable' value=''/>
+		<option name='xpath_expr' value=''/>
+		<option name='device_file' value=''/>
+		<option name='use_isbios' value=''/>
+		<option name='skip_mandatory' value=''/>
+		<option name='test_softreset' value=''/>
+		
+		<!-- xpath_expr examples -->
+		<!-- 'start_at' equivalent
+			<option name='xpath_expr' value='DRIVER_ROOT[@name="game"]/following-sibling::*'/>
+		-->
+		<!-- 'sourcefile' equivalent
+			<option name='xpath_expr' value='DRIVER_ROOT[@sourcefile="driver.c"]'/>
+		-->
+		<!-- 'use_autosave' value='2' equivalent
+			<option name='xpath_expr' value='DRIVER_ROOT/driver[@savestate="supported"]/parent::*'/>
+		-->
+	
+		<!-- commandline options -->
+		<option name='str' value='2'/>
+		<option name='use_bios' value=''/>
+		<option name='use_sound' value=''/>
+		<option name='use_ramsize' value=''/>
+		<option name='use_autosave' value=''/>
+		<option name='use_throttle' value=''/>
+		<option name='use_debug' value=''/>
+		<option name='additional_options' value=''/>
+		
+		<!-- output files -->
+		<option name='output_folder' value=''/>
+		<option name='store_output' value=''/>
+		<option name='clear_output_folder' value=''/>
+		<option name='print_xpath_results' value=''/>
+		<option name='use_log' value=''/>
+
+		<!-- additional options -->
+		<option name='use_valgrind' value=''/>
+		<option name='log_devices' value=''/>
+		<option name='test_createconfig' value=''/>
+
+		<!-- hacks -->
+		<option name='hack_debug' value=''/>
+		<option name='hack_ftr' value=''/>
+		<option name='hack_biospath' value=''/>
+		<option name='hack_mngwrite' value=''/>
+	</global>
+	<mess>
+		<option name='executable' value='mess.exe'/>
+	</mess>
+</mame_regtest>
