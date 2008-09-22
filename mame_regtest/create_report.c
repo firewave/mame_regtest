@@ -176,8 +176,11 @@ static int create_report_from_filename(const char *const filename, const struct 
 	
 						if( r1_cb_data->dokuwiki_format )
 						{
-							if( write_src_header )
+							if( write_src_header ) {
 								fprintf(r1_cb_data->report_fd, "===== %s =====\n", sourcefile_key);
+								/* disable so the header is only written once */
+								write_src_header = 0;
+							}
 							fprintf(r1_cb_data->report_fd, "==== %s ====\n", name_key);
 							if( bios_key )
 								fprintf(r1_cb_data->report_fd, "  * BIOS: ''%s''\n", bios_key);

@@ -95,13 +95,13 @@ mame_regtest
 			- verify*
 			- list*
 		- use -aviwrite
-		- duplicated driver entry in 0.125u8 for centiped.c
 		- add soft/hardreset tests after each call like "autosave" test?
 		- use grep to diff each file
 			- regex for auto.sta "^[+-].*auto.sta"
 		- write valgrind logfiles to output folder
 		- handle whitespaces in bios names?
 		- add information about -cc and -listxml in result XMLs?
+		- check for "cheat expression" errors in stderr
 
 	Obsolete/External:
 		- HTML report
