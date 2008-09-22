@@ -356,6 +356,7 @@
 	- added a small tool called "create_report", which will create reports out of the output XMLs
 	- removed option "result_file" in favor of "report 1"
 	- removed html_enc parameter from print_driver_info()
+	- removed "log_devices" (MESS already has the -listdevices option)
 
 	create_report
 	- added "report 1", which creates a file with all driver, that didn't return 0

@@ -53,7 +53,6 @@
 
 		<!-- additional options -->
 		<option name='use_valgrind' value=''/>
-		<option name='log_devices' value=''/>
 		<option name='test_createconfig' value=''/>
 
 		<!-- hacks -->

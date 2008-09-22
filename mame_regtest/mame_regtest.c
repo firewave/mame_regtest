@@ -99,8 +99,6 @@ static const char* const valgring_log_str ="--log-file=";
 static char* rompath_folder = NULL;
 static int app_type = 0;
 static int use_custom_list = 0;
-static FILE* device_info_fd = NULL;
-static int log_devices = 0;
 static int use_bios = 0;
 static xmlChar* app_ver = NULL;
 static int use_sound = 0;
@@ -1140,9 +1138,6 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 		(*new_driv_inf)->device_mandatory = 0;
 		xmlNodePtr game_children = game_child->children;
 		
-		if ( device_info_fd )
-			fprintf(device_info_fd, "%s:%s\n", (*new_driv_inf)->sourcefile, (*new_driv_inf)->name);
-		
 		while( game_children ) {
 			if( xmlStrcmp(game_children->name, (const xmlChar*)"driver") == 0 ) {
 				/*
@@ -1183,19 +1178,8 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 			
 			if( (app_type == APP_MESS) ) {
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"device") == 0 ) {
-					if( device_info_fd ) {
-						fprintf(device_info_fd, "device:");
-						xmlChar* dev_type = xmlGetProp(game_children, (const xmlChar*)"type");
-						if( dev_type ) {
-							fprintf(device_info_fd, " %s", (const char*)dev_type);
-							xmlFree(dev_type);
-						}
-					}
-
 					xmlChar* dev_man = xmlGetProp(game_children, (const xmlChar*)"mandatory");
 					if( dev_man ) {
-						if( device_info_fd )
-							fprintf(device_info_fd, " %s", (const char*)dev_man);
 						(*new_driv_inf)->device_mandatory = 1;
 						xmlFree(dev_man);
 					}
@@ -1205,17 +1189,12 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 						if( xmlStrcmp(dev_childs->name, (const xmlChar*)"instance") == 0 ) {
 							xmlChar* dev_brief = xmlGetProp(dev_childs, (const xmlChar*)"briefname");
 							if( dev_brief ) {
-								if( device_info_fd )
-									fprintf(device_info_fd, " %s", (const char*)dev_brief);
 								(*new_driv_inf)->devices[(*new_driv_inf)->device_count++] = dev_brief;
 							}					
 						}
 						
 						dev_childs = dev_childs->next;
 					}
-	
-					if( device_info_fd )								
-						fprintf(device_info_fd, "\n");
 				}
 			}
 									
@@ -1273,9 +1252,6 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 						real_xpath_expr = NULL;
 					}
 				}
-
-				if( (app_type == APP_MESS) && log_devices )
-					device_info_fd = mrt_fopen("device_info.txt", "wb");
 					
 				if( xpathObj ) {
 					if( xpathObj->nodesetval )
@@ -1344,11 +1320,6 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 						}
 						game_child = game_child->next;
 					}
-				}
-				
-				if( device_info_fd ) {
-					fclose(device_info_fd);
-					device_info_fd = NULL;
 				}
 				
 				if( xpathObj != NULL )
@@ -1457,7 +1428,6 @@ int read_config(const char* config_name)
 	}
 	
 	get_option_str_ptr(global_config_child, "executable", &mame_exe);
-	get_option_int(global_config_child, "log_devices", &log_devices);
 	get_option_str(global_config_child, "str", str_str, sizeof(str_str));
 	get_option_int(global_config_child, "pause_interval", &pause_at);
 	get_option_str_ptr(global_config_child, "listxml_file", &gamelist_xml_file);
@@ -1586,27 +1556,6 @@ int main(int argc, char *argv[])
 	append_string(&listxml_output, output_folder);
 	append_string(&listxml_output, FILESLASH);
 	append_string(&listxml_output, "listxml.xml");
-	
-	if( log_devices ) {
-		char* mame_call = NULL;
-		append_string(&mame_call, mame_exe);
-		append_string(&mame_call, " -listxml > ");
-		append_string(&mame_call, listxml_output);
-	
-		system(mame_call);
-		
-		free(mame_call);
-		mame_call = NULL;
-		
-		printf("logging devices to 'device_info.txt'\n");
-		struct driver_info* driv_inf = NULL;
-	
-		parse_listxml(listxml_output, &driv_inf);
-	
-		cleanup_driver_info_list(driv_inf);
-		
-		cleanup_and_exit(0, "finished");
-	}
 	
 	printf("str: %s\n", str_str);
 	printf("pause interval: %d\n", pause_at);
