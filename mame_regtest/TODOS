@@ -5,7 +5,6 @@ mame_regtest
 		- check every game with created files (re-run after clean run)
 		- review commandline output
 		- add silent mode?
-		- add valgrind location and string as parameters
 		- add sanity checks for maximum bios, ramsize and device count
 		- add option for testing of .inp file writing/reading (-record/-playback)
 		- add "start_at" for devices

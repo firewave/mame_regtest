@@ -39,6 +39,9 @@ mame_regtest returncodes:
 
 #ifndef WIN32
 #include <arpa/inet.h>
+#define USE_VALGRIND 1
+#else
+#define USE_VALGRIND 0
 #endif
 
 /* libxml2 */
@@ -91,9 +94,12 @@ static char* gamelist_xml_file = NULL;
 static int use_autosave = 0;
 static int use_ramsize = 0;
 static int write_mng = 0;
-#ifndef WIN32
+#if USE_VALGRIND
 static int use_valgrind = 0;
-static const char* const valgrind_str = "valgrind --tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --leak-resolution=med";
+static char* valgrind_binary = NULL;
+static char* valgrind_parameters = NULL;
+static const char* const valgrind_binary_def = "valgrind";
+static const char* const valgrind_parameters_def = "--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --leak-resolution=med";
 static const char* const valgring_log_str ="--log-file=";
 #endif
 static char* rompath_folder = NULL;
@@ -204,9 +210,11 @@ static const char* get_inifile()
 
 static void get_executable(char** sys, struct driver_entry* de, const char* callstr)
 {
-#ifndef WIN32
+#if USE_VALGRIND
 	if( use_valgrind ) {
-		append_string(sys, valgrind_str);
+		append_string(sys, valgrind_binary);
+		append_string(sys, " ");
+		append_string(sys, valgrind_parameters);
 		append_string(sys, " ");
 		append_string(sys, valgring_log_str);
 		append_string(sys, output_folder);
@@ -482,6 +490,17 @@ static void convert_xpath_expr(char** real_xpath_expr)
 
 static void cleanup_and_exit(int errcode, const char* errstr)
 {
+#if USE_VALGRIND
+	if( valgrind_parameters ) {
+		free(valgrind_parameters);
+		valgrind_parameters = NULL;
+	}
+	if( valgrind_binary ) {
+		free(valgrind_binary);
+		valgrind_binary = NULL;
+	}
+#endif
+	
 	if( gamelist_xml_file ) {
 		free(gamelist_xml_file);
 		gamelist_xml_file = NULL;
@@ -1436,8 +1455,10 @@ int read_config(const char* config_name)
 	get_option_int(global_config_child, "use_autosave", &use_autosave);
 	get_option_int(global_config_child, "use_ramsize", &use_ramsize);
 	get_option_int(global_config_child, "write_mng", &write_mng);
-#ifndef WIN32
+#if USE_VALGRIND
 	get_option_int(global_config_child, "use_valgrind", &use_valgrind);
+	get_option_str_ptr(global_config_child, "valgrind_binary", &valgrind_binary);
+	get_option_str_ptr(global_config_child, "valgrind_parameters", &valgrind_parameters);
 #endif
 	get_option_str_ptr(global_config_child, "rompath", &rompath_folder);
 	get_option_int(global_config_child, "use_bios", &use_bios);
@@ -1594,8 +1615,18 @@ int main(int argc, char *argv[])
 		}
 	}
 	
-#ifndef WIN32
+#if USE_VALGRIND
 	printf("valgrind: %d\n", use_valgrind);
+	
+	if( use_valgrind )
+	{
+		if( !valgrind_binary || (strlen(valgrind_binary) == 0) )
+			append_string(&valgrind_binary, valgrind_binary_def);
+		printf("valgrind_binary: %s\n", valgrind_binary);
+		if( !valgrind_parameters || (strlen(valgrind_parameters) == 0) )
+			append_string(&valgrind_parameters, valgrind_parameters_def);
+		printf("valgrind_parameters: %s\n", valgrind_parameters);
+	}
 #endif
 
 	if( rompath_folder && (strlen(rompath_folder) > 0) )
@@ -1648,7 +1679,13 @@ int main(int argc, char *argv[])
 		get_executable(&mame_call, NULL, "listxml");
 		append_string(&mame_call, " -listxml > ");
 		append_string(&mame_call, gamelist_xml_file);
-		
+
+		/*
+		printf("system call: %s\n", mame_call);
+		printf("press any key to continue\n");
+		mrt_getch();
+		*/
+
 		system(mame_call);
 		
 		free(mame_call);

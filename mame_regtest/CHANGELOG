@@ -359,6 +359,9 @@
 	- removed "log_devices" (MESS already has the -listdevices option)
 	- changed valgrind outfile file to <driver_string>.valgrind_<pid>
 	- valgrind output files are now written to the "output_folder"
+	- added option "valgrind_binary" to specify the valgrind binary location
+	- added option "valgrind_parameters" to specify the valgrind parameters (--log-file is added by mame_regtest)
+	- put valgrind code into compile-time defijne USE_VALGRIND
 
 	create_report
 	- added "report 1", which creates a file with all driver, that didn't return 0
