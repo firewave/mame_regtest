@@ -51,7 +51,7 @@
 		<option name='use_log' value=''/>
 
 		<!-- valgrind options -->
-		<option name='use_valgrind' value='1'/>
+		<option name='use_valgrind' value=''/>
 		<option name='valgrind_binary' value=''/>
 		<option name='valgrind_parameters' value=''/>
 
