@@ -209,6 +209,8 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 		append_string(sys, valgrind_str);
 		append_string(sys, " ");
 		append_string(sys, valgring_log_str);
+		append_string(sys, output_folder);
+		append_string(sys, FILESLASH);
 		if( de ) {
 			append_string(sys, de->name);
 			if( strlen(de->postfix) > 0 ) {
@@ -219,7 +221,7 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 		else {
 			append_string(sys, callstr);			
 		}
-		append_string(sys, "_valgrind_%p.log");
+		append_string(sys, ".valgrind_%p");
 		append_string(sys, " ");
 
 		append_string(sys, mame_exe);

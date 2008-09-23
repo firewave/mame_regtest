@@ -21,7 +21,6 @@ mame_regtest
 		- add more paths (like artwork and sample)
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
 		- change parse_mng to parse single frames
-		- test frontend functions (-listfull etc.)			
 		- multithreading mode
 		- change strcpy() to strncpy()
 		- change strcat() to strncat()
@@ -57,7 +56,6 @@ mame_regtest
 		- change CWD to dummy_root to also get some debug files created by MAME
 		- add -log output to XMLs?
 		- run test_createconfig in dummy_root to avoid usage of existing mame.ini
-		- call -validate?
 		- calls within gdb? (can gdb be scripted?)
 		- use the following debugger commands
 			- gtime <milliseconds in hex>
@@ -71,18 +69,19 @@ mame_regtest
 		- better way to align the dummy_root INI lines
 		- read images from folder with same name as device (look for XML first / specify folder in XML?)
 		- do not run drivers with mandatory devices without an image, if a device list exists
-		- add version number to create_report and create_image_xml (0.1)
+		- add version number to create_report and create_image_xml (0.1 or the actual mame_regtest version)
 		- rewrite config
 			- config_struct {
 				const char* name
 				int type
-				value
+				void* value
 			}
 			- config_init(config_struct)
 			- config_read(file, config_name)
 			- config_read(doc, config_name)
 			- config_get_int()
 			- config_get_str()
+			- config_get_ptr()
 		- use functions for lists
 			- list_create()
 			- list_next_entry()
@@ -94,14 +93,16 @@ mame_regtest
 		- use more command-line options
 			- verify*
 			- list*
+			- test frontend functions (-listfull etc.)
+			- call -validate?
+			- call "-listdevices" for MESS?
 		- use -aviwrite
 		- add soft/hardreset tests after each call like "autosave" test?
 		- use grep to diff each file
 			- regex for auto.sta "^[+-].*auto.sta"
-		- write valgrind logfiles to output folder
-		- handle whitespaces in bios names?
 		- add information about -cc and -listxml in result XMLs?
 		- check for "cheat expression" errors in stderr
+		- move the <driver_string> code to a function (append_driver_string())
 
 	Obsolete/External:
 		- HTML report
@@ -133,6 +134,7 @@ mame_regtest
 		- test 64-bit compile
 		- test with SDLMAME/SDLMESS
 		- test on PPC
+		- create testset with images for each device in each driver
 
 	Misc:
 		- create patch to write show_ui() in a file
