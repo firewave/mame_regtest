@@ -118,7 +118,7 @@ static const char* const config_xml = "mame_regtest.xml";
 static const char* const def_xpath_1 = "/mame/game";
 static const char* const def_xpath_2 = "/mess/machine";
 static char* xpath_expr = NULL;
-static const char* const debugscript_file = "mrt_debugscript";
+static const char* const debugscript_file = "mrt_temp"FILESLASH"mrt_debugscript";
 static xmlDocPtr global_config_doc = NULL;
 static xmlNodePtr global_config_root = NULL;
 static int hack_mngwrite = 0;
@@ -140,6 +140,10 @@ static int osdprocessors = 1;
 static int print_xpath_results = 0;
 static int use_log = 0;
 static int test_softreset = 0;
+static const char* const temp_folder = "mrt_temp";
+static const char* const stdout_temp_file = "mrt_temp"FILESLASH"tmp_stdout";
+static const char* const stderr_temp_file = "mrt_temp"FILESLASH"tmp_stderr";
+static const char* const dummy_ini_folder = "mrt_temp"FILESLASH"dummy_ini";
 
 static unsigned const char png_sig[8] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
 static unsigned const char mng_sig[8] = { 0x8a, 0x4d, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
@@ -408,9 +412,11 @@ static int create_dummy_root_ini()
 	printf("creating 'dummy_root' INI\n");
 	
 	int res = 0;
-	if( (access("dummy_ini", F_OK) == 0) || (mrt_mkdir("dummy_ini") == 0) ) {
-		char app_string[256];
-		snprintf(app_string, sizeof(app_string), "."FILESLASH"dummy_ini"FILESLASH"%s", get_inifile());
+	if( (access(dummy_ini_folder, F_OK) == 0) || (mrt_mkdir(dummy_ini_folder) == 0) ) {
+		char* app_string = NULL;
+		append_string(&app_string, dummy_ini_folder);
+		append_string(&app_string, FILESLASH);
+		append_string(&app_string, get_inifile());
 
 		FILE* fp = fopen(app_string, "w");
 		if( fp ) {
@@ -454,10 +460,13 @@ static int create_dummy_root_ini()
 			res = 1;
 		}
 		else
-			printf("could not create '%s' in 'dummy_ini'\n", get_inifile());
+			printf("could not create '%s' in '%s'\n", get_inifile(), dummy_ini_folder);
+			
+		free(app_string);
+		app_string = NULL;
 	}
 	else
-		printf("could not create 'dummy_ini'\n");
+		printf("could not create '%s'\n", dummy_ini_folder);
 
 	return res;
 }
@@ -515,8 +524,8 @@ static void cleanup_and_exit(int errcode, const char* errstr)
 	}
 	remove(debugscript_file);
 
+	clear_directory(temp_folder, 1);
 	clear_directory(dummy_root_str, 1);
-	clear_directory("dummy_ini", 1);
 
 	printf("%s\n", errstr);
 	exit(errcode);
@@ -749,9 +758,13 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 		append_string(&sys, " ");
 		append_string(&sys, additional_options);
 	}
-	append_string(&sys, " -inipath ."FILESLASH"dummy_ini");
-	append_string(&sys, " > tmp_stdout");
-	append_string(&sys, " 2> tmp_stderr");
+	append_string(&sys, " -inipath ");
+	append_string(&sys, dummy_ini_folder);
+	append_string(&sys, " > ");
+	append_string(&sys, stdout_temp_file);
+	
+	append_string(&sys, " 2> ");
+	append_string(&sys, stderr_temp_file);
 
 	/*
 	printf("system call: %s\n", sys);
@@ -790,12 +803,12 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 		snprintf(tmp, sizeof(tmp), "%d", sys_res);
 		xmlNewProp(*result, (const xmlChar*)"exitcode", (const xmlChar*)tmp);
 		char* content = NULL;
-		if( read_file("tmp_stdout", &content) == 0 ) {
+		if( read_file(stdout_temp_file, &content) == 0 ) {
 			xmlNewProp(*result, (const xmlChar*)"stdout", (const xmlChar*)content);
 			free(content);
 			content = NULL;
 		}
-		if( read_file("tmp_stderr", &content) == 0 ) {
+		if( read_file(stderr_temp_file, &content) == 0 ) {
 			xmlNewProp(*result, (const xmlChar*)"stderr", (const xmlChar*)content);
 			free(content);
 			content = NULL;
@@ -1610,6 +1623,19 @@ int main(int argc, char *argv[])
 			cleanup_and_exit(1, "aborting");
 		}
 	}
+
+	if( (access(temp_folder, F_OK) != 0) && mrt_mkdir(temp_folder) != 0 ) {
+		printf("could not create folder '%s'\n", temp_folder);
+		cleanup_and_exit(1, "aborting");
+	}
+
+	if( strlen(temp_folder) > 0 ) {
+		printf("using output folder: %s\n", temp_folder);
+		if( access(temp_folder, F_OK) != 0 ) {
+			printf("temp folder not found\n");
+			cleanup_and_exit(1, "aborting");
+		}
+	}
 	
 #if USE_VALGRIND
 	printf("valgrind: %d\n", use_valgrind);
@@ -1666,6 +1692,11 @@ int main(int argc, char *argv[])
 		clear_directory(output_folder, 0);
 	}
 
+	printf("clearing existing temp folder\n");
+	clear_directory(temp_folder, 0);
+
+	printf("\n"); /* for output formating */
+
 	if( !gamelist_xml_file || (strlen(gamelist_xml_file) == 0) ) {
 		append_string(&gamelist_xml_file, listxml_output); 
 	
@@ -1693,6 +1724,8 @@ int main(int argc, char *argv[])
 	printf("parsing -listxml output\n")	;
 	parse_listxml(gamelist_xml_file, &driv_inf);
 
+	printf("\n"); /* for output formating */
+
 	if( test_createconfig ) {
 		printf("writing '%s'\n", get_inifile());
 		char* mame_call = NULL;
@@ -1713,7 +1746,6 @@ int main(int argc, char *argv[])
 
 	printf("clearing existing dummy directories\n");
 	clear_directory(dummy_root_str, 1);
-	clear_directory("dummy_ini", 1);
 
 	if( (hack_debug || is_debug) && use_debug ) {
 		FILE* debugscript_fd = fopen(debugscript_file, "w");
