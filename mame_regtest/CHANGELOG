@@ -362,6 +362,7 @@
 	- added option "valgrind_binary" to specify the valgrind binary location
 	- added option "valgrind_parameters" to specify the valgrind parameters (--log-file is added by mame_regtest)
 	- put valgrind code into compile-time defijne USE_VALGRIND
+	- removed option "validate_listxml" - DTD validation is now always performed
 
 	create_report
 	- added "report 1", which creates a file with all driver, that didn't return 0

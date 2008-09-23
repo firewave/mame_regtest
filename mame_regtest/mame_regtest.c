@@ -125,7 +125,6 @@ static int hack_mngwrite = 0;
 static int use_nonrunnable = 0;
 static int is_debug = 0;
 static unsigned int exec_counter = 0;
-static int validate_listxml = 0;
 static const char* const xpath_placeholder = "DRIVER_ROOT";
 static int xpath_placeholder_size = 11;
 static char output_folder[256] = "mrt_output";
@@ -1226,9 +1225,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 
 static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 {
-	int xml_options = 0;
-	if( validate_listxml )
-		xml_options = XML_PARSE_DTDVALID;
+	int xml_options = XML_PARSE_DTDVALID;
 
 	xmlDocPtr doc = xmlReadFile(filename, NULL, xml_options);
 	if( doc ) {
@@ -1472,7 +1469,6 @@ int read_config(const char* config_name)
 	get_option_int(global_config_child, "hack_debug", &hack_debug);
 	get_option_int(global_config_child, "hack_mngwrite", &hack_mngwrite);
 	get_option_int(global_config_child, "use_nonrunnable", &use_nonrunnable);
-	get_option_int(global_config_child, "validate_listxml", &validate_listxml);
 	get_option_str(global_config_child, "output_folder", output_folder, sizeof(output_folder));
 	get_option_str_ptr(global_config_child, "device_file", &global_device_file);
 	get_option_int(global_config_child, "use_isbios", &use_isbios);
@@ -1639,7 +1635,6 @@ int main(int argc, char *argv[])
 	printf("xpath_expr: %s\n", xpath_expr ? xpath_expr : "");
 	printf("use_devices: %d\n", use_devices);
 	printf("use_nonrunnable: %d\n", use_nonrunnable);
-	printf("validate_listxml: %d\n", validate_listxml);
 	if( global_device_file && (strlen(global_device_file) > 0) )
 		printf("using device_file: %s\n", global_device_file);
 	printf("use_isbios: %d\n", use_isbios);

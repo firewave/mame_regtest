@@ -27,6 +27,18 @@ mame_regtest
 			- empty options will not properly overwrite/reset existing options to default values
 			- print config values in read function (or put in array and print function for array)
 			- cleanup post-loading code of configuration (checks, output etc.)
+			- rewrite config
+				- config_struct {
+					const char* name
+					int type
+					void* value
+				}
+				- config_init(config_struct)
+				- config_read(file, config_name)
+				- config_read(doc, config_name)
+				- config_get_int()
+				- config_get_str()
+				- config_get_ptr()
 		- store both output file states in case of autosave
 		- write temporary files to mrt_tmp folder 
 			- tmp_stderr
@@ -49,9 +61,6 @@ mame_regtest
 		- add printf-format support to append_string()
 		- switch to binaries/includes from http://www.zlatkovic.com/pub/libxml/
 		- make "xpath_results.xml" configurable
-		- remove "validate_listxml" option and always do it
-		- log "validate_listxml" errors somewhere
-		- log "test_createconfig" errors somewhere
 		- change CWD to dummy_root to also get some debug files created by MAME
 		- add -log output to XMLs?
 		- run test_createconfig in dummy_root to avoid usage of existing mame.ini
@@ -69,18 +78,6 @@ mame_regtest
 		- read images from folder with same name as device (look for XML first / specify folder in XML?)
 		- do not run drivers with mandatory devices without an image, if a device list exists
 		- add version number to create_report and create_image_xml (0.1 or the actual mame_regtest version)
-		- rewrite config
-			- config_struct {
-				const char* name
-				int type
-				void* value
-			}
-			- config_init(config_struct)
-			- config_read(file, config_name)
-			- config_read(doc, config_name)
-			- config_get_int()
-			- config_get_str()
-			- config_get_ptr()
 		- use functions for lists
 			- list_create()
 			- list_next_entry()
@@ -99,7 +96,7 @@ mame_regtest
 		- add soft/hardreset tests after each call like "autosave" test?
 		- use grep to diff each file
 			- regex for auto.sta "^[+-].*auto.sta"
-		- add information about -cc and -listxml in result XMLs?
+		- add information about command-line option calls in result XMLs?
 		- check for "cheat expression" errors in stderr
 		- move the <driver_string> code to a function (append_driver_string())
 

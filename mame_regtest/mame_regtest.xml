@@ -4,7 +4,6 @@
 		<!-- input options -->
 		<option name='executable' value='mame.exe'/>
 		<option name='listxml_file' value=''/>
-		<option name='validate_listxml' value=''/>
 		
 		<!-- environment options -->
 		<option name='rompath' value=''/>
