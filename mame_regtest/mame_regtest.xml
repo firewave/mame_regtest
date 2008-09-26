@@ -61,6 +61,7 @@
 		<option name='hack_ftr' value=''/>
 		<option name='hack_biospath' value=''/>
 		<option name='hack_mngwrite' value=''/>
+		<option name='hack_pinmame' value=''/>
 	</global>
 	<mess>
 		<option name='executable' value='mess.exe'/>

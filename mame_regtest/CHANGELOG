@@ -375,6 +375,7 @@
 	- quoted all parts of command-line string, that could contain whitespaces as well as the whole command-line string
 	- added function append_quoted_string()
 	- added function append_driver_info()
+	- added option "hack_pinmame" (still hangs at warning screens)
 
 	create_report
 	- added "report 1", which creates a file with all driver, that didn't return 0

@@ -150,6 +150,7 @@ static const char* const stdout_temp_file_str = "tmp_stdout";
 static const char* const stderr_temp_file_str = "tmp_stderr";
 static const char* const dummy_ini_folder_str = "dummy_ini";
 static char current_path[MAX_PATH] = "";
+static int hack_pinmame = 0;
 
 static unsigned const char png_sig[8] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
 static unsigned const char mng_sig[8] = { 0x8a, 0x4d, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
@@ -199,18 +200,21 @@ static int is_absolute_path(const char* path)
 	return 0;
 }
 
-/*
-static void read_and_strip_sampleof()
+static void strip_sampleof_pinmame(const char* listxml_in, const char* listxml_out)
 {
-	FILE* in_fd = fopen("pinmame_listxml.xml", "rb");
+	FILE* in_fd = fopen(listxml_in, "rb");
 	
-	FILE* out_fd = fopen("pinmame_listxml_fixed.xml", "wb");
+	FILE* out_fd = fopen(listxml_out, "wb");
 	
 	if( in_fd ) {
 		const size_t sampleof_size = strlen(" sampleof=\"pinmame\"");
 		char buf[4096];
 		while ( fgets(buf, sizeof(buf), in_fd) ) {
-			char* pos = strstr(buf, " sampleof=\"pinmame\"");
+			char* pos = strstr(buf, "x&os2732.u2");
+			if( pos )
+				continue;
+
+			pos = strstr(buf, " sampleof=\"pinmame\"");
 			if( pos ) {
 				char* pos2 = pos+sampleof_size;
 				*pos = '\0';
@@ -228,7 +232,6 @@ static void read_and_strip_sampleof()
 		in_fd = NULL;
 	}
 }
-*/
 
 static const char* get_inifile()
 {
@@ -806,6 +809,11 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 	}
 	append_string(&sys, " -inipath ");
 	append_quoted_string(&sys, dummy_ini_folder);
+	if( hack_pinmame ) {
+		append_string(&sys, " -skip_disclaimer");
+		append_string(&sys, " -skip_gameinfo");
+	}
+
 	append_string(&sys, " > ");
 	append_quoted_string(&sys, stdout_temp_file);
 	
@@ -1191,8 +1199,16 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 		
 		xmlChar* sourcefile = xmlGetProp(game_child, (const xmlChar*)"sourcefile");
 		if( !sourcefile ) {
-			printf("'sourcefile' attribute is empty\n");
-			return;
+			if( hack_pinmame ) {
+				/* set a dummy sourcefile for PinMAME */
+				char* sourcefile_c = NULL;
+				append_string(&sourcefile_c, "pinmame.c");
+				sourcefile = (xmlChar*)sourcefile_c;
+			}
+			else {
+				printf("'sourcefile' attribute is empty\n");
+				return;
+			}
 		}
 
 		*new_driv_inf = (struct driver_info*)malloc(sizeof(struct driver_info));
@@ -1534,6 +1550,7 @@ int read_config(const char* config_name)
 	get_option_int(global_config_child, "print_xpath_results", &print_xpath_results);
 	get_option_int(global_config_child, "use_log", &use_log);
 	get_option_int(global_config_child, "test_softreset", &test_softreset);	
+	get_option_int(global_config_child, "hack_pinmame", &hack_pinmame);	
 	
 	return 1;
 }
@@ -1752,6 +1769,7 @@ int main(int argc, char *argv[])
 	printf("hack_biospath: %d\n", hack_biospath);
 	printf("hack_debug: %d\n", hack_debug);
 	printf("hack_mngwrite: %d\n", hack_mngwrite);
+	printf("hack_pinmame: %d\n", hack_pinmame);
 	
 	printf("\n"); /* for output formating */
 
@@ -1786,7 +1804,23 @@ int main(int argc, char *argv[])
 		*/
 
 		system(mame_call);
-		
+	
+		if( hack_pinmame ) {
+			char* tmp_gamelist_xml = NULL;
+			/* TODO: quoting */
+			append_string(&tmp_gamelist_xml, temp_folder);
+			append_string(&tmp_gamelist_xml, FILESLASH);
+			append_string(&tmp_gamelist_xml, "listxml.xml");
+
+			strip_sampleof_pinmame(gamelist_xml_file, tmp_gamelist_xml);
+			
+			remove(gamelist_xml_file);
+			copy_file(tmp_gamelist_xml, gamelist_xml_file);
+			
+			free(tmp_gamelist_xml);
+			tmp_gamelist_xml = NULL;
+		}
+	
 		free(mame_call);
 		mame_call = NULL;
 	}
