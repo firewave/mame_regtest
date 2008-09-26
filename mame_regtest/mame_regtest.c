@@ -118,7 +118,8 @@ static const char* const config_xml = "mame_regtest.xml";
 static const char* const def_xpath_1 = "/mame/game";
 static const char* const def_xpath_2 = "/mess/machine";
 static char* xpath_expr = NULL;
-static const char* const debugscript_file = "mrt_temp"FILESLASH"mrt_debugscript";
+static char* debugscript_file = NULL;
+static const char* const debugscript_file_str = "mrt_debugscript";
 static xmlDocPtr global_config_doc = NULL;
 static xmlNodePtr global_config_root = NULL;
 static int hack_mngwrite = 0;
@@ -140,10 +141,15 @@ static int osdprocessors = 1;
 static int print_xpath_results = 0;
 static int use_log = 0;
 static int test_softreset = 0;
-static const char* const temp_folder = "mrt_temp";
-static const char* const stdout_temp_file = "mrt_temp"FILESLASH"tmp_stdout";
-static const char* const stderr_temp_file = "mrt_temp"FILESLASH"tmp_stderr";
-static const char* const dummy_ini_folder = "mrt_temp"FILESLASH"dummy_ini";
+static char* temp_folder = NULL;
+static char* stdout_temp_file = NULL;
+static char* stderr_temp_file = NULL;
+static char* dummy_ini_folder = NULL;
+static const char* const temp_folder_str = "mrt_temp";
+static const char* const stdout_temp_file_str = "tmp_stdout";
+static const char* const stderr_temp_file_str = "tmp_stderr";
+static const char* const dummy_ini_folder_str = "dummy_ini";
+static char current_path[MAX_PATH] = "";
 
 static unsigned const char png_sig[8] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
 static unsigned const char mng_sig[8] = { 0x8a, 0x4d, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
@@ -164,6 +170,25 @@ static void open_mng_and_skip_header(const char* mng_name, FILE** mng_fd);
 static int internal_get_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void free_config();
 static void cleanup_and_exit(int errcode, const char* errstr);
+
+void append_quoted_string(char** str, const char* str_to_append)
+{
+	append_string(str, "\"");
+	append_string(str, str_to_append);
+	append_string(str, "\"");	
+}
+
+static int is_absolute_path(const char* path)
+{
+	int len = strlen(path);
+
+	if(len >= 1 && path[0] == '/')
+		return 1;
+	if(len >= 3 && path[1] == ':' && path[2] == ':')
+		return 1;
+		
+	return 0;
+}
 
 /*
 static void read_and_strip_sampleof()
@@ -234,16 +259,13 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 		}
 		append_string(sys, ".valgrind_%p");
 		append_string(sys, " ");
-
-		append_string(sys, mame_exe);
 	}
-	else
 #else
 	/* shut up compiler */
 	(void)de;
 	(void)callstr;
 #endif
-		append_string(sys, mame_exe);
+	append_quoted_string(sys, mame_exe);
 }
 
 static int mrt_mkdir(const char* path)
@@ -498,6 +520,11 @@ static void convert_xpath_expr(char** real_xpath_expr)
 
 static void cleanup_and_exit(int errcode, const char* errstr)
 {
+	if( debugscript_file ) {
+		free(debugscript_file);
+		debugscript_file = NULL;
+	}	
+
 #if USE_VALGRIND
 	if( valgrind_parameters ) {
 		free(valgrind_parameters);
@@ -522,9 +549,24 @@ static void cleanup_and_exit(int errcode, const char* errstr)
 		xmlFreeDoc(global_config_doc);
 		global_config_doc = NULL;
 	}
-	remove(debugscript_file);
 
+	if( stderr_temp_file ) {
+		free(stderr_temp_file);
+		stderr_temp_file = NULL;
+	}
+	if( dummy_ini_folder ) {
+		free(dummy_ini_folder);
+		dummy_ini_folder = NULL;
+	}
+	if( stdout_temp_file ) {
+		free(stdout_temp_file);
+		stdout_temp_file = NULL;
+	}
+	
 	clear_directory(temp_folder, 1);
+	free(temp_folder);
+	temp_folder = NULL;
+
 	clear_directory(dummy_root_str, 1);
 
 	printf("%s\n", errstr);
@@ -712,8 +754,12 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 	
 	/* DEBUG!!! */
 	/* return 1; */
-	
+
 	char* sys = NULL;
+	
+	/* the whole command-line has to be quoted - begin */
+	append_string(&sys, "\" ");
+	
 	get_executable(&sys, de, NULL);
 	append_string(&sys, " ");
 	append_string(&sys, de->name);
@@ -735,9 +781,8 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 			(images->device_file && xmlStrlen(images->device_file) > 0) ) {
 			append_string(&sys, " -");
 			append_string(&sys, (const char*)images->device_type);
-			append_string(&sys, " \"");
-			append_string(&sys, (const char*)images->device_file);
-			append_string(&sys, "\"");
+			append_string(&sys, " ");
+			append_quoted_string(&sys,  (const char*)images->device_file);
 		}
 		
 		images = images->next;
@@ -754,17 +799,20 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 		}
 		append_string(&sys, ".mng");
 	}
-	if( additional_options ) {
+	if( additional_options && (strlen(additional_options) > 0) ) {
 		append_string(&sys, " ");
 		append_string(&sys, additional_options);
 	}
 	append_string(&sys, " -inipath ");
-	append_string(&sys, dummy_ini_folder);
+	append_quoted_string(&sys, dummy_ini_folder);
 	append_string(&sys, " > ");
-	append_string(&sys, stdout_temp_file);
+	append_quoted_string(&sys, stdout_temp_file);
 	
 	append_string(&sys, " 2> ");
-	append_string(&sys, stderr_temp_file);
+	append_quoted_string(&sys, stderr_temp_file);
+
+	/* the whole command-line has to be quoted - end */
+	append_string(&sys, " \"");
 
 	/*
 	printf("system call: %s\n", sys);
@@ -1534,6 +1582,14 @@ int main(int argc, char *argv[])
 		printf("usage: mame_regtest <configname>\n");
 		exit(1);
 	}
+	
+	if( getcwd(current_path, sizeof(current_path)) == NULL ) {
+		printf("could not get current working path\n");
+		exit(1);
+	}
+	printf("\n");
+	printf("current path: %s\n", current_path);
+	printf("\n");
 
 	if( access(config_xml, F_OK) == -1 ) {
 		printf("'%s' does not exist\n", config_xml);
@@ -1573,6 +1629,15 @@ int main(int argc, char *argv[])
 		cleanup_and_exit(1, "aborting");
 		
 	printf("\n"); /* for output formating */
+	
+	if( is_absolute_path(mame_exe) == 0 ) {
+		char* tmp_mame_exe = NULL;
+		append_string(&tmp_mame_exe, current_path);
+		append_string(&tmp_mame_exe, FILESLASH);
+		append_string(&tmp_mame_exe, mame_exe);
+		free(mame_exe);
+		mame_exe = tmp_mame_exe;
+	}
 	
 	if( !mame_exe || (strlen(mame_exe) == 0) ) {
 		printf("'executable' is empty or missing\n");
@@ -1623,6 +1688,10 @@ int main(int argc, char *argv[])
 			cleanup_and_exit(1, "aborting");
 		}
 	}
+	
+	append_string(&temp_folder, current_path);
+	append_string(&temp_folder, FILESLASH);
+	append_string(&temp_folder, temp_folder_str);
 
 	if( (access(temp_folder, F_OK) != 0) && mrt_mkdir(temp_folder) != 0 ) {
 		printf("could not create folder '%s'\n", temp_folder);
@@ -1636,6 +1705,18 @@ int main(int argc, char *argv[])
 			cleanup_and_exit(1, "aborting");
 		}
 	}
+
+	append_string(&stdout_temp_file, temp_folder);
+	append_string(&stdout_temp_file, FILESLASH);
+	append_string(&stdout_temp_file, stdout_temp_file_str);
+
+	append_string(&stderr_temp_file, temp_folder);
+	append_string(&stderr_temp_file, FILESLASH);
+	append_string(&stderr_temp_file, stderr_temp_file_str);
+
+	append_string(&dummy_ini_folder, temp_folder);
+	append_string(&dummy_ini_folder, FILESLASH);
+	append_string(&dummy_ini_folder, dummy_ini_folder_str);
 	
 #if USE_VALGRIND
 	printf("valgrind: %d\n", use_valgrind);
@@ -1748,6 +1829,10 @@ int main(int argc, char *argv[])
 	clear_directory(dummy_root_str, 1);
 
 	if( (hack_debug || is_debug) && use_debug ) {
+		append_string(&debugscript_file, temp_folder);
+		append_string(&debugscript_file, FILESLASH);
+		append_string(&debugscript_file, debugscript_file_str);		
+		
 		FILE* debugscript_fd = fopen(debugscript_file, "w");
 		if( !debugscript_fd ) {
 			printf("could not open %s\n", debugscript_file);

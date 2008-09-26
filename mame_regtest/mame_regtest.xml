@@ -9,9 +9,6 @@
 		<option name='rompath' value=''/>
 		<option name='osdprocessors' value='1'/>
 
-		<!-- comparsion options -->		
-		<option name='write_mng' value=''/>
-
 		<!-- processing options -->
 		<option name='pause_interval' value='0'/>
 		<option name='use_devices' value=''/>
@@ -41,6 +38,7 @@
 		<option name='use_autosave' value=''/>
 		<option name='use_throttle' value=''/>
 		<option name='use_debug' value=''/>
+		<option name='write_mng' value=''/>
 		<option name='additional_options' value=''/>
 		
 		<!-- output files -->

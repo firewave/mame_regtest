@@ -17,7 +17,7 @@ mame_regtest
 		- multipass XPath (e.g. first select m6502 cpus and then all with autosave from those nodes)
 		- add MAME version to hack_mngwrite description (change seems to be in 0.108u5)
 		- properly handle invalid XPath expressions (check for DRIVER_ROOT / react on libxml2 errors)
-		- add more paths (like artwork and sample)
+		- add more input paths to configuration (like artwork and samples)
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
 		- change parse_mng to parse single frames
 		- multithreading mode
@@ -52,12 +52,10 @@ mame_regtest
 			- add parse flag?
 			- only use on relative path entries (x:\, /, \\, etc.)
 			- use folder node in-between to be able to switch folders
-		- proper handling for absolute paths in options
+		- test absolute paths in INI (debugfile / rompath)
 		- add printf-format support to append_string()
 		- switch to binaries/includes from http://www.zlatkovic.com/pub/libxml/
-		- make "xpath_results.xml" configurable
 		- change CWD to dummy_root to also get some debug files created by MAME
-		- add -log output to XMLs?
 		- run test_createconfig in dummy_root to avoid usage of existing mame.ini
 		- calls within gdb? (can gdb be scripted?)
 		- use the following debugger commands
@@ -65,10 +63,19 @@ mame_regtest
 			- hardreset (causes endless restarts of MAME)
 			- snap
 		- add option to use a specific debugscript?
-		- add hack for PinMAME -listxml (strip duplicated "sampleof" attribute / has stray & in rom name)
+		- add hack for PinMAME 
+			- -listxml (strip duplicated "sampleof" attribute / has stray & in rom name)
+			- no "sourcefile" attribute
+			- OK screens (-skip_disclaimer / -skip_gameinfo)
 		- write comparison tool
 			- parse dir A and check dir B for missing file
 			- parse dir B and check dir A for new files
+			- show the following
+				- files differ (PNG/MNG frame diffs)
+				- exitcode differs
+				- files missing
+				- new files
+				- stdout/stderr differs
 		- better way to align the dummy_root INI lines
 		- read images from folder with same name as device (look for XML first / specify folder in XML?)
 		- do not run drivers with mandatory devices without an image, if a device list exists
@@ -89,11 +96,13 @@ mame_regtest
 			- call "-listdevices" for MESS?
 		- use -aviwrite
 		- add soft/hardreset tests after each call like "autosave" test?
+			- how will it work with -autosave?
 		- use grep to diff each file
 			- regex for auto.sta "^[+-].*auto.sta"
-		- add information about command-line option calls in result XMLs?
+		- add clean/merged configuration to output data
 		- check for "cheat expression" errors in stderr
-		- move the <driver_string> code to a function (append_driver_string())
+		- fix display of autosave drivers in reports
+		- polystar shows just a "<" as result
 
 	Obsolete/External:
 		- HTML report

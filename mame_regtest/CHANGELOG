@@ -356,8 +356,7 @@
 	- added a small tool called "create_report", which will create reports out of the output XMLs
 	- removed option "result_file" in favor of "report 1"
 	- removed html_enc parameter from print_driver_info()
-	- added option "use_log" to write the -log output
-	- removed "log_devices" (MESS already has the -listdevices option)
+	- removed option "log_devices", because MESS already has the -listdevices option
 	- changed valgrind outfile file to <driver_string>.valgrind_<pid>
 	- valgrind output files are now written to the "output_folder"
 	- added option "valgrind_binary" to specify the valgrind binary location
@@ -369,6 +368,12 @@
 		- tmp_stderr
 		- mrt_debugscript
 		- dummy_ini folder
+	- added function is_absolute_path()
+	- changed most relative paths to be absolute ones
+	- restructed get_executable() a bit
+	- empty "additional_options" were appended
+	- quoted all parts of command-line string, that could contain whitespaces as well as the whole command-line string
+	- added function append_quoted_string()
 
 	create_report
 	- added "report 1", which creates a file with all driver, that didn't return 0
