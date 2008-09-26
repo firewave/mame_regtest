@@ -171,6 +171,15 @@ static int internal_get_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned
 static void free_config();
 static void cleanup_and_exit(int errcode, const char* errstr);
 
+void append_driver_info(char** str, struct driver_entry* de)
+{
+	append_string(str, de->name);
+	if( strlen(de->postfix) > 0 ) {
+		append_string(str, "_");
+		append_string(str, de->postfix);
+	}
+}
+
 void append_quoted_string(char** str, const char* str_to_append)
 {
 	append_string(str, "\"");
@@ -248,11 +257,7 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 		append_string(sys, output_folder);
 		append_string(sys, FILESLASH);
 		if( de ) {
-			append_string(sys, de->name);
-			if( strlen(de->postfix) > 0 ) {
-				append_string(sys, "_");
-				append_string(sys, de->postfix);
-			}
+			append_driver_info(sys, de);
 		}
 		else {
 			append_string(sys, callstr);			
@@ -792,11 +797,7 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 			append_string(&sys, " -mngwrite mng"FILESLASH);
 		else
 			append_string(&sys, " -mngwrite ");
-		append_string(&sys, de->name);
-		if( strlen(de->postfix) > 0 ) {
-			append_string(&sys, "_");
-			append_string(&sys, de->postfix);
-		}
+		append_driver_info(&sys, de);
 		append_string(&sys, ".mng");
 	}
 	if( additional_options && (strlen(additional_options) > 0) ) {
@@ -984,12 +985,8 @@ static int execute_mame2(struct driver_entry* de)
 		char* outputdir = NULL;
 		append_string(&outputdir, output_folder);
 		append_string(&outputdir, FILESLASH);
-		append_string(&outputdir, de->name);
+		append_driver_info(&outputdir, de);
 
-		if( strlen(de->postfix) > 0 ) {
-			append_string(&outputdir, "_");
-			append_string(&outputdir, de->postfix);
-		}
 		if( rename(dummy_root_str, outputdir) != 0 )
 			printf("could not rename '%s' to '%s'\n", dummy_root_str, outputdir);
 
@@ -1003,12 +1000,7 @@ static int execute_mame2(struct driver_entry* de)
 	char* outputname = NULL;
 	append_string(&outputname, output_folder);
 	append_string(&outputname, FILESLASH);
-	append_string(&outputname, de->name);
-
-	if( strlen(de->postfix) > 0 ) {
-		append_string(&outputname, "_");
-		append_string(&outputname, de->postfix);
-	}
+	append_driver_info(&outputname, de);
 	append_string(&outputname, ".xml");
 
 	xmlSaveFormatFileEnc(outputname, output_doc, "UTF-8", 1);
