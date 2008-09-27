@@ -41,6 +41,13 @@ void append_string(char** str, const char* str_to_append)
 	}
 }
 
+void append_quoted_string(char** str, const char* str_to_append)
+{
+	append_string(str, "\"");
+	append_string(str, str_to_append);
+	append_string(str, "\"");
+}
+
 int read_file(const char* file, char** content)
 {
 	FILE* fd = fopen(file, "rb");
@@ -179,4 +186,16 @@ void parse_directory(const char* dirname,
 	}
 	else
 		printf("parse_directory() - could not open '%s'\n", dirname);
+}
+
+int is_absolute_path(const char* path)
+{
+	int len = strlen(path);
+
+	if(len >= 1 && path[0] == '/')
+		return 1;
+	if(len >= 3 && path[1] == ':' && path[2] == ':')
+		return 1;
+
+	return 0;
 }

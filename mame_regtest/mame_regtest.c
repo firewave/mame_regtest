@@ -181,25 +181,6 @@ void append_driver_info(char** str, struct driver_entry* de)
 	}
 }
 
-void append_quoted_string(char** str, const char* str_to_append)
-{
-	append_string(str, "\"");
-	append_string(str, str_to_append);
-	append_string(str, "\"");	
-}
-
-static int is_absolute_path(const char* path)
-{
-	int len = strlen(path);
-
-	if(len >= 1 && path[0] == '/')
-		return 1;
-	if(len >= 3 && path[1] == ':' && path[2] == ':')
-		return 1;
-		
-	return 0;
-}
-
 static void strip_sampleof_pinmame(const char* listxml_in, const char* listxml_out)
 {
 	FILE* in_fd = fopen(listxml_in, "rb");

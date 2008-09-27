@@ -30,6 +30,7 @@
 
 int mrt_getch();
 void append_string(char** str, const char* str_to_append);
+void append_quoted_string(char** str, const char* str_to_append);
 int read_file(const char* file, char** content);
 int copy_file(const char* source, const char* dest);
 
@@ -56,5 +57,7 @@ void parse_directory(const char* dirname,
 						int recursive, 
 						void (*callback)(struct parse_callback_data* pcd),
 						void* user_data);
+
+int is_absolute_path(const char* path);
 
 #endif

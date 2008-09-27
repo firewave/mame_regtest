@@ -103,6 +103,8 @@ mame_regtest
 		- check for "cheat expression" errors in stderr
 		- fix display of autosave drivers in reports
 		- polystar shows just a "<" as result
+		- fix compilation on systems, that already have a htonl() function
+		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER?)
 
 	Obsolete/External:
 		- HTML report
