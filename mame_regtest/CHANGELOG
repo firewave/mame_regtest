@@ -384,6 +384,7 @@
 	- re-grouped the static variables
 	- removed unnecessary static variable "use_custom_list"
 	- moved the configuration code to config.c/.h
+	- cleaned up global variables
 
 	create_report
 	- added "report 1", which creates a file with all driver, that didn't return 0

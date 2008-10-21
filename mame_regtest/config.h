@@ -13,7 +13,7 @@ struct config_entry {
 	void* value;
 };
 
-int config_init(const char* config_xml);
+int config_init(const char* config_xml, const char* root_node);
 int config_read(struct config_entry config_entries[], const char* config_name);
 void config_free(struct config_entry config_entries[]);
 

@@ -13,7 +13,7 @@
 static xmlDocPtr global_config_doc = NULL;
 static xmlNodePtr global_config_root = NULL;
 
-int config_init(const char* config_xml)
+int config_init(const char* config_xml, const char* root_node)
 {
 	if( access(config_xml, F_OK) == -1 ) {
 		printf("'%s' does not exist\n", config_xml);
@@ -33,7 +33,7 @@ int config_init(const char* config_xml)
 		return 0;
 	}
 
-	if( xmlStrcmp(global_config_root->name, (const xmlChar*)"mame_regtest") != 0 ) {
+	if( xmlStrcmp(global_config_root->name, (const xmlChar*)root_node) != 0 ) {
 		printf("invalid configuration - no 'mame_regtest' element\n");
 		return 0;
 	}

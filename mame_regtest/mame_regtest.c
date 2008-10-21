@@ -91,7 +91,7 @@ struct driver_entry {
 static int app_type = 0;
 static int is_debug = 0;
 static unsigned int exec_counter = 0;
-static int xpath_placeholder_size = 11;
+static const int xpath_placeholder_size = 11;
 
 static xmlChar* app_ver = NULL;
 static char* debugscript_file = NULL;
@@ -103,21 +103,8 @@ static char* dummy_ini_folder = NULL;
 static char current_path[MAX_PATH] = "";
 
 /* constant string variables */
-#if USE_VALGRIND
-static const char* const valgrind_binary_def = "valgrind";
-static const char* const valgrind_parameters_def = "--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --leak-resolution=med";
-static const char* const valgring_log_str ="--log-file=";
-#endif
-/* TODO: rename */
-static const char* const config_xml = "mame_regtest.xml";
-static const char* const def_xpath_1 = "/mame/game";
-static const char* const def_xpath_2 = "/mess/machine";
-static const char* const debugscript_file_str = "mrt_debugscript";
 static const char* const xpath_placeholder = "DRIVER_ROOT";
-static const char* const temp_folder_str = "mrt_temp";
-static const char* const stdout_temp_file_str = "tmp_stdout";
-static const char* const stderr_temp_file_str = "tmp_stderr";
-static const char* const dummy_ini_folder_str = "dummy_ini";
+static const char* const dummy_root_str = "dummy_root";
 
 /* PNG/MNG signatures */
 static unsigned const char png_sig[8] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
@@ -125,8 +112,6 @@ static unsigned const char mng_sig[8] = { 0x8a, 0x4d, 0x4e, 0x47, 0x0d, 0x0a, 0x
 static unsigned const char IDAT_name[4] = { 'I', 'D', 'A', 'T' };
 static unsigned const char IEND_name[4] = { 'I', 'E', 'N', 'D' };
 static unsigned const char MEND_name[4] = { 'M', 'E', 'N', 'D' };
-
-static const char* const dummy_root_str = "dummy_root";
 
 enum {
 	APP_UNKNOWN = 0,
@@ -283,7 +268,7 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 		append_string(sys, " ");
 		append_string(sys, config_valgrind_parameters);
 		append_string(sys, " ");
-		append_string(sys, valgring_log_str);
+		append_string(sys, "--log-file=");
 		append_string(sys, config_output_folder);
 		append_string(sys, FILESLASH);
 		if( de ) {
@@ -530,9 +515,9 @@ static void convert_xpath_expr(char** real_xpath_expr)
 			*pos1 = 0;
 		
 		if( app_type == APP_MAME )
-			append_string(real_xpath_expr, def_xpath_1);
+			append_string(real_xpath_expr, "/mame/game");
 		else if( app_type == APP_MESS )
-			append_string(real_xpath_expr, def_xpath_2);
+			append_string(real_xpath_expr, "/mess/machine");
 			
 		append_string(real_xpath_expr, pos);
 		
@@ -1433,7 +1418,7 @@ int main(int argc, char *argv[])
 	printf("\n");
 	
 	printf("initializing configuration\n");
-	int config_res = config_init(config_xml);
+	int config_res = config_init("mame_regtest.xml", "mame_regtest");
 	if( !config_res )
 		cleanup_and_exit(1, "aborting");
 
@@ -1510,7 +1495,7 @@ int main(int argc, char *argv[])
 	
 	append_string(&temp_folder, current_path);
 	append_string(&temp_folder, FILESLASH);
-	append_string(&temp_folder, temp_folder_str);
+	append_string(&temp_folder, "mrt_temp");
 
 	if( (access(temp_folder, F_OK) != 0) && mrt_mkdir(temp_folder) != 0 ) {
 		printf("could not create folder '%s'\n", temp_folder);
@@ -1527,15 +1512,15 @@ int main(int argc, char *argv[])
 
 	append_string(&stdout_temp_file, temp_folder);
 	append_string(&stdout_temp_file, FILESLASH);
-	append_string(&stdout_temp_file, stdout_temp_file_str);
+	append_string(&stdout_temp_file, "tmp_stdout");
 
 	append_string(&stderr_temp_file, temp_folder);
 	append_string(&stderr_temp_file, FILESLASH);
-	append_string(&stderr_temp_file, stderr_temp_file_str);
+	append_string(&stderr_temp_file, "tmp_stderr");
 
 	append_string(&dummy_ini_folder, temp_folder);
 	append_string(&dummy_ini_folder, FILESLASH);
-	append_string(&dummy_ini_folder, dummy_ini_folder_str);
+	append_string(&dummy_ini_folder, "dummy_ini");
 	
 #if USE_VALGRIND
 	printf("valgrind: %d\n", config_use_valgrind);
@@ -1543,10 +1528,10 @@ int main(int argc, char *argv[])
 	if( config_use_valgrind )
 	{
 		if( !config_valgrind_binary || (strlen(config_valgrind_binary) == 0) )
-			append_string(&config_valgrind_binary, valgrind_binary_def);
+			append_string(&config_valgrind_binary, "valgrind");
 		printf("valgrind_binary: %s\n", config_valgrind_binary);
 		if( !config_valgrind_parameters || (strlen(config_valgrind_parameters) == 0) )
-			append_string(&config_valgrind_parameters, valgrind_parameters_def);
+			append_string(&config_valgrind_parameters, "--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --leak-resolution=med");
 		printf("valgrind_parameters: %s\n", config_valgrind_parameters);
 	}
 #endif
@@ -1666,7 +1651,7 @@ int main(int argc, char *argv[])
 	if( (config_hack_debug || is_debug) && config_use_debug ) {
 		append_string(&debugscript_file, temp_folder);
 		append_string(&debugscript_file, FILESLASH);
-		append_string(&debugscript_file, debugscript_file_str);		
+		append_string(&debugscript_file, "mrt_debugscript");		
 		
 		FILE* debugscript_fd = fopen(debugscript_file, "w");
 		if( !debugscript_fd ) {
