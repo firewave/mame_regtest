@@ -376,6 +376,8 @@
 	- added function append_quoted_string()
 	- added function append_driver_info()
 	- added option "hack_pinmame" (still hangs at warning screens)
+	- CWD is changed to dummy_root to get all output files (including error.log)
+	- removed option "use_log", because it doesn't need any special handling anymore and can be specified via the "additional_options" option
 
 	create_report
 	- added "report 1", which creates a file with all driver, that didn't return 0

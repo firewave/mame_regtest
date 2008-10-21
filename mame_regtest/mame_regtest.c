@@ -139,7 +139,6 @@ static char* additional_options = NULL;
 static int skip_mandatory = 0;
 static int osdprocessors = 1;
 static int print_xpath_results = 0;
-static int use_log = 0;
 static int test_softreset = 0;
 static char* temp_folder = NULL;
 static char* stdout_temp_file = NULL;
@@ -431,14 +430,6 @@ static int create_dummy_root_ini()
 
 		FILE* fp = fopen(app_string, "w");
 		if( fp ) {
-			fprintf(fp, "cfg_directory      ."FILESLASH"dummy_root"FILESLASH"cfg\n");
-			fprintf(fp, "nvram_directory    ."FILESLASH"dummy_root"FILESLASH"nvram\n");
-			fprintf(fp, "memcard_directory  ."FILESLASH"dummy_root"FILESLASH"memcard\n");
-			fprintf(fp, "input_directory    ."FILESLASH"dummy_root"FILESLASH"inp\n");
-			fprintf(fp, "state_directory    ."FILESLASH"dummy_root"FILESLASH"sta\n");
-			fprintf(fp, "snapshot_directory ."FILESLASH"dummy_root"FILESLASH"snap\n");
-			fprintf(fp, "diff_directory     ."FILESLASH"dummy_root"FILESLASH"diff\n");
-			fprintf(fp, "comment_directory  ."FILESLASH"dummy_root"FILESLASH"comments\n");
 			fprintf(fp, "video              none\n"); /* disable video output */
 			if( !use_sound )
 				fprintf(fp, "sound              0\n"); /* disable sound output */
@@ -465,8 +456,6 @@ static int create_dummy_root_ini()
 				else
 					fprintf(fp, "biospath           %s\n", rompath_folder); /* old biospath for MESS */
 			}
-			if( use_log )
-				fprintf(fp, "log                1\n");
 			fclose(fp);
 			res = 1;
 		}
@@ -810,31 +799,15 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 	mrt_getch();
 	*/
 
+	/* TODO: errorhandling */
+	mrt_mkdir(dummy_root_str);
+	int ch_res = chdir(dummy_root_str);
 	int sys_res = system(sys);
+	ch_res = chdir(current_path);
 	
 	free(sys);
 	sys = NULL;
 
-	if( use_log ) {
-		char* new_errorlog = NULL;
-		append_string(&new_errorlog, output_folder);
-		append_string(&new_errorlog, FILESLASH);
-		append_string(&new_errorlog, de->name);
-		if( strlen(de->postfix) > 0 ) {
-			append_string(&new_errorlog, "_");
-			append_string(&new_errorlog, de->postfix);
-		}
-		append_string(&new_errorlog, ".log");
-		
-		if( copy_file("error.log", new_errorlog) == -1 )
-			printf("could not copy 'error.log' to '%s'\n", new_errorlog);
-		
-		remove("error.log");
-		
-		free(new_errorlog);
-		new_errorlog = NULL;
-	}
-	
 	if( result ) {
 		*result = xmlNewNode(NULL, (const xmlChar*)"result");
 		char tmp[128];
@@ -1529,7 +1502,6 @@ int read_config(const char* config_name)
 	get_option_int(global_config_child, "skip_mandatory", &skip_mandatory);
 	get_option_int(global_config_child, "osdprocessors", &osdprocessors);
 	get_option_int(global_config_child, "print_xpath_results", &print_xpath_results);
-	get_option_int(global_config_child, "use_log", &use_log);
 	get_option_int(global_config_child, "test_softreset", &test_softreset);	
 	get_option_int(global_config_child, "hack_pinmame", &hack_pinmame);	
 	
@@ -1743,7 +1715,6 @@ int main(int argc, char *argv[])
 	printf("skip_mandatory: %d\n", skip_mandatory);
 	printf("osdprocessors: %d\n", osdprocessors);
 	printf("print_xpath_results: %d\n", print_xpath_results);
-	printf("use_log: %d\n", use_log);
 	printf("test_softreset: %d\n", test_softreset);
 
 	printf("hack_ftr: %d\n", hack_ftr);

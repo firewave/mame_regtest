@@ -55,7 +55,6 @@ mame_regtest
 		- test absolute paths in INI (debugfile / rompath)
 		- add printf-format support to append_string()
 		- switch to binaries/includes from http://www.zlatkovic.com/pub/libxml/
-		- change CWD to dummy_root to also get some debug files created by MAME
 		- run test_createconfig in dummy_root to avoid usage of existing mame.ini
 		- calls within gdb? (can gdb be scripted?)
 		- use the following debugger commands
@@ -105,6 +104,8 @@ mame_regtest
 		- polystar shows just a "<" as result
 		- fix compilation on systems, that already have a htonl() function
 		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER?)
+		- move the results and pages on the wiki
+		- add option with folder for device XMLs?
 
 	Obsolete/External:
 		- HTML report
