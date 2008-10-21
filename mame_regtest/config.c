@@ -34,7 +34,7 @@ int config_init(const char* config_xml, const char* root_node)
 	}
 
 	if( xmlStrcmp(global_config_root->name, (const xmlChar*)root_node) != 0 ) {
-		printf("invalid configuration - no 'mame_regtest' element\n");
+		printf("invalid configuration - no '%s' element\n", root_node);
 		return 0;
 	}
 
