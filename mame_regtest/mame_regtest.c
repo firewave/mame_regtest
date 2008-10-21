@@ -87,70 +87,40 @@ struct driver_entry {
 	int device_mandatory;
 };
 
-static char config_str_str[16] = "2";
-static int config_pause_at = 100;
-static char* config_mame_exe = NULL;
-static char* config_gamelist_xml_file = NULL;
-static int config_use_autosave = 0;
-static int config_use_ramsize = 0;
-static int config_write_mng = 0;
-#if USE_VALGRIND
-static int config_use_valgrind = 0;
-static char* config_valgrind_binary = NULL;
-static char* config_valgrind_parameters = NULL;
-static const char* const valgrind_binary_def = "valgrind";
-static const char* const valgrind_parameters_def = "--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --leak-resolution=med";
-static const char* const valgring_log_str ="--log-file=";
-#endif
-static char* config_rompath_folder = NULL;
 static int app_type = 0;
-static int use_custom_list = 0;
-static int config_use_bios = 0;
-static xmlChar* app_ver = NULL;
-static int config_use_sound = 0;
-static int config_use_throttle = 0;
-static int config_use_debug = 0;
-static int config_hack_debug = 0;
-static int config_hack_ftr = 0;
-static int config_use_devices = 1;
-static int config_hack_biospath = 0;
-static const char* const config_xml = "mame_regtest.xml";
-static const char* const def_xpath_1 = "/mame/game";
-static const char* const def_xpath_2 = "/mess/machine";
-static char* config_xpath_expr = NULL;
-static char* debugscript_file = NULL;
-static const char* const debugscript_file_str = "mrt_debugscript";
-static xmlDocPtr global_config_doc = NULL;
-static xmlNodePtr global_config_root = NULL;
-static int config_hack_mngwrite = 0;
-static int config_use_nonrunnable = 0;
 static int is_debug = 0;
 static unsigned int exec_counter = 0;
-static const char* const xpath_placeholder = "DRIVER_ROOT";
 static int xpath_placeholder_size = 11;
-static char config_output_folder[256] = "mrt_output";
-static char* config_global_device_file = NULL;
-static int config_use_isbios = 0;
-static int config_store_output = 0;
-static int config_clear_output_folder = 0;
-static int config_test_createconfig = 1;
+
+static xmlChar* app_ver = NULL;
+static char* debugscript_file = NULL;
+static xmlDocPtr global_config_doc = NULL;
+static xmlNodePtr global_config_root = NULL;
 static char* listxml_output = NULL;
-static char* config_additional_options = NULL;
-static int config_skip_mandatory = 0;
-static int config_osdprocessors = 1;
-static int config_print_xpath_results = 0;
-static int config_test_softreset = 0;
 static char* temp_folder = NULL;
 static char* stdout_temp_file = NULL;
 static char* stderr_temp_file = NULL;
 static char* dummy_ini_folder = NULL;
+static char current_path[MAX_PATH] = "";
+
+/* constant string variables */
+#if USE_VALGRIND
+static const char* const valgrind_binary_def = "valgrind";
+static const char* const valgrind_parameters_def = "--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --leak-resolution=med";
+static const char* const valgring_log_str ="--log-file=";
+#endif
+/* TODO: rename */
+static const char* const config_xml = "mame_regtest.xml";
+static const char* const def_xpath_1 = "/mame/game";
+static const char* const def_xpath_2 = "/mess/machine";
+static const char* const debugscript_file_str = "mrt_debugscript";
+static const char* const xpath_placeholder = "DRIVER_ROOT";
 static const char* const temp_folder_str = "mrt_temp";
 static const char* const stdout_temp_file_str = "tmp_stdout";
 static const char* const stderr_temp_file_str = "tmp_stderr";
 static const char* const dummy_ini_folder_str = "dummy_ini";
-static char current_path[MAX_PATH] = "";
-static int config_hack_pinmame = 0;
 
+/* PNG/MNG signatures */
 static unsigned const char png_sig[8] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
 static unsigned const char mng_sig[8] = { 0x8a, 0x4d, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
 static unsigned const char IDAT_name[4] = { 'I', 'D', 'A', 'T' };
@@ -176,6 +146,44 @@ struct config_entry {
 	enum config_entry_type type;
 	void* value;
 };
+
+/* configuration variables */
+static char config_str_str[16] = "2";
+static int config_pause_at = 100;
+static char* config_mame_exe = NULL;
+static char* config_gamelist_xml_file = NULL;
+static int config_use_autosave = 0;
+static int config_use_ramsize = 0;
+static int config_write_mng = 0;
+#if USE_VALGRIND
+static int config_use_valgrind = 0;
+static char* config_valgrind_binary = NULL;
+static char* config_valgrind_parameters = NULL;
+#endif
+static char* config_rompath_folder = NULL;
+static int config_use_bios = 0;
+static int config_use_sound = 0;
+static int config_use_throttle = 0;
+static int config_use_debug = 0;
+static int config_hack_debug = 0;
+static int config_hack_ftr = 0;
+static int config_use_devices = 1;
+static int config_hack_biospath = 0;
+static char* config_xpath_expr = NULL;
+static int config_hack_mngwrite = 0;
+static int config_use_nonrunnable = 0;
+static char config_output_folder[256] = "mrt_output";
+static char* config_global_device_file = NULL;
+static int config_use_isbios = 0;
+static int config_store_output = 0;
+static int config_clear_output_folder = 0;
+static int config_test_createconfig = 1;
+static char* config_additional_options = NULL;
+static int config_skip_mandatory = 0;
+static int config_osdprocessors = 1;
+static int config_print_xpath_results = 0;
+static int config_test_softreset = 0;
+static int config_hack_pinmame = 0;
 
 struct config_entry mrt_config[] =
 {
@@ -1499,7 +1507,7 @@ static void config_read_option_str_ptr(const xmlNodePtr config_node, const char*
 	}
 }
 
-static int config_init(const char* config_name)
+static int config_read(const char* config_name)
 {
 	int config_found = 0;
 	
@@ -1605,11 +1613,11 @@ int main(int argc, char *argv[])
 	}
 	
 	printf("reading configuration 'global'\n");
-	int config_res = config_init("global");
+	int config_res = config_read("global");
 	
 	if( config_res && (argc == 2) ) {
 		printf("reading configuration '%s'\n", argv[1]);
-		config_res = config_init(argv[1]);
+		config_res = config_read(argv[1]);
 	}
 	
 	xmlFreeDoc(global_config_doc);
@@ -1649,7 +1657,6 @@ int main(int argc, char *argv[])
 	
 	if( config_gamelist_xml_file && (strlen(config_gamelist_xml_file) > 0) ) {
 		printf("using custom list: %s\n", config_gamelist_xml_file);
-		use_custom_list = 1;
 	}
 
 	printf("autosave: %d\n", config_use_autosave);

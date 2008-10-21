@@ -382,6 +382,8 @@
 	- renamed config_get_* to config_read_*
 	- renamed all configuration variables to config_*
 	- fixed a memory leak with "listxml_file" (fixed by configuration rewrite)
+	- re-grouped the static variables
+	- removed unnecessary static variable "use_custom_list"
 
 	create_report
 	- added "report 1", which creates a file with all driver, that didn't return 0

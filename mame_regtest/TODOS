@@ -29,9 +29,6 @@ mame_regtest
 			- cleanup post-loading code of configuration (checks, output etc.)
 			- proper handling of default values in config
 		- store both output file states in case of autosave
-		- restructure static variables
-			- pair the config ones
-			- pair the static strings
 		- add macro to output files/folders for version/revsion etc.
 		- how to test system configurations
 		- how to test dipswitches
