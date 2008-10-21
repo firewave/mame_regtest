@@ -1507,6 +1507,34 @@ static void config_read_option_str_ptr(const xmlNodePtr config_node, const char*
 	}
 }
 
+static int config_init()
+{
+	if( access(config_xml, F_OK) == -1 ) {
+		printf("'%s' does not exist\n", config_xml);
+		return 0;
+	}
+	printf("using configuration '%s'\n", config_xml);
+
+	global_config_doc = xmlReadFile(config_xml, NULL, 0);
+	if( !global_config_doc ) {
+		printf("could not load configuration\n");
+		return 0;
+	}
+
+	global_config_root = xmlDocGetRootElement(global_config_doc);
+	if( !global_config_root ) {
+		printf("invalid configuration - no root element\n");
+		return 0;
+	}
+
+	if( xmlStrcmp(global_config_root->name, (const xmlChar*)"mame_regtest") != 0 ) {
+		printf("invalid configuration - no 'mame_regtest' element\n");
+		return 0;
+	}
+	
+	return 1;
+}
+
 static int config_read(const char* config_name)
 {
 	int config_found = 0;
@@ -1588,32 +1616,14 @@ int main(int argc, char *argv[])
 	printf("\n");
 	printf("current path: %s\n", current_path);
 	printf("\n");
-
-	if( access(config_xml, F_OK) == -1 ) {
-		printf("'%s' does not exist\n", config_xml);
-		cleanup_and_exit(1, "aborting");
-	}
-	printf("using configuration '%s'\n", config_xml);
 	
-	global_config_doc = xmlReadFile(config_xml, NULL, 0);
-	if( !global_config_doc ) {
-		printf("could not load configuration\n");
+	printf("initializing configuration\n");
+	int config_res = config_init();
+	if( !config_res )
 		cleanup_and_exit(1, "aborting");
-	}
 
-	global_config_root = xmlDocGetRootElement(global_config_doc);
-	if( !global_config_root ) {
-		printf("invalid configuration - no root element\n");
-		cleanup_and_exit(1, "aborting");
-	}
-
-	if( xmlStrcmp(global_config_root->name, (const xmlChar*)"mame_regtest") != 0 ) {
-		printf("invalid configuration - no 'mame_regtest' element\n");
-		cleanup_and_exit(1, "aborting");
-	}
-	
 	printf("reading configuration 'global'\n");
-	int config_res = config_read("global");
+	config_res = config_read("global");
 	
 	if( config_res && (argc == 2) ) {
 		printf("reading configuration '%s'\n", argv[1]);
