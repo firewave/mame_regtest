@@ -87,59 +87,59 @@ struct driver_entry {
 	int device_mandatory;
 };
 
-static char str_str[16] = "2";
-static int pause_at = 100;
-static char* mame_exe = NULL;
-static char* gamelist_xml_file = NULL;
-static int use_autosave = 0;
-static int use_ramsize = 0;
-static int write_mng = 0;
+static char config_str_str[16] = "2";
+static int config_pause_at = 100;
+static char* config_mame_exe = NULL;
+static char* config_gamelist_xml_file = NULL;
+static int config_use_autosave = 0;
+static int config_use_ramsize = 0;
+static int config_write_mng = 0;
 #if USE_VALGRIND
-static int use_valgrind = 0;
-static char* valgrind_binary = NULL;
-static char* valgrind_parameters = NULL;
+static int config_use_valgrind = 0;
+static char* config_valgrind_binary = NULL;
+static char* config_valgrind_parameters = NULL;
 static const char* const valgrind_binary_def = "valgrind";
 static const char* const valgrind_parameters_def = "--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --leak-resolution=med";
 static const char* const valgring_log_str ="--log-file=";
 #endif
-static char* rompath_folder = NULL;
+static char* config_rompath_folder = NULL;
 static int app_type = 0;
 static int use_custom_list = 0;
-static int use_bios = 0;
+static int config_use_bios = 0;
 static xmlChar* app_ver = NULL;
-static int use_sound = 0;
-static int use_throttle = 0;
-static int use_debug = 0;
-static int hack_debug = 0;
-static int hack_ftr = 0;
-static int use_devices = 1;
-static int hack_biospath = 0;
+static int config_use_sound = 0;
+static int config_use_throttle = 0;
+static int config_use_debug = 0;
+static int config_hack_debug = 0;
+static int config_hack_ftr = 0;
+static int config_use_devices = 1;
+static int config_hack_biospath = 0;
 static const char* const config_xml = "mame_regtest.xml";
 static const char* const def_xpath_1 = "/mame/game";
 static const char* const def_xpath_2 = "/mess/machine";
-static char* xpath_expr = NULL;
+static char* config_xpath_expr = NULL;
 static char* debugscript_file = NULL;
 static const char* const debugscript_file_str = "mrt_debugscript";
 static xmlDocPtr global_config_doc = NULL;
 static xmlNodePtr global_config_root = NULL;
-static int hack_mngwrite = 0;
-static int use_nonrunnable = 0;
+static int config_hack_mngwrite = 0;
+static int config_use_nonrunnable = 0;
 static int is_debug = 0;
 static unsigned int exec_counter = 0;
 static const char* const xpath_placeholder = "DRIVER_ROOT";
 static int xpath_placeholder_size = 11;
-static char output_folder[256] = "mrt_output";
-static char* global_device_file = NULL;
-static int use_isbios = 0;
-static int store_output = 0;
-static int clear_output_folder = 0;
-static int test_createconfig = 1;
+static char config_output_folder[256] = "mrt_output";
+static char* config_global_device_file = NULL;
+static int config_use_isbios = 0;
+static int config_store_output = 0;
+static int config_clear_output_folder = 0;
+static int config_test_createconfig = 1;
 static char* listxml_output = NULL;
-static char* additional_options = NULL;
-static int skip_mandatory = 0;
-static int osdprocessors = 1;
-static int print_xpath_results = 0;
-static int test_softreset = 0;
+static char* config_additional_options = NULL;
+static int config_skip_mandatory = 0;
+static int config_osdprocessors = 1;
+static int config_print_xpath_results = 0;
+static int config_test_softreset = 0;
 static char* temp_folder = NULL;
 static char* stdout_temp_file = NULL;
 static char* stderr_temp_file = NULL;
@@ -149,7 +149,7 @@ static const char* const stdout_temp_file_str = "tmp_stdout";
 static const char* const stderr_temp_file_str = "tmp_stderr";
 static const char* const dummy_ini_folder_str = "dummy_ini";
 static char current_path[MAX_PATH] = "";
-static int hack_pinmame = 0;
+static int config_hack_pinmame = 0;
 
 static unsigned const char png_sig[8] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
 static unsigned const char mng_sig[8] = { 0x8a, 0x4d, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
@@ -163,6 +163,58 @@ enum {
 	APP_UNKNOWN = 0,
 	APP_MAME 	= 1,
 	APP_MESS	= 2
+};
+
+enum config_entry_type {
+	CFG_INT 	= 0,
+	CFG_STR 	= 1,
+	CFG_STR_PTR = 2
+};
+
+struct config_entry {
+	const char* name;
+	enum config_entry_type type;
+	void* value;
+};
+
+struct config_entry mrt_config[] =
+{
+	{ "executable",				CFG_STR_PTR,	&config_mame_exe },
+	{ "str",					CFG_STR,		config_str_str },
+	{ "pause_interval",			CFG_INT,		&config_pause_at },
+	{ "listxml_file",			CFG_STR_PTR,	&config_gamelist_xml_file },
+	{ "use_autosave",			CFG_INT,		&config_use_autosave },
+	{ "use_ramsize",			CFG_INT,		&config_use_ramsize },
+	{ "write_mng",				CFG_INT,		&config_write_mng },
+#if USE_VALGRIND
+	{ "use_valgrind",			CFG_INT,		&config_use_valgrind },
+	{ "valgrind_binary",		CFG_STR_PTR,	&config_valgrind_binary },
+	{ "valgrind_parameters",	CFG_STR_PTR,	&config_valgrind_parameters },
+#endif
+	{ "rompath",				CFG_STR_PTR,	&config_rompath_folder },
+	{ "use_bios",				CFG_INT,		&config_use_bios },
+	{ "use_sound",				CFG_INT,		&config_use_sound },
+	{ "use_throttle",			CFG_INT,		&config_use_throttle },
+	{ "use_debug",				CFG_INT,		&config_use_debug },
+	{ "xpath_expr",				CFG_STR_PTR,	&config_xpath_expr },
+	{ "use_devices",			CFG_INT,		&config_use_devices },
+	{ "hack_ftr",				CFG_INT,		&config_hack_ftr },
+	{ "hack_biospath",			CFG_INT,		&config_hack_biospath },
+	{ "hack_debug",				CFG_INT,		&config_hack_debug },
+	{ "hack_mngwrite",			CFG_INT,		&config_hack_mngwrite },
+	{ "use_nonrunnable",		CFG_INT,		&config_use_nonrunnable },
+	{ "output_folder",			CFG_STR,		config_output_folder },
+	{ "device_file",			CFG_STR_PTR,	&config_global_device_file },
+	{ "use_isbios",				CFG_INT,		&config_use_isbios },
+	{ "store_output",			CFG_INT,		&config_store_output },
+	{ "clear_output_folder",	CFG_INT,		&config_clear_output_folder },
+	{ "test_createconfig",		CFG_INT,		&config_test_createconfig },
+	{ "additional_options",		CFG_STR_PTR,	&config_additional_options },
+	{ "skip_mandatory",			CFG_INT,		&config_skip_mandatory },
+	{ "osdprocessors",			CFG_INT,		&config_osdprocessors },
+	{ "print_xpath_results",	CFG_INT,		&config_print_xpath_results },
+	{ "test_softreset",			CFG_INT,		&config_test_softreset },
+	{ "hack_pinmame",			CFG_INT,		&config_hack_pinmame },
 };
 
 static int get_png_IDAT_data(const char* png_name, unsigned int *IDAT_size, unsigned int* IDAT_crc);
@@ -231,13 +283,13 @@ static const char* get_inifile()
 static void get_executable(char** sys, struct driver_entry* de, const char* callstr)
 {
 #if USE_VALGRIND
-	if( use_valgrind ) {
-		append_string(sys, valgrind_binary);
+	if( config_use_valgrind ) {
+		append_string(sys, config_valgrind_binary);
 		append_string(sys, " ");
-		append_string(sys, valgrind_parameters);
+		append_string(sys, config_valgrind_parameters);
 		append_string(sys, " ");
 		append_string(sys, valgring_log_str);
-		append_string(sys, output_folder);
+		append_string(sys, config_output_folder);
 		append_string(sys, FILESLASH);
 		if( de ) {
 			append_driver_info(sys, de);
@@ -253,7 +305,7 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 	(void)de;
 	(void)callstr;
 #endif
-	append_quoted_string(sys, mame_exe);
+	append_quoted_string(sys, config_mame_exe);
 }
 
 static int mrt_mkdir(const char* path)
@@ -335,7 +387,7 @@ static FILE* mrt_fopen(const char* filename, const char* attr)
 	FILE* result = NULL;
 	
 	char* outputfile = NULL;
-	append_string(&outputfile, output_folder);
+	append_string(&outputfile, config_output_folder);
 	append_string(&outputfile, FILESLASH);
 	append_string(&outputfile, filename);
 	
@@ -431,12 +483,12 @@ static int create_dummy_root_ini()
 		FILE* fp = fopen(app_string, "w");
 		if( fp ) {
 			fprintf(fp, "video              none\n"); /* disable video output */
-			if( !use_sound )
+			if( !config_use_sound )
 				fprintf(fp, "sound              0\n"); /* disable sound output */
-			if( !use_throttle )
+			if( !config_use_throttle )
 				fprintf(fp, "throttle           0\n"); /* disable throttle */
-			if( hack_debug || is_debug ) {
-				if( !use_debug )
+			if( config_hack_debug || is_debug ) {
+				if( !config_use_debug )
 					fprintf(fp, "debug              0\n"); /* disable debug window */
 				else {
 					fprintf(fp, "debug              1\n"); /* enable debug window */
@@ -446,15 +498,15 @@ static int create_dummy_root_ini()
 			}
 			fprintf(fp, "mouse              0\n"); /* disable "mouse" so it doesn't grabs the mouse pointer on window creation */
 			fprintf(fp, "window             1\n"); /* run it in windowed mode */
-			if( !hack_ftr )
-				fprintf(fp, "seconds_to_run     %s\n", str_str);
+			if( !config_hack_ftr )
+				fprintf(fp, "seconds_to_run     %s\n", config_str_str);
 			else
-				fprintf(fp, "frames_to_run      %s\n", str_str);
-			if( rompath_folder && (strlen(rompath_folder) > 0) ) {
-				if( !hack_biospath )
-					fprintf(fp, "rompath            %s\n", rompath_folder); /* rompath for MAME/MESS */
+				fprintf(fp, "frames_to_run      %s\n", config_str_str);
+			if( config_rompath_folder && (strlen(config_rompath_folder) > 0) ) {
+				if( !config_hack_biospath )
+					fprintf(fp, "rompath            %s\n", config_rompath_folder); /* rompath for MAME/MESS */
 				else
-					fprintf(fp, "biospath           %s\n", rompath_folder); /* old biospath for MESS */
+					fprintf(fp, "biospath           %s\n", config_rompath_folder); /* old biospath for MESS */
 			}
 			fclose(fp);
 			res = 1;
@@ -473,7 +525,7 @@ static int create_dummy_root_ini()
 
 static void convert_xpath_expr(char** real_xpath_expr)
 {	
-	char* xpath_copy = strdup(xpath_expr);
+	char* xpath_copy = strdup(config_xpath_expr);
 	char* pos = strstr(xpath_copy, xpath_placeholder);
 	while( pos != NULL )
 	{
@@ -504,19 +556,19 @@ static void cleanup_and_exit(int errcode, const char* errstr)
 	}	
 
 #if USE_VALGRIND
-	if( valgrind_parameters ) {
-		free(valgrind_parameters);
-		valgrind_parameters = NULL;
+	if( config_valgrind_parameters ) {
+		free(config_valgrind_parameters);
+		config_valgrind_parameters = NULL;
 	}
-	if( valgrind_binary ) {
-		free(valgrind_binary);
-		valgrind_binary = NULL;
+	if( config_valgrind_binary ) {
+		free(config_valgrind_binary);
+		config_valgrind_binary = NULL;
 	}
 #endif
 	
-	if( gamelist_xml_file ) {
-		free(gamelist_xml_file);
-		gamelist_xml_file = NULL;
+	if( config_gamelist_xml_file ) {
+		free(config_gamelist_xml_file);
+		config_gamelist_xml_file = NULL;
 	} 
 	if( listxml_output ) {
 		free(listxml_output);
@@ -726,7 +778,7 @@ static void open_mng_and_skip_header(const char* mng_name, FILE** mng_fd)
 static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 {
 	print_driver_info(de, stdout);
-	if( use_autosave && de->autosave )
+	if( config_use_autosave && de->autosave )
 		printf(" (autosave)");
 	printf("\n");
 	
@@ -741,7 +793,7 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 	get_executable(&sys, de, NULL);
 	append_string(&sys, " ");
 	append_string(&sys, de->name);
-	if( use_autosave && de->autosave )
+	if( config_use_autosave && de->autosave )
 		append_string(&sys, " -autosave");
 	if( de->bios && strlen(de->bios) > 0 ) {
 		append_string(&sys, " -bios ");
@@ -765,21 +817,21 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 		
 		images = images->next;
 	}
-	if( write_mng ) {
-		if( hack_mngwrite )
+	if( config_write_mng ) {
+		if( config_hack_mngwrite )
 			append_string(&sys, " -mngwrite mng"FILESLASH);
 		else
 			append_string(&sys, " -mngwrite ");
 		append_driver_info(&sys, de);
 		append_string(&sys, ".mng");
 	}
-	if( additional_options && (strlen(additional_options) > 0) ) {
+	if( config_additional_options && (strlen(config_additional_options) > 0) ) {
 		append_string(&sys, " ");
-		append_string(&sys, additional_options);
+		append_string(&sys, config_additional_options);
 	}
 	append_string(&sys, " -inipath ");
 	append_quoted_string(&sys, dummy_ini_folder);
-	if( hack_pinmame ) {
+	if( config_hack_pinmame ) {
 		append_string(&sys, " -skip_disclaimer");
 		append_string(&sys, " -skip_gameinfo");
 	}
@@ -886,7 +938,7 @@ static int execute_mame2(struct driver_entry* de)
 		return 0;
 	}
 
-	if( (pause_at > 0) && ((++exec_counter % pause_at) == 0) ) {
+	if( (config_pause_at > 0) && ((++exec_counter % config_pause_at) == 0) ) {
 		printf("please press any key to continue\n");
 		mrt_getch();
 	}
@@ -934,7 +986,7 @@ static int execute_mame2(struct driver_entry* de)
 		build_output_xml(dummy_root_str, result1);
 	}
 
-	if( res == 1 && use_autosave && de->autosave ) {
+	if( res == 1 && config_use_autosave && de->autosave ) {
 		res = execute_mame(de, &result2);
 
 		if( result2 ) {
@@ -943,9 +995,9 @@ static int execute_mame2(struct driver_entry* de)
 		}
 	}
 
-	if( store_output && (access(dummy_root_str, F_OK) == 0) ) {
+	if( config_store_output && (access(dummy_root_str, F_OK) == 0) ) {
 		char* outputdir = NULL;
-		append_string(&outputdir, output_folder);
+		append_string(&outputdir, config_output_folder);
 		append_string(&outputdir, FILESLASH);
 		append_driver_info(&outputdir, de);
 
@@ -960,7 +1012,7 @@ static int execute_mame2(struct driver_entry* de)
 	}
 
 	char* outputname = NULL;
-	append_string(&outputname, output_folder);
+	append_string(&outputname, config_output_folder);
 	append_string(&outputname, FILESLASH);
 	append_driver_info(&outputname, de);
 	append_string(&outputname, ".xml");
@@ -982,7 +1034,7 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 {
 	int res = 0;
 	
-	if( skip_mandatory && de->device_mandatory ) {
+	if( config_skip_mandatory && de->device_mandatory ) {
 		res = 1;
 	}
 	else {
@@ -991,10 +1043,10 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 			return res;
 	}
 
-	if( use_devices && actual_driv_inf->device_count ) {
+	if( config_use_devices && actual_driv_inf->device_count ) {
 		char* device_file = NULL;
-		if( global_device_file && (strlen(global_device_file) > 0) )
-			append_string(&device_file, global_device_file);
+		if( config_global_device_file && (strlen(config_global_device_file) > 0) )
+			append_string(&device_file, config_global_device_file);
 		else {
 			append_string(&device_file, "mrt_");
 			append_string(&device_file, (const char*)actual_driv_inf->name);
@@ -1127,7 +1179,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 	if( ((app_type == APP_MAME) && (xmlStrcmp(game_child->name, (const xmlChar*)"game") == 0)) ||
 		((app_type == APP_MESS) && (xmlStrcmp(game_child->name, (const xmlChar*)"machine") == 0)) ) {
 
-		if( !use_nonrunnable ) {
+		if( !config_use_nonrunnable ) {
 			/* skip runnable="no" entries (bioses in MAME) */
 			xmlChar* run_state = xmlGetProp(game_child, (const xmlChar*)"runnable");
 			if( run_state ) {
@@ -1139,7 +1191,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 			}
 		}
 
-		if( !use_isbios ) {
+		if( !config_use_isbios ) {
 			/* skip isbios="yes" entries (bioses in MAME) */
 			xmlChar* bios_state = xmlGetProp(game_child, (const xmlChar*)"isbios");
 			if( bios_state ) {
@@ -1153,7 +1205,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 		
 		xmlChar* sourcefile = xmlGetProp(game_child, (const xmlChar*)"sourcefile");
 		if( !sourcefile ) {
-			if( hack_pinmame ) {
+			if( config_hack_pinmame ) {
 				/* set a dummy sourcefile for PinMAME */
 				char* sourcefile_c = NULL;
 				append_string(&sourcefile_c, "pinmame.c");
@@ -1200,7 +1252,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 				}
 			}
 			
-			if( (app_type == APP_MESS) && use_ramsize ) {
+			if( (app_type == APP_MESS) && config_use_ramsize ) {
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"ramoption") == 0 ) {
 					xmlChar* ram_content = xmlNodeGetContent(game_children);
 					if( ram_content ) {
@@ -1210,7 +1262,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 				}
 			}
 			
-			if( use_bios ) {
+			if( config_use_bios ) {
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"biosset") == 0 ) {
 					xmlChar* bios_content = xmlGetProp(game_children, (const xmlChar*)"name");
 					if( bios_content ) {
@@ -1277,7 +1329,7 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 					printf("build: %s%s\n", app_ver, is_debug ? " (debug)" : "");
 				}
 
-				if( xpath_expr && (strlen(xpath_expr) > 0) ) {
+				if( config_xpath_expr && (strlen(config_xpath_expr) > 0) ) {
 					xpathCtx = xmlXPathNewContext(doc);
 					if( xpathCtx ) {
 						char* real_xpath_expr = NULL;
@@ -1300,7 +1352,7 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 						printf("xpath found %d nodes\n", xpathObj->nodesetval->nodeNr);
 						
 						xmlBufferPtr xmlBuf = NULL;
-						if( print_xpath_results )
+						if( config_print_xpath_results )
 							xmlBuf = xmlBufferCreate();
 
 						struct driver_info* last_driv_inf = NULL;
@@ -1308,7 +1360,7 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 						int i = 0;
 						for( ; i < xpathObj->nodesetval->nodeNr; ++i )
 						{
-							if( print_xpath_results ) {
+							if( config_print_xpath_results ) {
 								xmlBufferAdd(xmlBuf, (const xmlChar*)"\t", 1);
 								xmlNodeDump(xmlBuf, doc, xpathObj->nodesetval->nodeTab[i], 0, 1);
 								xmlBufferAdd(xmlBuf, (const xmlChar*)"\n", 1);
@@ -1329,7 +1381,7 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 							}							
 						}
 						
-						if( print_xpath_results ) {
+						if( config_print_xpath_results ) {
 							FILE *xpath_result_fd = mrt_fopen("xpath_results.xml", "w");
 							fprintf(xpath_result_fd, "<xpath_result>\n");
 							xmlBufferDump(xpath_result_fd, xmlBuf);
@@ -1376,7 +1428,7 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 	}
 }
 
-static int config_get_option(const xmlNodePtr config_node, const char* name, xmlChar** option)
+static int config_read_option(const xmlNodePtr config_node, const char* name, xmlChar** option)
 {
 	int result = 0;
 	
@@ -1413,10 +1465,10 @@ static int config_get_option(const xmlNodePtr config_node, const char* name, xml
 	return result;
 }
 
-static void config_get_option_int(const xmlNodePtr config_node, const char* opt_name, int* value)
+static void config_read_option_int(const xmlNodePtr config_node, const char* opt_name, int* value)
 {
 	xmlChar* opt = NULL;
-	if( config_get_option(config_node, opt_name, &opt) ) {
+	if( config_read_option(config_node, opt_name, &opt) ) {
 		if( opt && xmlStrlen(opt) > 0 ) {
 			*value = atoi((const char*)opt);
 		}
@@ -1424,10 +1476,10 @@ static void config_get_option_int(const xmlNodePtr config_node, const char* opt_
 	xmlFree(opt);
 }
 
-static void config_get_option_str(const xmlNodePtr config_node, const char* opt_name, char* value, int size)
+static void config_read_option_str(const xmlNodePtr config_node, const char* opt_name, char* value, int size)
 {
 	xmlChar* opt = NULL;
-	if( config_get_option(config_node, opt_name, &opt) ) {
+	if( config_read_option(config_node, opt_name, &opt) ) {
 		if( opt && xmlStrlen(opt) > 0 ) {
 			strncpy(value, (const char*)opt, size-1);
 			value[size-1] = '\0';
@@ -1436,10 +1488,10 @@ static void config_get_option_str(const xmlNodePtr config_node, const char* opt_
 	xmlFree(opt);
 }
 
-static void config_get_option_str_ptr(const xmlNodePtr config_node, const char* opt_name, char** value)
+static void config_read_option_str_ptr(const xmlNodePtr config_node, const char* opt_name, char** value)
 {
 	xmlChar* opt = NULL;
-	if( config_get_option(config_node, opt_name, &opt) ) {
+	if( config_read_option(config_node, opt_name, &opt) ) {
 		xmlChar** tmp = (xmlChar**)value;
 		if( *tmp )
 			xmlFree(*tmp);
@@ -1468,71 +1520,47 @@ static int config_init(const char* config_name)
 		return 0;
 	}
 	
-	config_get_option_str_ptr(global_config_child, "executable", &mame_exe);
-	config_get_option_str(global_config_child, "str", str_str, sizeof(str_str));
-	config_get_option_int(global_config_child, "pause_interval", &pause_at);
-	config_get_option_str_ptr(global_config_child, "listxml_file", &gamelist_xml_file);
-	config_get_option_int(global_config_child, "use_autosave", &use_autosave);
-	config_get_option_int(global_config_child, "use_ramsize", &use_ramsize);
-	config_get_option_int(global_config_child, "write_mng", &write_mng);
-#if USE_VALGRIND
-	config_get_option_int(global_config_child, "use_valgrind", &use_valgrind);
-	config_get_option_str_ptr(global_config_child, "valgrind_binary", &valgrind_binary);
-	config_get_option_str_ptr(global_config_child, "valgrind_parameters", &valgrind_parameters);
-#endif
-	config_get_option_str_ptr(global_config_child, "rompath", &rompath_folder);
-	config_get_option_int(global_config_child, "use_bios", &use_bios);
-	config_get_option_int(global_config_child, "use_sound", &use_sound);	
-	config_get_option_int(global_config_child, "use_throttle", &use_throttle);
-	config_get_option_int(global_config_child, "use_debug", &use_debug);
-	config_get_option_str_ptr(global_config_child, "xpath_expr", &xpath_expr);
-	config_get_option_int(global_config_child, "use_devices", &use_devices);
-	config_get_option_int(global_config_child, "hack_ftr", &hack_ftr);
-	config_get_option_int(global_config_child, "hack_biospath", &hack_biospath);
-	config_get_option_int(global_config_child, "hack_debug", &hack_debug);
-	config_get_option_int(global_config_child, "hack_mngwrite", &hack_mngwrite);
-	config_get_option_int(global_config_child, "use_nonrunnable", &use_nonrunnable);
-	config_get_option_str(global_config_child, "output_folder", output_folder, sizeof(output_folder));
-	config_get_option_str_ptr(global_config_child, "device_file", &global_device_file);
-	config_get_option_int(global_config_child, "use_isbios", &use_isbios);
-	config_get_option_int(global_config_child, "store_output", &store_output);
-	config_get_option_int(global_config_child, "clear_output_folder", &clear_output_folder);
-	config_get_option_int(global_config_child, "test_createconfig", &test_createconfig);
-	config_get_option_str_ptr(global_config_child, "additional_options", &additional_options);
-	config_get_option_int(global_config_child, "skip_mandatory", &skip_mandatory);
-	config_get_option_int(global_config_child, "osdprocessors", &osdprocessors);
-	config_get_option_int(global_config_child, "print_xpath_results", &print_xpath_results);
-	config_get_option_int(global_config_child, "test_softreset", &test_softreset);	
-	config_get_option_int(global_config_child, "hack_pinmame", &hack_pinmame);	
-	
+	int config_size = sizeof(mrt_config) / sizeof(struct config_entry);
+	int i = 0;
+	for( ; i < config_size; ++i )
+	{
+		struct config_entry* ce = &mrt_config[i];
+		printf("entry - %s - %d - ", ce->name, ce->type);
+		if( ce->type == CFG_INT ) {
+			int* value = (int*)ce->value;
+			config_read_option_int(global_config_child, ce->name, value);
+			printf("%d\n", *value);
+		}
+		else if( ce->type == CFG_STR ) {
+			char* value = (char*)ce->value;
+			config_read_option_str(global_config_child, ce->name, value, sizeof(value));
+			printf("%s\n", value);
+		}
+		else if( ce->type == CFG_STR_PTR ) {
+			char** value = (char**)ce->value;
+			config_read_option_str_ptr(global_config_child, ce->name, value);
+			printf("%s\n", *value ? *value : "");
+		}
+		else
+			printf("unknown config_entry type\n");
+	}
+
 	return 1;
 }
 
 static void config_free()
 {
-	if( additional_options ) {
-		xmlFree((xmlChar*)additional_options);
-		additional_options = NULL;
-	}
-
-	if( global_device_file ) {
-		xmlFree((xmlChar*)global_device_file);
-		global_device_file = NULL;
-	}
-
-	if( xpath_expr ) {
-		xmlFree((xmlChar*)xpath_expr);
-		xpath_expr = NULL;
-	}
-
-	if( rompath_folder ) {
-		xmlFree((xmlChar*)rompath_folder);
-		rompath_folder = NULL;
-	}
-
-	if( mame_exe ) {
-		xmlFree((xmlChar*)mame_exe);
-		mame_exe = NULL;
+	int config_size = sizeof(mrt_config) / sizeof(struct config_entry);
+	int i = 0;
+	for( ; i < config_size; ++i )
+	{
+		struct config_entry* ce = &mrt_config[i];
+		if( ce->type == CFG_STR_PTR ) {
+			char** value = (char**)ce->value;
+			xmlChar* xml_value = (xmlChar*)*value;
+			xmlFree(xml_value);
+			xml_value = NULL;
+		}
 	}
 }
 
@@ -1592,60 +1620,60 @@ int main(int argc, char *argv[])
 		
 	printf("\n"); /* for output formating */
 	
-	if( is_absolute_path(mame_exe) == 0 ) {
+	if( is_absolute_path(config_mame_exe) == 0 ) {
 		char* tmp_mame_exe = NULL;
 		append_string(&tmp_mame_exe, current_path);
 		append_string(&tmp_mame_exe, FILESLASH);
-		append_string(&tmp_mame_exe, mame_exe);
-		free(mame_exe);
-		mame_exe = tmp_mame_exe;
+		append_string(&tmp_mame_exe, config_mame_exe);
+		free(config_mame_exe);
+		config_mame_exe = tmp_mame_exe;
 	}
 	
-	if( !mame_exe || (strlen(mame_exe) == 0) ) {
+	if( !config_mame_exe || (strlen(config_mame_exe) == 0) ) {
 		printf("'executable' is empty or missing\n");
 		cleanup_and_exit(1, "aborting");
 	}
 
-	if( access(mame_exe, F_OK ) == -1 ) {
-		printf("'%s' does not exist\n", mame_exe);
+	if( access(config_mame_exe, F_OK ) == -1 ) {
+		printf("'%s' does not exist\n", config_mame_exe);
 		cleanup_and_exit(1, "aborting");
 	}
-	printf("executable: %s\n", mame_exe);	
+	printf("executable: %s\n", config_mame_exe);
 
-	append_string(&listxml_output, output_folder);
+	append_string(&listxml_output, config_output_folder);
 	append_string(&listxml_output, FILESLASH);
 	append_string(&listxml_output, "listxml.xml");
 	
-	printf("str: %s\n", str_str);
-	printf("pause interval: %d\n", pause_at);
+	printf("str: %s\n", config_str_str);
+	printf("pause interval: %d\n", config_pause_at);
 	
-	if( gamelist_xml_file && (strlen(gamelist_xml_file) > 0) ) {
-		printf("using custom list: %s\n", gamelist_xml_file);
+	if( config_gamelist_xml_file && (strlen(config_gamelist_xml_file) > 0) ) {
+		printf("using custom list: %s\n", config_gamelist_xml_file);
 		use_custom_list = 1;
 	}
 
-	printf("autosave: %d\n", use_autosave);
+	printf("autosave: %d\n", config_use_autosave);
 
-	printf("ramsize: %d\n", use_ramsize);
+	printf("ramsize: %d\n", config_use_ramsize);
 
-	if( write_mng ) {
-		if( hack_mngwrite ) {
+	if( config_write_mng ) {
+		if( config_hack_mngwrite ) {
 			if( mrt_mkdir("mng") != 0 ) {
 				printf("could not create folder 'mng' - disabling MNG writing\n");
-				write_mng = 0;
+				config_write_mng = 0;
 			}
 		}
 	}
-	printf("write mng: %d\n", write_mng);
+	printf("write mng: %d\n", config_write_mng);
 
-	if( (access(output_folder, F_OK) != 0) && mrt_mkdir(output_folder) != 0 ) {
-		printf("could not create folder '%s'\n", output_folder);
+	if( (access(config_output_folder, F_OK) != 0) && mrt_mkdir(config_output_folder) != 0 ) {
+		printf("could not create folder '%s'\n", config_output_folder);
 		cleanup_and_exit(1, "aborting");
 	}
 
-	if( strlen(output_folder) > 0 ) {
-		printf("using output folder: %s\n", output_folder);
-		if( access(output_folder, F_OK) != 0 ) {
+	if( strlen(config_output_folder) > 0 ) {
+		printf("using output folder: %s\n", config_output_folder);
+		if( access(config_output_folder, F_OK) != 0 ) {
 			printf("output folder not found\n");
 			cleanup_and_exit(1, "aborting");
 		}
@@ -1681,58 +1709,58 @@ int main(int argc, char *argv[])
 	append_string(&dummy_ini_folder, dummy_ini_folder_str);
 	
 #if USE_VALGRIND
-	printf("valgrind: %d\n", use_valgrind);
+	printf("valgrind: %d\n", config_use_valgrind);
 	
-	if( use_valgrind )
+	if( config_use_valgrind )
 	{
-		if( !valgrind_binary || (strlen(valgrind_binary) == 0) )
-			append_string(&valgrind_binary, valgrind_binary_def);
-		printf("valgrind_binary: %s\n", valgrind_binary);
-		if( !valgrind_parameters || (strlen(valgrind_parameters) == 0) )
-			append_string(&valgrind_parameters, valgrind_parameters_def);
-		printf("valgrind_parameters: %s\n", valgrind_parameters);
+		if( !config_valgrind_binary || (strlen(config_valgrind_binary) == 0) )
+			append_string(&config_valgrind_binary, valgrind_binary_def);
+		printf("valgrind_binary: %s\n", config_valgrind_binary);
+		if( !config_valgrind_parameters || (strlen(config_valgrind_parameters) == 0) )
+			append_string(&config_valgrind_parameters, valgrind_parameters_def);
+		printf("valgrind_parameters: %s\n", config_valgrind_parameters);
 	}
 #endif
 
-	if( rompath_folder && (strlen(rompath_folder) > 0) )
-		printf("using rompath folder: %s\n", rompath_folder);
+	if( config_rompath_folder && (strlen(config_rompath_folder) > 0) )
+		printf("using rompath folder: %s\n", config_rompath_folder);
 
-	printf("bios: %d\n", use_bios);
-	printf("sound: %d\n", use_sound);
-	printf("throttle: %d\n", use_throttle);
-	printf("debug: %d\n", use_debug);
-	printf("xpath_expr: %s\n", xpath_expr ? xpath_expr : "");
-	printf("use_devices: %d\n", use_devices);
-	printf("use_nonrunnable: %d\n", use_nonrunnable);
-	if( global_device_file && (strlen(global_device_file) > 0) )
-		printf("using device_file: %s\n", global_device_file);
-	printf("use_isbios: %d\n", use_isbios);
-	printf("store_output: %d\n", store_output);
-	printf("clear_output_folder: %d\n", clear_output_folder);
-	printf("test_createconfig: %d\n", test_createconfig);
-	if( additional_options )
-		printf("additional_options: %s\n", additional_options);
-	printf("skip_mandatory: %d\n", skip_mandatory);
-	printf("osdprocessors: %d\n", osdprocessors);
-	printf("print_xpath_results: %d\n", print_xpath_results);
-	printf("test_softreset: %d\n", test_softreset);
+	printf("bios: %d\n", config_use_bios);
+	printf("sound: %d\n", config_use_sound);
+	printf("throttle: %d\n", config_use_throttle);
+	printf("debug: %d\n", config_use_debug);
+	printf("xpath_expr: %s\n", config_xpath_expr ? config_xpath_expr : "");
+	printf("use_devices: %d\n", config_use_devices);
+	printf("use_nonrunnable: %d\n", config_use_nonrunnable);
+	if( config_global_device_file && (strlen(config_global_device_file) > 0) )
+		printf("using device_file: %s\n", config_global_device_file);
+	printf("use_isbios: %d\n", config_use_isbios);
+	printf("store_output: %d\n", config_store_output);
+	printf("clear_output_folder: %d\n", config_clear_output_folder);
+	printf("test_createconfig: %d\n", config_test_createconfig);
+	if( config_additional_options )
+		printf("additional_options: %s\n", config_additional_options);
+	printf("skip_mandatory: %d\n", config_skip_mandatory);
+	printf("osdprocessors: %d\n", config_osdprocessors);
+	printf("print_xpath_results: %d\n", config_print_xpath_results);
+	printf("test_softreset: %d\n", config_test_softreset);
 
-	printf("hack_ftr: %d\n", hack_ftr);
-	printf("hack_biospath: %d\n", hack_biospath);
-	printf("hack_debug: %d\n", hack_debug);
-	printf("hack_mngwrite: %d\n", hack_mngwrite);
-	printf("hack_pinmame: %d\n", hack_pinmame);
+	printf("hack_ftr: %d\n", config_hack_ftr);
+	printf("hack_biospath: %d\n", config_hack_biospath);
+	printf("hack_debug: %d\n", config_hack_debug);
+	printf("hack_mngwrite: %d\n", config_hack_mngwrite);
+	printf("hack_pinmame: %d\n", config_hack_pinmame);
 	
 	printf("\n"); /* for output formating */
 
-	if( hack_ftr && (atoi(str_str) < 2)) {
+	if( config_hack_ftr && (atoi(config_str_str) < 2)) {
 		printf("'str' value has to be at least '2' when used with 'hack_ftr'\n");
 		cleanup_and_exit(1, "aborting");
 	}
 
-	if( clear_output_folder ) {
+	if( config_clear_output_folder ) {
 		printf("clearing existing output folder\n");
-		clear_directory(output_folder, 0);
+		clear_directory(config_output_folder, 0);
 	}
 
 	printf("clearing existing temp folder\n");
@@ -1740,14 +1768,14 @@ int main(int argc, char *argv[])
 
 	printf("\n"); /* for output formating */
 
-	if( !gamelist_xml_file || (strlen(gamelist_xml_file) == 0) ) {
-		append_string(&gamelist_xml_file, listxml_output); 
+	if( !config_gamelist_xml_file || (strlen(config_gamelist_xml_file) == 0) ) {
+		append_string(&config_gamelist_xml_file, listxml_output); 
 	
 		printf("writing -listxml output\n");
 		char* mame_call = NULL;
 		get_executable(&mame_call, NULL, "listxml");
 		append_string(&mame_call, " -listxml > ");
-		append_string(&mame_call, gamelist_xml_file);
+		append_string(&mame_call, config_gamelist_xml_file);
 
 		/*
 		printf("system call: %s\n", mame_call);
@@ -1757,17 +1785,17 @@ int main(int argc, char *argv[])
 
 		system(mame_call);
 	
-		if( hack_pinmame ) {
+		if( config_hack_pinmame ) {
 			char* tmp_gamelist_xml = NULL;
 			/* TODO: quoting */
 			append_string(&tmp_gamelist_xml, temp_folder);
 			append_string(&tmp_gamelist_xml, FILESLASH);
 			append_string(&tmp_gamelist_xml, "listxml.xml");
 
-			strip_sampleof_pinmame(gamelist_xml_file, tmp_gamelist_xml);
+			strip_sampleof_pinmame(config_gamelist_xml_file, tmp_gamelist_xml);
 			
-			remove(gamelist_xml_file);
-			copy_file(tmp_gamelist_xml, gamelist_xml_file);
+			remove(config_gamelist_xml_file);
+			copy_file(tmp_gamelist_xml, config_gamelist_xml_file);
 			
 			free(tmp_gamelist_xml);
 			tmp_gamelist_xml = NULL;
@@ -1781,16 +1809,16 @@ int main(int argc, char *argv[])
 	
 	printf("\n"); /* for output formating */
 	printf("parsing -listxml output\n")	;
-	parse_listxml(gamelist_xml_file, &driv_inf);
+	parse_listxml(config_gamelist_xml_file, &driv_inf);
 
 	printf("\n"); /* for output formating */
 
-	if( test_createconfig ) {
+	if( config_test_createconfig ) {
 		printf("writing '%s'\n", get_inifile());
 		char* mame_call = NULL;
 		get_executable(&mame_call, NULL, "createconfig");
 		append_string(&mame_call, " -showconfig > ");
-		append_string(&mame_call, output_folder);
+		append_string(&mame_call, config_output_folder);
 		append_string(&mame_call, FILESLASH);
 		append_string(&mame_call, get_inifile());
 
@@ -1806,7 +1834,7 @@ int main(int argc, char *argv[])
 	printf("clearing existing dummy directories\n");
 	clear_directory(dummy_root_str, 1);
 
-	if( (hack_debug || is_debug) && use_debug ) {
+	if( (config_hack_debug || is_debug) && config_use_debug ) {
 		append_string(&debugscript_file, temp_folder);
 		append_string(&debugscript_file, FILESLASH);
 		append_string(&debugscript_file, debugscript_file_str);		
@@ -1816,7 +1844,7 @@ int main(int argc, char *argv[])
 			printf("could not open %s\n", debugscript_file);
 			cleanup_and_exit(1, "aborted");
 		}
-		if( test_softreset )
+		if( config_test_softreset )
 			fprintf(debugscript_fd, "softreset\n");
 		fprintf(debugscript_fd, "go\n");
 		fclose(debugscript_fd);
@@ -1829,7 +1857,7 @@ int main(int argc, char *argv[])
 		
 	/* setup OSDPROCESSORS */
 	char osdprocessors_tmp[128];
-	snprintf(osdprocessors_tmp, sizeof(osdprocessors_tmp), "OSDPROCESSORS=%d", osdprocessors);
+	snprintf(osdprocessors_tmp, sizeof(osdprocessors_tmp), "OSDPROCESSORS=%d", config_osdprocessors);
 	putenv(osdprocessors_tmp);
 	
 	printf("\n");

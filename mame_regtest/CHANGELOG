@@ -378,6 +378,10 @@
 	- added option "hack_pinmame" (still hangs at warning screens)
 	- CWD is changed to dummy_root to get all output files (including error.log)
 	- removed option "use_log", because it doesn't need any special handling anymore and can be specified via the "additional_options" option
+	- rewrote configuration code to utilize a structure for initialisation to be able to re-use it
+	- renamed config_get_* to config_read_*
+	- renamed all configuration variables to config_*
+	- fixed a memory leak with "listxml_file" (fixed by configuration rewrite)
 
 	create_report
 	- added "report 1", which creates a file with all driver, that didn't return 0

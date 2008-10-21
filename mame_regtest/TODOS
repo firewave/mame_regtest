@@ -23,22 +23,11 @@ mame_regtest
 		- multithreading mode
 		- change strcpy() to strncpy()
 		- change strcat() to strncat()
-		- rewrite configuration by using a default array and just overwrite existing nodes
+		- configuration rewrite
 			- empty options will not properly overwrite/reset existing options to default values
 			- print config values in read function (or put in array and print function for array)
 			- cleanup post-loading code of configuration (checks, output etc.)
-			- rewrite config
-				- config_struct {
-					const char* name
-					int type
-					void* value
-				}
-				- config_init(config_struct)
-				- config_read(file, config_name)
-				- config_read(doc, config_name)
-				- config_get_int()
-				- config_get_str()
-				- config_get_ptr()
+			- proper handling of default values in config
 		- store both output file states in case of autosave
 		- restructure static variables
 			- pair the config ones
@@ -106,6 +95,7 @@ mame_regtest
 		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER?)
 		- move the results and pages on the wiki
 		- add option with folder for device XMLs?
+		- valgrind variables mix libc and libxml2 allocations
 
 	Obsolete/External:
 		- HTML report
