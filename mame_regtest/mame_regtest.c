@@ -171,7 +171,7 @@ static int internal_get_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned
 static void config_free();
 static void cleanup_and_exit(int errcode, const char* errstr);
 
-void append_driver_info(char** str, struct driver_entry* de)
+static void append_driver_info(char** str, struct driver_entry* de)
 {
 	append_string(str, de->name);
 	if( strlen(de->postfix) > 0 ) {
@@ -1447,7 +1447,7 @@ static void config_get_option_str_ptr(const xmlNodePtr config_node, const char* 
 	}
 }
 
-int config_init(const char* config_name)
+static int config_init(const char* config_name)
 {
 	int config_found = 0;
 	
@@ -1508,7 +1508,7 @@ int config_init(const char* config_name)
 	return 1;
 }
 
-void config_free()
+static void config_free()
 {
 	if( additional_options ) {
 		xmlFree((xmlChar*)additional_options);
