@@ -8,6 +8,7 @@
 #else
 #define FILESLASH "/"
 #endif
+
 #include <sys/stat.h>
 
 #if !defined(LITTLE_ENDIAN) && !defined(BIG_ENDIAN)
