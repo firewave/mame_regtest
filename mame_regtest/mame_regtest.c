@@ -53,6 +53,7 @@ mame_regtest returncodes:
 
 /* local */
 #include "common.h"
+#include "config.h"
 
 #define VERSION "0.68"
 
@@ -94,8 +95,6 @@ static int xpath_placeholder_size = 11;
 
 static xmlChar* app_ver = NULL;
 static char* debugscript_file = NULL;
-static xmlDocPtr global_config_doc = NULL;
-static xmlNodePtr global_config_root = NULL;
 static char* listxml_output = NULL;
 static char* temp_folder = NULL;
 static char* stdout_temp_file = NULL;
@@ -133,18 +132,6 @@ enum {
 	APP_UNKNOWN = 0,
 	APP_MAME 	= 1,
 	APP_MESS	= 2
-};
-
-enum config_entry_type {
-	CFG_INT 	= 0,
-	CFG_STR 	= 1,
-	CFG_STR_PTR = 2
-};
-
-struct config_entry {
-	const char* name;
-	enum config_entry_type type;
-	void* value;
 };
 
 /* configuration variables */
@@ -223,12 +210,12 @@ struct config_entry mrt_config[] =
 	{ "print_xpath_results",	CFG_INT,		&config_print_xpath_results },
 	{ "test_softreset",			CFG_INT,		&config_test_softreset },
 	{ "hack_pinmame",			CFG_INT,		&config_hack_pinmame },
+	{ NULL,						-1,				NULL }
 };
 
 static int get_png_IDAT_data(const char* png_name, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void open_mng_and_skip_header(const char* mng_name, FILE** mng_fd);
 static int internal_get_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc);
-static void config_free();
 static void cleanup_and_exit(int errcode, const char* errstr);
 
 static void append_driver_info(char** str, struct driver_entry* de)
@@ -574,19 +561,11 @@ static void cleanup_and_exit(int errcode, const char* errstr)
 	}
 #endif
 	
-	if( config_gamelist_xml_file ) {
-		free(config_gamelist_xml_file);
-		config_gamelist_xml_file = NULL;
-	} 
 	if( listxml_output ) {
 		free(listxml_output);
 		listxml_output = NULL;
 	}
-	config_free();
-	if( global_config_doc ) {
-		xmlFreeDoc(global_config_doc);
-		global_config_doc = NULL;
-	}
+	config_free(mrt_config);
 
 	if( stderr_temp_file ) {
 		free(stderr_temp_file);
@@ -1436,170 +1415,6 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 	}
 }
 
-static int config_read_option(const xmlNodePtr config_node, const char* name, xmlChar** option)
-{
-	int result = 0;
-	
-	if( config_node ) {
-		xmlNodePtr config_child = config_node->children;
-		while( config_child != NULL) {
-			if( config_child->type == XML_ELEMENT_NODE ) {
-				if( xmlStrcmp(config_child->name, (const xmlChar*)"option") == 0 ) {
-					xmlChar* opt_name = xmlGetProp(config_child, (const xmlChar*)"name");
-					if( opt_name ) {
-						if( xmlStrcmp(opt_name, (const xmlChar*)name) == 0 ) {
-							result = 1;
-							*option = xmlGetProp(config_child, (const xmlChar*)"value");
-							xmlFree(opt_name);
-							break;
-						}
-						xmlFree(opt_name);
-					}
-				}
-				else {
-					printf("invalid node '%s' found\n", config_child->name);
-				}
-			}
-			
-			config_child = config_child->next;
-		}
-	}
-	
-	/*
-	if( result == 0 )
-		printf("unknown option '%s'\n", name);
-	*/
-	
-	return result;
-}
-
-static void config_read_option_int(const xmlNodePtr config_node, const char* opt_name, int* value)
-{
-	xmlChar* opt = NULL;
-	if( config_read_option(config_node, opt_name, &opt) ) {
-		if( opt && xmlStrlen(opt) > 0 ) {
-			*value = atoi((const char*)opt);
-		}
-	}
-	xmlFree(opt);
-}
-
-static void config_read_option_str(const xmlNodePtr config_node, const char* opt_name, char* value, int size)
-{
-	xmlChar* opt = NULL;
-	if( config_read_option(config_node, opt_name, &opt) ) {
-		if( opt && xmlStrlen(opt) > 0 ) {
-			strncpy(value, (const char*)opt, size-1);
-			value[size-1] = '\0';
-		}
-	}
-	xmlFree(opt);
-}
-
-static void config_read_option_str_ptr(const xmlNodePtr config_node, const char* opt_name, char** value)
-{
-	xmlChar* opt = NULL;
-	if( config_read_option(config_node, opt_name, &opt) ) {
-		xmlChar** tmp = (xmlChar**)value;
-		if( *tmp )
-			xmlFree(*tmp);
-		*tmp = opt;
-	}
-}
-
-static int config_init()
-{
-	if( access(config_xml, F_OK) == -1 ) {
-		printf("'%s' does not exist\n", config_xml);
-		return 0;
-	}
-	printf("using configuration '%s'\n", config_xml);
-
-	global_config_doc = xmlReadFile(config_xml, NULL, 0);
-	if( !global_config_doc ) {
-		printf("could not load configuration\n");
-		return 0;
-	}
-
-	global_config_root = xmlDocGetRootElement(global_config_doc);
-	if( !global_config_root ) {
-		printf("invalid configuration - no root element\n");
-		return 0;
-	}
-
-	if( xmlStrcmp(global_config_root->name, (const xmlChar*)"mame_regtest") != 0 ) {
-		printf("invalid configuration - no 'mame_regtest' element\n");
-		return 0;
-	}
-	
-	return 1;
-}
-
-static int config_read(const char* config_name)
-{
-	int config_found = 0;
-	
-	xmlNodePtr global_config_child = global_config_root->children;
-	while( global_config_child != NULL ) {
-		if( global_config_child->type == XML_ELEMENT_NODE ) {
-			if( xmlStrcmp(global_config_child->name, (const xmlChar*)config_name) == 0 ) {
-				config_found = 1;
-				break;
-			}
-		}
-		
-		global_config_child	= global_config_child->next;
-	}
-	
-	if( !config_found ) {
-		printf("could not find configuration '%s'\n", config_name);
-		return 0;
-	}
-	
-	int config_size = sizeof(mrt_config) / sizeof(struct config_entry);
-	int i = 0;
-	for( ; i < config_size; ++i )
-	{
-		struct config_entry* ce = &mrt_config[i];
-		printf("entry - %s - %d - ", ce->name, ce->type);
-		if( ce->type == CFG_INT ) {
-			int* value = (int*)ce->value;
-			config_read_option_int(global_config_child, ce->name, value);
-			printf("%d\n", *value);
-		}
-		else if( ce->type == CFG_STR ) {
-			char* value = (char*)ce->value;
-			config_read_option_str(global_config_child, ce->name, value, sizeof(value));
-			printf("%s\n", value);
-		}
-		else if( ce->type == CFG_STR_PTR ) {
-			char** value = (char**)ce->value;
-			config_read_option_str_ptr(global_config_child, ce->name, value);
-			printf("%s\n", *value ? *value : "");
-		}
-		else
-			printf("unknown config_entry type\n");
-	}
-
-	return 1;
-}
-
-static void config_free()
-{
-	int config_size = sizeof(mrt_config) / sizeof(struct config_entry);
-	int i = 0;
-	for( ; i < config_size; ++i )
-	{
-		struct config_entry* ce = &mrt_config[i];
-		if( ce->type == CFG_STR_PTR ) {
-			char** value = (char**)ce->value;
-			xmlChar* xml_value = (xmlChar*)*value;
-			xmlFree(xml_value);
-			xml_value = NULL;
-		}
-	}
-}
-
 int main(int argc, char *argv[])
 {
 	printf("mame_regtest %s\n", VERSION);
@@ -1618,20 +1433,17 @@ int main(int argc, char *argv[])
 	printf("\n");
 	
 	printf("initializing configuration\n");
-	int config_res = config_init();
+	int config_res = config_init(config_xml);
 	if( !config_res )
 		cleanup_and_exit(1, "aborting");
 
 	printf("reading configuration 'global'\n");
-	config_res = config_read("global");
+	config_res = config_read(mrt_config, "global");
 	
 	if( config_res && (argc == 2) ) {
 		printf("reading configuration '%s'\n", argv[1]);
-		config_res = config_read(argv[1]);
+		config_res = config_read(mrt_config, argv[1]);
 	}
-	
-	xmlFreeDoc(global_config_doc);
-	global_config_doc = NULL;
 	
 	if( !config_res )
 		cleanup_and_exit(1, "aborting");

@@ -1,7 +1,7 @@
 [Project]
 FileName=mame_regtest.dev
 Name=mame_regtest
-UnitCount=7
+UnitCount=9
 PchHead=-1
 PchSource=-1
 Ver=3
@@ -142,6 +142,26 @@ BuildCmd=
 
 [Unit6]
 FileName=common.c
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit8]
+FileName=config.c
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit9]
+FileName=config.h
 CompileCpp=1
 Folder=
 Compile=1

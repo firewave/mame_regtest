@@ -93,6 +93,7 @@ mame_regtest
 		- move the results and pages on the wiki
 		- add option with folder for device XMLs?
 		- valgrind variables mix libc and libxml2 allocations
+		- config_gamelist_xml_file mixes libc and libxml2 allocations
 
 	Obsolete/External:
 		- HTML report
