@@ -168,7 +168,7 @@ enum {
 static int get_png_IDAT_data(const char* png_name, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void open_mng_and_skip_header(const char* mng_name, FILE** mng_fd);
 static int internal_get_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc);
-static void free_config();
+static void config_free();
 static void cleanup_and_exit(int errcode, const char* errstr);
 
 void append_driver_info(char** str, struct driver_entry* de)
@@ -522,7 +522,7 @@ static void cleanup_and_exit(int errcode, const char* errstr)
 		free(listxml_output);
 		listxml_output = NULL;
 	}
-	free_config();
+	config_free();
 	if( global_config_doc ) {
 		xmlFreeDoc(global_config_doc);
 		global_config_doc = NULL;
@@ -1376,7 +1376,7 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 	}
 }
 
-int get_option(const xmlNodePtr config_node, const char* name, xmlChar** option)
+static int config_get_option(const xmlNodePtr config_node, const char* name, xmlChar** option)
 {
 	int result = 0;
 	
@@ -1413,10 +1413,10 @@ int get_option(const xmlNodePtr config_node, const char* name, xmlChar** option)
 	return result;
 }
 
-static void get_option_int(const xmlNodePtr config_node, const char* opt_name, int* value)
+static void config_get_option_int(const xmlNodePtr config_node, const char* opt_name, int* value)
 {
 	xmlChar* opt = NULL;
-	if( get_option(config_node, opt_name, &opt) ) {
+	if( config_get_option(config_node, opt_name, &opt) ) {
 		if( opt && xmlStrlen(opt) > 0 ) {
 			*value = atoi((const char*)opt);
 		}
@@ -1424,10 +1424,10 @@ static void get_option_int(const xmlNodePtr config_node, const char* opt_name, i
 	xmlFree(opt);
 }
 
-static void get_option_str(const xmlNodePtr config_node, const char* opt_name, char* value, int size)
+static void config_get_option_str(const xmlNodePtr config_node, const char* opt_name, char* value, int size)
 {
 	xmlChar* opt = NULL;
-	if( get_option(config_node, opt_name, &opt) ) {
+	if( config_get_option(config_node, opt_name, &opt) ) {
 		if( opt && xmlStrlen(opt) > 0 ) {
 			strncpy(value, (const char*)opt, size-1);
 			value[size-1] = '\0';
@@ -1436,10 +1436,10 @@ static void get_option_str(const xmlNodePtr config_node, const char* opt_name, c
 	xmlFree(opt);
 }
 
-static void get_option_str_ptr(const xmlNodePtr config_node, const char* opt_name, char** value)
+static void config_get_option_str_ptr(const xmlNodePtr config_node, const char* opt_name, char** value)
 {
 	xmlChar* opt = NULL;
-	if( get_option(config_node, opt_name, &opt) ) {
+	if( config_get_option(config_node, opt_name, &opt) ) {
 		xmlChar** tmp = (xmlChar**)value;
 		if( *tmp )
 			xmlFree(*tmp);
@@ -1447,7 +1447,7 @@ static void get_option_str_ptr(const xmlNodePtr config_node, const char* opt_nam
 	}
 }
 
-int read_config(const char* config_name)
+int config_init(const char* config_name)
 {
 	int config_found = 0;
 	
@@ -1468,47 +1468,47 @@ int read_config(const char* config_name)
 		return 0;
 	}
 	
-	get_option_str_ptr(global_config_child, "executable", &mame_exe);
-	get_option_str(global_config_child, "str", str_str, sizeof(str_str));
-	get_option_int(global_config_child, "pause_interval", &pause_at);
-	get_option_str_ptr(global_config_child, "listxml_file", &gamelist_xml_file);
-	get_option_int(global_config_child, "use_autosave", &use_autosave);
-	get_option_int(global_config_child, "use_ramsize", &use_ramsize);
-	get_option_int(global_config_child, "write_mng", &write_mng);
+	config_get_option_str_ptr(global_config_child, "executable", &mame_exe);
+	config_get_option_str(global_config_child, "str", str_str, sizeof(str_str));
+	config_get_option_int(global_config_child, "pause_interval", &pause_at);
+	config_get_option_str_ptr(global_config_child, "listxml_file", &gamelist_xml_file);
+	config_get_option_int(global_config_child, "use_autosave", &use_autosave);
+	config_get_option_int(global_config_child, "use_ramsize", &use_ramsize);
+	config_get_option_int(global_config_child, "write_mng", &write_mng);
 #if USE_VALGRIND
-	get_option_int(global_config_child, "use_valgrind", &use_valgrind);
-	get_option_str_ptr(global_config_child, "valgrind_binary", &valgrind_binary);
-	get_option_str_ptr(global_config_child, "valgrind_parameters", &valgrind_parameters);
+	config_get_option_int(global_config_child, "use_valgrind", &use_valgrind);
+	config_get_option_str_ptr(global_config_child, "valgrind_binary", &valgrind_binary);
+	config_get_option_str_ptr(global_config_child, "valgrind_parameters", &valgrind_parameters);
 #endif
-	get_option_str_ptr(global_config_child, "rompath", &rompath_folder);
-	get_option_int(global_config_child, "use_bios", &use_bios);
-	get_option_int(global_config_child, "use_sound", &use_sound);	
-	get_option_int(global_config_child, "use_throttle", &use_throttle);
-	get_option_int(global_config_child, "use_debug", &use_debug);
-	get_option_str_ptr(global_config_child, "xpath_expr", &xpath_expr);
-	get_option_int(global_config_child, "use_devices", &use_devices);
-	get_option_int(global_config_child, "hack_ftr", &hack_ftr);
-	get_option_int(global_config_child, "hack_biospath", &hack_biospath);
-	get_option_int(global_config_child, "hack_debug", &hack_debug);
-	get_option_int(global_config_child, "hack_mngwrite", &hack_mngwrite);
-	get_option_int(global_config_child, "use_nonrunnable", &use_nonrunnable);
-	get_option_str(global_config_child, "output_folder", output_folder, sizeof(output_folder));
-	get_option_str_ptr(global_config_child, "device_file", &global_device_file);
-	get_option_int(global_config_child, "use_isbios", &use_isbios);
-	get_option_int(global_config_child, "store_output", &store_output);
-	get_option_int(global_config_child, "clear_output_folder", &clear_output_folder);
-	get_option_int(global_config_child, "test_createconfig", &test_createconfig);
-	get_option_str_ptr(global_config_child, "additional_options", &additional_options);
-	get_option_int(global_config_child, "skip_mandatory", &skip_mandatory);
-	get_option_int(global_config_child, "osdprocessors", &osdprocessors);
-	get_option_int(global_config_child, "print_xpath_results", &print_xpath_results);
-	get_option_int(global_config_child, "test_softreset", &test_softreset);	
-	get_option_int(global_config_child, "hack_pinmame", &hack_pinmame);	
+	config_get_option_str_ptr(global_config_child, "rompath", &rompath_folder);
+	config_get_option_int(global_config_child, "use_bios", &use_bios);
+	config_get_option_int(global_config_child, "use_sound", &use_sound);	
+	config_get_option_int(global_config_child, "use_throttle", &use_throttle);
+	config_get_option_int(global_config_child, "use_debug", &use_debug);
+	config_get_option_str_ptr(global_config_child, "xpath_expr", &xpath_expr);
+	config_get_option_int(global_config_child, "use_devices", &use_devices);
+	config_get_option_int(global_config_child, "hack_ftr", &hack_ftr);
+	config_get_option_int(global_config_child, "hack_biospath", &hack_biospath);
+	config_get_option_int(global_config_child, "hack_debug", &hack_debug);
+	config_get_option_int(global_config_child, "hack_mngwrite", &hack_mngwrite);
+	config_get_option_int(global_config_child, "use_nonrunnable", &use_nonrunnable);
+	config_get_option_str(global_config_child, "output_folder", output_folder, sizeof(output_folder));
+	config_get_option_str_ptr(global_config_child, "device_file", &global_device_file);
+	config_get_option_int(global_config_child, "use_isbios", &use_isbios);
+	config_get_option_int(global_config_child, "store_output", &store_output);
+	config_get_option_int(global_config_child, "clear_output_folder", &clear_output_folder);
+	config_get_option_int(global_config_child, "test_createconfig", &test_createconfig);
+	config_get_option_str_ptr(global_config_child, "additional_options", &additional_options);
+	config_get_option_int(global_config_child, "skip_mandatory", &skip_mandatory);
+	config_get_option_int(global_config_child, "osdprocessors", &osdprocessors);
+	config_get_option_int(global_config_child, "print_xpath_results", &print_xpath_results);
+	config_get_option_int(global_config_child, "test_softreset", &test_softreset);	
+	config_get_option_int(global_config_child, "hack_pinmame", &hack_pinmame);	
 	
 	return 1;
 }
 
-void free_config()
+void config_free()
 {
 	if( additional_options ) {
 		xmlFree((xmlChar*)additional_options);
@@ -1577,11 +1577,11 @@ int main(int argc, char *argv[])
 	}
 	
 	printf("reading configuration 'global'\n");
-	int config_res = read_config("global");
+	int config_res = config_init("global");
 	
 	if( config_res && (argc == 2) ) {
 		printf("reading configuration '%s'\n", argv[1]);
-		config_res = read_config(argv[1]);
+		config_res = config_init(argv[1]);
 	}
 	
 	xmlFreeDoc(global_config_doc);
