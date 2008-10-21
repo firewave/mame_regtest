@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<create_report>
+	<report_10>
+		<option name='xml_folder' value='d:\mess\mrt_output.rev3478'/>
+		<option name='output_file' value='d:\report_10.txt'/>
+		<option name='print_stderr' value='1'/>
+		<option name='dokuwiki_format' value='1'/>
+		<option name='ignore_exitcode_4' value='1'/>
+		<option name='show_memleaks' value='1'/>
+		<option name='show_clipped' value='1'/>
+		<option name='group_data' value='1'/>
+	</report_10>
+</create_report>

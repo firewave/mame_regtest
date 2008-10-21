@@ -27,7 +27,10 @@ mame_regtest
 			- empty options will not properly overwrite/reset existing options to default values
 			- print config values in read function (or put in array and print function for array)
 			- cleanup post-loading code of configuration (checks, output etc.)
-			- proper handling of default values in config
+			- proper handling of default values in config (add additional entry in struct)
+			- move variables into the structure (only one dynamic string type)
+			- read all options as const to avoid modifications outside the config
+			- report unknown options
 		- store both output file states in case of autosave
 		- add macro to output files/folders for version/revsion etc.
 		- how to test system configurations
@@ -71,7 +74,6 @@ mame_regtest
 			- list_insert() - sorted
 			- list_append() - unsorted
 			- list_free()
-		- create config for create_report
 		- update building instructions in Wiki
 		- use more command-line options
 			- verify*
@@ -94,6 +96,12 @@ mame_regtest
 		- add option with folder for device XMLs?
 		- valgrind variables mix libc and libxml2 allocations
 		- config_gamelist_xml_file mixes libc and libxml2 allocations
+		- make it possible to use multiple configurations
+			- config_object {
+				void* xml;
+				void* root;
+				config_entries[]
+			}
 
 	Obsolete/External:
 		- HTML report

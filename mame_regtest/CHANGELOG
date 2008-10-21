@@ -387,6 +387,4 @@
 	- cleaned up global variables
 
 	create_report
-	- added "report 1", which creates a file with all driver, that didn't return 0
-	- added "report 2", which creates a file with all driver, that didn't return 0 along with stderr information
-	TODO: ... all changes
+	- initial version

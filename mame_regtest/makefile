@@ -24,7 +24,7 @@ clean:
 create_image_xml$(BIN_EXT): create_image_xml.c common.c
 	$(CC) $(LIBXML2_INC) $(CFLAGS) $? $(LIBS) -o $@
 
-create_report$(BIN_EXT): create_report.c common.c
+create_report$(BIN_EXT): create_report.c common.c config.c
 	$(CC) $(LIBXML2_INC) $(CFLAGS) $? $(LIBS) -o $@
 
 mame_regtest$(BIN_EXT): mame_regtest.c common.c config.c
