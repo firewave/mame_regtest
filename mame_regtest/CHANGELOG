@@ -388,3 +388,6 @@
 
 	create_report
 	- initial version
+
+	create_image_xml
+	- added version number

@@ -6,6 +6,8 @@
 
 #include "common.h"
 
+#define VERSION "0.68"
+
 struct image_file_data
 {
 	const char* type;
@@ -31,6 +33,8 @@ static void build_image_list(const char* dirname, const char* type, xmlNodePtr n
 
 int main(int argc, char *argv[])
 {
+	printf("create_image_xml %s\n", VERSION);
+
 	if( argc != 4 ) {
 		printf("usage: create_image_xml <path> <output> <type>\n");
 		exit(0);

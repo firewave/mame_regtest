@@ -67,7 +67,6 @@ mame_regtest
 		- better way to align the dummy_root INI lines
 		- read images from folder with same name as device (look for XML first / specify folder in XML?)
 		- do not run drivers with mandatory devices without an image, if a device list exists
-		- add version number to create_report and create_image_xml (0.1 or the actual mame_regtest version)
 		- use functions for lists
 			- list_create()
 			- list_next_entry()

@@ -9,6 +9,8 @@
 #include "common.h"
 #include "config.h"
 
+#define VERSION "0.68"
+
 /*
 	TODO:
 		- errorhandling for _key/devices entries
@@ -348,6 +350,8 @@ static void create_report()
 
 int main(int argc, char *argv[])
 {
+	printf("create_report %s\n", VERSION);
+	
 	if( argc != 2 ) {
 		printf("usage: create_report <report_name>\n");
 		exit(1);
