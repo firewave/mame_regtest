@@ -288,15 +288,6 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 	append_quoted_string(sys, config_mame_exe);
 }
 
-static int mrt_mkdir(const char* path)
-{
-#ifdef WIN32
-	return mkdir(path);
-#else
-	return mkdir(path, 0777); 
-#endif
-}
-
 static int parse_mng(const char* file, xmlNodePtr filenode)
 {
 	int frame = 0;

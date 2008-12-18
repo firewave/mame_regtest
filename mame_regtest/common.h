@@ -61,4 +61,6 @@ void parse_directory(const char* dirname,
 
 int is_absolute_path(const char* path);
 
+int mrt_mkdir(const char* path);
+
 #endif

@@ -199,3 +199,12 @@ int is_absolute_path(const char* path)
 
 	return 0;
 }
+
+int mrt_mkdir(const char* path)
+{
+#ifdef WIN32
+	return mkdir(path);
+#else
+	return mkdir(path, 0777);
+#endif
+}

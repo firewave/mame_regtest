@@ -391,3 +391,6 @@
 
 	create_image_xml
 	- added version number
+
+0.69
+	- moved mrt_mkdir() to common.c/.h
