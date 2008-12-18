@@ -55,7 +55,7 @@ mame_regtest returncodes:
 #include "common.h"
 #include "config.h"
 
-#define VERSION "0.68"
+#define VERSION "0.69"
 
 struct driver_info {
 	xmlChar* name;
