@@ -91,7 +91,7 @@ mame_regtest
 		- polystar shows just a "<" as result
 		- fix compilation on systems, that already have a htonl() function
 		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER?)
-		- move the results and pages on the wiki
+		- move the result pages on the wiki
 		- add option with folder for device XMLs?
 		- valgrind variables mix libc and libxml2 allocations
 		- config_gamelist_xml_file mixes libc and libxml2 allocations
@@ -101,6 +101,15 @@ mame_regtest
 				void* root;
 				config_entries[]
 			}
+		- create default configuration for create_report to match removed options
+			- result_file
+			- stdout_file
+			- stderr_file
+		- add documentation for create_report configuration
+		- rename CFG_STR_PTR to CFG_STR
+		- handle all options as string (use atoi() to convert to integers)
+		- use register function to add config values?
+		- make it possible to run multiple instances of mame_regtest at the same time (create the temporary files with the process ID appended?)
 
 	Obsolete/External:
 		- HTML report
