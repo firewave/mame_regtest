@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <create_report>
 	<report_10>
+		<option name='report_type' value='0'/>
 		<option name='xml_folder' value='d:\mess\mrt_output'/>
 		<option name='output_file' value='d:\report_10.txt'/>
 		<option name='print_stderr' value='1'/>
@@ -10,4 +11,12 @@
 		<option name='show_clipped' value='1'/>
 		<option name='group_data' value='1'/>
 	</report_10>
+	<comparison>
+		<option name='report_type' value='1'/>
+		<option name='xml_folder' value='d:\mame\mrt_output.129u3'/>
+		<option name='compare_folder' value='d:\mame\mrt_output.129u5'/>
+		<option name='output_file' value='d:\mrt_diff.txt'/>
+		<option name='dokuwiki_format' value='1'/>
+		<option name='group_data' value='1'/>
+	</comparison>
 </create_report>

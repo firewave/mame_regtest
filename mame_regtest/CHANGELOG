@@ -395,3 +395,8 @@
 0.69
 	- moved mrt_mkdir() to common.c/.h
 	- added "get_filename" to common.c/.h
+
+	create_report
+	- added option "report_type" (0 = result report / 1 = comparison report)
+	- added option "compare_folder" (used for comparison report to compare "xml_folder" against)
+	- implemented comparison report (checks "exitcode", "stderr" and "png_crc")
