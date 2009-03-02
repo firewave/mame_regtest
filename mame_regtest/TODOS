@@ -126,6 +126,8 @@ mame_regtest
 		- "output_folder" doesn't work
 		- test setcwd() on start-up and bail out when it fails
 		- add the PNG/MNG sizes (e.g. 640x480) to the output XML
+		- make doesn't work when the additional files already exist
+		- create_report crashes when "compare_folder" is missing
 
 	Obsolete/External:
 		- HTML report
@@ -143,10 +145,18 @@ mame_regtest
 		- regression detection (compare different versions and tell between which it did change)
 		- extract differing frames (also for HTML report)
 		- show PNG differences (use Aaron's code)
-		- do a very simple comparison based on hard-coded XPath expressions based on the first folder
-			- exitcode
-			- snapshot
-			- autosave
+
+	mrt_compare (obsolete)
+		- configuration
+		- color codes based on exitcodes
+		- expose the data (collect the necessary XMLs and add them to a subfolder?)
+		- wiki syntax
+			| row1 | row 2 |
+		- create an intermediate format to process, so it's not necessary to process all output again when a new version comes out
+			- add option to merge the output to a report
+		- properly handle sets with autosave (use index in XPath to access the second set of nodes when both support autosave)
+		- handle missing attributes properly
+		- add the various XPaths as options in the configuration
 
 	Linux:
 		- add a signal handler for linux?
