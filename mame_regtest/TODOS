@@ -105,11 +105,27 @@ mame_regtest
 			- result_file
 			- stdout_file
 			- stderr_file
+			- add some useful reports from old create_report
 		- add documentation for create_report configuration
 		- rename CFG_STR_PTR to CFG_STR
 		- handle all options as string (use atoi() to convert to integers)
 		- use register function to add config values?
 		- make it possible to run multiple instances of mame_regtest at the same time (create the temporary files with the process ID appended?)
+		- bail out when invalid config type found
+		- replace "pause_at" with a signal file (add pid to it to support multiple instances?)
+		- create_report crashes when an invalid report is specified
+		- add memory dumps to the output files for -debug runs?
+		- change tests to do
+			- a run on the official binary once the cycle is completed
+			- runs with the usual builds on the u-releases
+		- document on the wiki
+			- the different builds
+			- how the results are created
+			- the machine the tests are run on
+		- fix Fedora Core 10 compilation (MAX_PATH)
+		- "output_folder" doesn't work
+		- test setcwd() on start-up and bail out when it fails
+		- add the PNG/MNG sizes (e.g. 640x480) to the output XML
 
 	Obsolete/External:
 		- HTML report
@@ -127,6 +143,10 @@ mame_regtest
 		- regression detection (compare different versions and tell between which it did change)
 		- extract differing frames (also for HTML report)
 		- show PNG differences (use Aaron's code)
+		- do a very simple comparison based on hard-coded XPath expressions based on the first folder
+			- exitcode
+			- snapshot
+			- autosave
 
 	Linux:
 		- add a signal handler for linux?
