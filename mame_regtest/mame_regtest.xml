@@ -11,13 +11,13 @@
 
 		<!-- processing options -->
 		<option name='pause_interval' value='0'/>
-		<option name='use_devices' value=''/>
-		<option name='use_nonrunnable' value=''/>
+		<option name='use_devices' value='1'/>
+		<option name='use_nonrunnable' value='0'/>
 		<option name='xpath_expr' value=''/>
 		<option name='device_file' value=''/>
-		<option name='use_isbios' value=''/>
-		<option name='skip_mandatory' value=''/>
-		<option name='test_softreset' value=''/>
+		<option name='use_isbios' value='0'/>
+		<option name='skip_mandatory' value='0'/>
+		<option name='test_softreset' value='0'/>
 		
 		<!-- xpath_expr examples -->
 		<!-- 'start_at' equivalent
@@ -32,35 +32,35 @@
 	
 		<!-- commandline options -->
 		<option name='str' value='2'/>
-		<option name='use_bios' value=''/>
-		<option name='use_sound' value=''/>
-		<option name='use_ramsize' value=''/>
-		<option name='use_autosave' value=''/>
-		<option name='use_throttle' value=''/>
-		<option name='use_debug' value=''/>
-		<option name='write_mng' value=''/>
+		<option name='use_bios' value='0'/>
+		<option name='use_sound' value='0'/>
+		<option name='use_ramsize' value='0'/>
+		<option name='use_autosave' value='0'/>
+		<option name='use_throttle' value='0'/>
+		<option name='use_debug' value='0'/>
+		<option name='write_mng' value='0'/>
 		<option name='additional_options' value=''/>
 		
 		<!-- output files -->
-		<option name='output_folder' value=''/>
-		<option name='store_output' value=''/>
-		<option name='clear_output_folder' value=''/>
-		<option name='print_xpath_results' value=''/>
+		<option name='output_folder' value='mrt_output'/>
+		<option name='store_output' value='0'/>
+		<option name='clear_output_folder' value='0'/>
+		<option name='print_xpath_results' value='0'/>
 
 		<!-- valgrind options -->
-		<option name='use_valgrind' value=''/>
-		<option name='valgrind_binary' value=''/>
-		<option name='valgrind_parameters' value=''/>
+		<option name='use_valgrind' value='0'/>
+		<option name='valgrind_binary' value='valgrind'/>
+		<option name='valgrind_parameters' value='--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --leak-resolution=med'/>
 
 		<!-- additional options -->
-		<option name='test_createconfig' value=''/>
+		<option name='test_createconfig' value='1'/>
 
 		<!-- hacks -->
-		<option name='hack_debug' value=''/>
-		<option name='hack_ftr' value=''/>
-		<option name='hack_biospath' value=''/>
-		<option name='hack_mngwrite' value=''/>
-		<option name='hack_pinmame' value=''/>
+		<option name='hack_debug' value='0'/>
+		<option name='hack_ftr' value='0'/>
+		<option name='hack_biospath' value='0'/>
+		<option name='hack_mngwrite' value='0'/>
+		<option name='hack_pinmame' value='0'/>
 	</global>
 	<mess>
 		<option name='executable' value='mess.exe'/>
