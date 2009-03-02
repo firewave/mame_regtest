@@ -30,8 +30,11 @@
 #endif
 
 int mrt_getch();
+
+/* you have to free the pointer you append the string to */
 void append_string(char** str, const char* str_to_append);
 void append_quoted_string(char** str, const char* str_to_append);
+
 int read_file(const char* file, char** content);
 int copy_file(const char* source, const char* dest);
 
@@ -62,5 +65,8 @@ void parse_directory(const char* dirname,
 int is_absolute_path(const char* path);
 
 int mrt_mkdir(const char* path);
+
+/* you have to free the result */
+char* get_filename(const char* filepath);
 
 #endif

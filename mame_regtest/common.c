@@ -208,3 +208,14 @@ int mrt_mkdir(const char* path)
 	return mkdir(path, 0777);
 #endif
 }
+
+char* get_filename(const char* filepath)
+{
+	char* result = NULL;
+	
+	char* pos = strrchr(filepath, FILESLASH[0]);
+	if( pos )
+		append_string(&result, pos+1);
+
+	return result;	
+}
