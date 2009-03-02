@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <create_report>
 	<report_10>
-		<option name='xml_folder' value='d:\mess\mrt_output.rev3478'/>
+		<option name='xml_folder' value='d:\mess\mrt_output'/>
 		<option name='output_file' value='d:\report_10.txt'/>
 		<option name='print_stderr' value='1'/>
 		<option name='dokuwiki_format' value='1'/>
