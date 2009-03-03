@@ -55,15 +55,6 @@ mame_regtest
 			- -listxml (strip duplicated "sampleof" attribute / has stray & in rom name)
 			- no "sourcefile" attribute
 			- OK screens (-skip_disclaimer / -skip_gameinfo)
-		- write comparison tool
-			- parse dir A and check dir B for missing file
-			- parse dir B and check dir A for new files
-			- show the following
-				- files differ (PNG/MNG frame diffs)
-				- exitcode differs
-				- files missing
-				- new files
-				- stdout/stderr differs
 		- better way to align the dummy_root INI lines
 		- read images from folder with same name as device (look for XML first / specify folder in XML?)
 		- do not run drivers with mandatory devices without an image, if a device list exists
@@ -90,7 +81,7 @@ mame_regtest
 		- fix display of autosave drivers in reports
 		- polystar shows just a "<" as result
 		- fix compilation on systems, that already have a htonl() function
-		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER?)
+		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER? LSB_FIRST?)
 		- move the result pages on the wiki
 		- add option with folder for device XMLs?
 		- valgrind variables mix libc and libxml2 allocations
@@ -106,14 +97,12 @@ mame_regtest
 			- stdout_file
 			- stderr_file
 			- add some useful reports from old create_report
-		- add documentation for create_report configuration
 		- rename CFG_STR_PTR to CFG_STR
 		- handle all options as string (use atoi() to convert to integers)
 		- use register function to add config values?
 		- make it possible to run multiple instances of mame_regtest at the same time (create the temporary files with the process ID appended?)
 		- bail out when invalid config type found
 		- replace "pause_at" with a signal file (add pid to it to support multiple instances?)
-		- create_report crashes when an invalid report is specified
 		- add memory dumps to the output files for -debug runs?
 		- change tests to do
 			- a run on the official binary once the cycle is completed
@@ -126,10 +115,21 @@ mame_regtest
 		- "output_folder" doesn't work
 		- test setcwd() on start-up and bail out when it fails
 		- add the PNG/MNG sizes (e.g. 640x480) to the output XML
-		- make doesn't work when the additional files already exist
-		- create_report crashes when "compare_folder" is missing
-
-	Obsolete/External:
+		- make doesn't work when the additional files already exist		
+		
+	create_report:
+		- write comparison tool
+			- parse dir A and check dir B for missing file
+			- parse dir B and check dir A for new files
+			- show the following
+				- files differ (PNG/MNG frame diffs)
+				- exitcode differs
+				- files missing
+				- new files
+				- stdout/stderr differs
+		- add documentation for configuration
+		- crashes when an invalid report is specified
+		- crashes when "compare_folder" is missing
 		- HTML report
 			- create HTML report (different variants)
 				Unexpected Returnvalues (sourcefile - driver - returncode - details [flags, stdout])
@@ -142,12 +142,8 @@ mame_regtest
 			- put HTML report into a folder and copy pictures in a <html_report_name>_new/<html_report_name>_ref folder
 			- add option for main HTML report folder
 			- make HTML report work in Mozilla ( use /ref and /new links)
-		- regression detection (compare different versions and tell between which it did change)
 		- extract differing frames (also for HTML report)
 		- show PNG differences (use Aaron's code)
-
-	mrt_compare (obsolete)
-		- configuration
 		- color codes based on exitcodes
 		- expose the data (collect the necessary XMLs and add them to a subfolder?)
 		- wiki syntax
