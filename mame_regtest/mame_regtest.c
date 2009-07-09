@@ -22,7 +22,7 @@ MAME/MESS returncodes:
         128 - ???  
         100 - exception
 -1073741819 - exception (SDLMAME/SDLMESS)
-	
+
 mame_regtest returncodes:
 	0 - OK
 	1 - error
@@ -246,7 +246,7 @@ static void strip_sampleof_pinmame(const char* listxml_in, const char* listxml_o
 		
 		fclose(out_fd);
 		out_fd = NULL;
-		
+
 		fclose(in_fd);
 		in_fd = NULL;
 	}
@@ -263,7 +263,7 @@ static const char* get_inifile()
 			printf("invalid application type\n");
 			cleanup_and_exit(1, "aborting");
 	}
-	
+
 	return ""; /* shut up compiler */
 }
 
@@ -282,7 +282,7 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 			append_driver_info(sys, de);
 		}
 		else {
-			append_string(sys, callstr);			
+			append_string(sys, callstr);
 		}
 		append_string(sys, ".valgrind_%p");
 		append_string(sys, " ");
@@ -351,7 +351,7 @@ static int parse_mng(const char* file, xmlNodePtr filenode)
 
 	fclose(mng_fd);
 	mng_fd = NULL;
-	
+
 	return frame;
 }
 
@@ -361,13 +361,13 @@ static void calc_crc32(const char* file, unsigned int* crc)
 	FILE* fd = fopen(file, "rb");
 	if( !fd )
 		return;
-	
+
 	size_t bytesread;
 	*crc = crc32(0L, Z_NULL, 0);
 	while( (bytesread = fread(buffer, 1, 1024, fd)) != 0 ) {
 		*crc = crc32(*crc, (const Bytef*)buffer, bytesread);
 	}
-	
+
 	fclose(fd);
 	fd = NULL;
 }
@@ -375,16 +375,16 @@ static void calc_crc32(const char* file, unsigned int* crc)
 static FILE* mrt_fopen(const char* filename, const char* attr)
 {
 	FILE* result = NULL;
-	
+
 	char* outputfile = NULL;
 	append_string(&outputfile, config_output_folder);
 	append_string(&outputfile, FILESLASH);
 	append_string(&outputfile, filename);
-	
+
 	result = fopen(outputfile, attr);
-	
+
 	free(outputfile);
-	
+
 	return result;
 }
 
@@ -609,7 +609,7 @@ static void print_driver_info(struct driver_entry* de, FILE* print_fd)
 static void free_image_entries(struct image_entry* images)
 {
 	while( images ) {
-		struct image_entry* temp = images;		
+		struct image_entry* temp = images;
 		images = images->next;
 		free(temp);
 	}
@@ -618,7 +618,7 @@ static void free_image_entries(struct image_entry* images)
 static int read_image_entries(const xmlNodePtr node, struct image_entry** images)
 {
 	*images = NULL;
-	
+
 	xmlAttrPtr attrs = node->properties;
 	struct image_entry* last = NULL;
 	while( attrs ) {
@@ -634,7 +634,7 @@ static int read_image_entries(const xmlNodePtr node, struct image_entry** images
 			image->device_file = value->content;
 		else
 			image->device_file = NULL;
-	
+
 		if( last )
 			last->next = image;
 		else
@@ -732,9 +732,9 @@ static int get_IHDR_data(FILE* in_fd, unsigned int* IHDR_width, unsigned int* IH
 		
 		return 1;
 	}
-	
+
 	printf("could not find IHDR chunk\n");
-	
+
 	return 0;
 }
 
@@ -743,20 +743,20 @@ static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, uns
 	unsigned int chunk_size = 0;
 	unsigned int reversed_chunk_size = 0;
 	unsigned char chunk_name[4] = "";
-	
+
 	do {
 		if( fread(&chunk_size, sizeof(unsigned int), 1, in_fd) != 1 ) {
 			printf("could not read chunk size\n");
 			return 0;
 		}
-				
+
 		reversed_chunk_size = htonl(chunk_size);
 		
 		if( fread(chunk_name, sizeof(unsigned char), 4, in_fd) != 4 ) {
 			printf("could not read chunk name\n");
 			return 0;
 		}
-		
+
 		if( memcmp(IDAT_name, chunk_name, 4) == 0 ) {
 			fseek(in_fd, reversed_chunk_size, SEEK_CUR); /* jump IDAT chunk */
 			
@@ -771,19 +771,19 @@ static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, uns
 				return 1;
 			}
 		}
-		
+
 		if( memcmp(IEND_name, chunk_name, 4) == 0 ) {
 			fseek(in_fd, reversed_chunk_size, SEEK_CUR); /* jump IEND chunk */
 			fseek(in_fd, 4, SEEK_CUR); /* jump CRC */
 			return 0;
 		}
-		
+
 		if( memcmp(MEND_name, chunk_name, 4) == 0 ) {
 			fseek(in_fd, reversed_chunk_size, SEEK_CUR); /* jump MEND chunk */
 			fseek(in_fd, 4, SEEK_CUR); /* jump CRC */
 			return 2;
 		}
-		
+
 		fseek(in_fd, reversed_chunk_size, SEEK_CUR); /* jump chunk */
 		fseek(in_fd, 4, SEEK_CUR); /* jump CRC */
 	} while(1);
@@ -806,26 +806,26 @@ static int get_png_data(const char* png_name, unsigned int *IHDR_width, unsigned
 		fclose(png_fd);
 		return 0;
 	}
-	
+
 	if( memcmp(png_sig, sig, 8) != 0 ) {
 		printf("contains no PNG signature: %s\n", png_name);
 		fclose(png_fd);
 		return 0;		
 	}
-	
+
 	int IHDR_res = get_IHDR_data(png_fd, IHDR_width, IHDR_height);
 	if( IHDR_res != 1 ) {
 		printf("error getting IHDR data: %s\n", png_name);
 		fclose(png_fd);
 		return IHDR_res;
 	}
-	
+
 	int IDAT_res = internal_get_next_IDAT_data(png_fd, IDAT_size, IDAT_crc);
 	if( IDAT_res != 1 ) 
 		printf("error getting IDAT data: %s\n", png_name);
-	
+
 	fclose(png_fd);
-	
+
 	return IDAT_res;
 }
 
@@ -836,18 +836,18 @@ static void open_mng_and_skip_sig(const char* mng_name, FILE** mng_fd)
 		printf("could not open %s\n", mng_name);
 		return;
 	}
-	
+
 	fseek(*mng_fd, 0, SEEK_SET);
-	
+
 	unsigned char sig[8] = "";
-	
+
 	if( fread(sig, sizeof(unsigned char), 8, *mng_fd) != 8 ) {
 		printf("could not read signature: %s\n", mng_name);
 		fclose(*mng_fd);
 		*mng_fd = NULL;
 		return;
 	}
-	
+
 	if( memcmp(mng_sig, sig, 8) != 0 ) {
 		printf("contains no MNG signature: %s\n", mng_name);
 		fclose(*mng_fd);
@@ -862,7 +862,7 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 	if( config_use_autosave && de->autosave )
 		printf(" (autosave)");
 	printf("\n");
-	
+
 	/* DEBUG!!! */
 	/* return 1; */
 
@@ -870,7 +870,7 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 	
 	/* the whole command-line has to be quoted - begin */
 	append_string(&sys, "\" ");
-	
+
 	get_executable(&sys, de, NULL);
 	append_string(&sys, " ");
 	append_string(&sys, de->name);
@@ -924,7 +924,7 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 
 	append_string(&sys, " > ");
 	append_quoted_string(&sys, stdout_temp_file);
-	
+
 	append_string(&sys, " 2> ");
 	append_quoted_string(&sys, stderr_temp_file);
 
@@ -965,7 +965,7 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 	}
 	else { /* sys_res == 0 */
 	}
-	
+
 	return 1;
 }
 
@@ -975,10 +975,10 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 		xmlFree(app_ver);
 		app_ver = NULL;
 	}
-	
+
 	if( driv_inf == NULL )
 		return;
-	
+
 	struct driver_info* actual_driv_inf = driv_inf;
 	do {
 		if( actual_driv_inf->name )
@@ -996,7 +996,7 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 			for( ; i < actual_driv_inf->device_count; ++i ) {
 				xmlFree(actual_driv_inf->devices[i]);
 			}
-		}		
+		}
 		if( actual_driv_inf->next ) {
 			struct driver_info* tmp_driv_inf = actual_driv_inf;
 			actual_driv_inf = (struct driver_info*)actual_driv_inf->next;
@@ -1033,7 +1033,7 @@ static int execute_mame2(struct driver_entry* de)
 	xmlDocPtr output_doc = xmlNewDoc((const xmlChar*)"1.0");
 	xmlNodePtr output_node = xmlNewNode(NULL, (const xmlChar*)"output");
 	xmlDocSetRootElement(output_doc, output_node);
-	
+
 	xmlNewProp(output_node, (const xmlChar*)"name", (const xmlChar*)de->name);
 	xmlNewProp(output_node, (const xmlChar*)"sourcefile", (const xmlChar*)de->sourcefile);
 	if( de->autosave )
@@ -1057,9 +1057,9 @@ static int execute_mame2(struct driver_entry* de)
 				(images->device_file && xmlStrlen(images->device_file) > 0) ) {
 				xmlNewProp(devices_node, images->device_type, images->device_file);
 			}
-	
+
 			images = images->next;
-		}			
+		}
 	}
 
 	res = execute_mame(de, &result1);
@@ -1104,7 +1104,7 @@ static int execute_mame2(struct driver_entry* de)
 	
 	free(outputname);
 	outputname = NULL;
-	
+
 	if( output_doc ) {
 		xmlFreeDoc(output_doc);
 		output_doc = NULL;
@@ -1170,11 +1170,11 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 				device_doc = NULL;
 			}
 		}
-		
+
 		free(device_file);
 		device_file = NULL;
 	}
-	
+
 	return res;
 }
 
@@ -1182,7 +1182,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 {
 	if( driv_inf == NULL )
 		return;
-	
+
 	struct driver_info* actual_driv_inf = driv_inf;
 	int res = 0;
 	do {
@@ -1195,7 +1195,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 		de.postfix[0] = '\0';
 		de.autosave = actual_driv_inf->savestate;
 		de.device_mandatory = actual_driv_inf->device_mandatory;
-		
+
 		/* only run with the default options when no additional bioses or ramsizes are available to avoid duplicate runs */
 		if( actual_driv_inf->bios_count <= 1 &&
 			actual_driv_inf->ram_count <= 1 ) {
@@ -1212,10 +1212,10 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				
 				res = execute_mame3(&de, actual_driv_inf);
 			}
-			
+
 			de.bios = NULL;
 		}
-		
+
 		if( actual_driv_inf->ram_count > 1 ) {
 			int i = 0;
 			for( ; i < actual_driv_inf->ram_count; ++i )
@@ -1226,10 +1226,10 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 
 				res = execute_mame3(&de, actual_driv_inf);
 			}
-			
+
 			de.ramsize = 0;
 		}
-		
+
 		if( actual_driv_inf->bios_count > 0 &&
 			actual_driv_inf->ram_count > 0 ) {
 			int bios_i = 0;
@@ -1241,14 +1241,14 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				for( ; ram_i < actual_driv_inf->ram_count; ++ram_i )
 				{
 					snprintf(de.postfix, sizeof(de.postfix), "bios%05dram%05d", bios_i, ram_i);
-	
+
 					de.ramsize = actual_driv_inf->ramsizes[ram_i];
-	
+
 					res = execute_mame3(&de, actual_driv_inf);
 				}
 			}
 		}
-		
+
 		if( actual_driv_inf->next )
 			actual_driv_inf = (struct driver_info*)actual_driv_inf->next;
 		else
@@ -1285,7 +1285,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 				}
 			}
 		}
-		
+
 		xmlChar* sourcefile = xmlGetProp(game_child, (const xmlChar*)"sourcefile");
 		if( !sourcefile ) {
 			if( config_hack_pinmame ) {
@@ -1306,16 +1306,16 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 			return;
 		}
 		memset(*new_driv_inf, 0, sizeof(struct driver_info));
-		
+
 		(*new_driv_inf)->name = xmlGetProp(game_child, (const xmlChar*)"name");
 		(*new_driv_inf)->sourcefile = sourcefile;
-		
+
 		(*new_driv_inf)->ram_count = 0;
 		(*new_driv_inf)->bios_count = 0;
 		(*new_driv_inf)->device_count = 0;
 		(*new_driv_inf)->device_mandatory = 0;
 		xmlNodePtr game_children = game_child->children;
-		
+
 		while( game_children ) {
 			if( xmlStrcmp(game_children->name, (const xmlChar*)"driver") == 0 ) {
 				/*
@@ -1334,7 +1334,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					xmlFree(game_status);
 				}
 			}
-			
+
 			if( (app_type == APP_MESS) && config_use_ramsize ) {
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"ramoption") == 0 ) {
 					xmlChar* ram_content = xmlNodeGetContent(game_children);
@@ -1344,7 +1344,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					}
 				}
 			}
-			
+
 			if( config_use_bios ) {
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"biosset") == 0 ) {
 					xmlChar* bios_content = xmlGetProp(game_children, (const xmlChar*)"name");
@@ -1353,7 +1353,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					}
 				}
 			}
-			
+
 			if( (app_type == APP_MESS) ) {
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"device") == 0 ) {
 					xmlChar* dev_man = xmlGetProp(game_children, (const xmlChar*)"mandatory");
@@ -1361,21 +1361,21 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 						(*new_driv_inf)->device_mandatory = 1;
 						xmlFree(dev_man);
 					}
-					
+
 					xmlNodePtr dev_childs = game_children->children;
 					while( dev_childs != NULL ) {
 						if( xmlStrcmp(dev_childs->name, (const xmlChar*)"instance") == 0 ) {
 							xmlChar* dev_brief = xmlGetProp(dev_childs, (const xmlChar*)"briefname");
 							if( dev_brief ) {
 								(*new_driv_inf)->devices[(*new_driv_inf)->device_count++] = dev_brief;
-							}					
+							}
 						}
-						
+
 						dev_childs = dev_childs->next;
 					}
 				}
 			}
-									
+
 			game_children = game_children->next;
 		}
 	}
@@ -1419,21 +1419,21 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 						convert_xpath_expr(&real_xpath_expr);
 						
 						printf("using xpath expression: %s\n", real_xpath_expr);
-					
+
 						xpathObj = xmlXPathEvalExpression((const xmlChar*)real_xpath_expr, xpathCtx);
 						if( xpathObj == NULL )
 							xmlXPathFreeContext(xpathCtx);
-						
+
 						free(real_xpath_expr);
 						real_xpath_expr = NULL;
 					}
 				}
-					
+
 				if( xpathObj ) {
 					if( xpathObj->nodesetval )
 					{
 						printf("xpath found %d nodes\n", xpathObj->nodesetval->nodeNr);
-						
+
 						xmlBufferPtr xmlBuf = NULL;
 						if( config_print_xpath_results )
 							xmlBuf = xmlBufferCreate();
@@ -1448,11 +1448,11 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 								xmlNodeDump(xmlBuf, doc, xpathObj->nodesetval->nodeTab[i], 0, 1);
 								xmlBufferAdd(xmlBuf, (const xmlChar*)"\n", 1);
 							}
-							
+
 							struct driver_info* new_driv_inf = NULL;
-								
+
 							parse_listxml_element(xpathObj->nodesetval->nodeTab[i], &new_driv_inf);
-								
+
 							if( new_driv_inf != NULL )
 							{
 								if( last_driv_inf )
@@ -1461,9 +1461,9 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 									*driv_inf = new_driv_inf;
 									
 								last_driv_inf = new_driv_inf;
-							}							
+							}
 						}
-						
+
 						if( config_print_xpath_results ) {
 							FILE *xpath_result_fd = mrt_fopen("xpath_results.xml", "w");
 							fprintf(xpath_result_fd, "<xpath_result>\n");
@@ -1471,20 +1471,20 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 							fprintf(xpath_result_fd, "</xpath_result>\n");
 							fclose(xpath_result_fd);
 							xpath_result_fd = NULL;
-							
+
 							xmlBufferFree(xmlBuf);
 							xmlBuf = NULL;
 						}
 					}
 				}
-				else {				
+				else {
 					xmlNodePtr game_child = root->children;
 					struct driver_info* last_driv_inf = NULL;
 					while( game_child ) {
 						struct driver_info* new_driv_inf = NULL;
-						
+
 						parse_listxml_element(game_child, &new_driv_inf);
-						
+
 						if( new_driv_inf != NULL )
 						{
 							if( last_driv_inf )
@@ -1497,7 +1497,7 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 						game_child = game_child->next;
 					}
 				}
-				
+
 				if( xpathObj != NULL )
 					xmlXPathFreeObject(xpathObj);
 				if( xpathCtx != NULL )
@@ -1514,12 +1514,12 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 int main(int argc, char *argv[])
 {
 	printf("mame_regtest %s\n", VERSION);
-	
+
 	if( argc > 2) {
 		printf("usage: mame_regtest <configname>\n");
 		exit(1);
 	}
-	
+
 	if( getcwd(current_path, sizeof(current_path)) == NULL ) {
 		printf("could not get current working path\n");
 		exit(1);
@@ -1527,7 +1527,7 @@ int main(int argc, char *argv[])
 	printf("\n");
 	printf("current path: %s\n", current_path);
 	printf("\n");
-	
+
 	printf("initializing configuration\n");
 	int config_res = config_init("mame_regtest.xml", "mame_regtest");
 	if( !config_res )
@@ -1535,17 +1535,17 @@ int main(int argc, char *argv[])
 
 	printf("reading configuration 'global'\n");
 	config_res = config_read(mrt_config, "global");
-	
+
 	if( config_res && (argc == 2) ) {
 		printf("reading configuration '%s'\n", argv[1]);
 		config_res = config_read(mrt_config, argv[1]);
 	}
-	
+
 	if( !config_res )
 		cleanup_and_exit(1, "aborting");
-		
+
 	printf("\n"); /* for output formating */
-	
+
 	if( is_absolute_path(config_mame_exe) == 0 ) {
 		char* tmp_mame_exe = NULL;
 		append_string(&tmp_mame_exe, current_path);
@@ -1554,7 +1554,7 @@ int main(int argc, char *argv[])
 		free(config_mame_exe);
 		config_mame_exe = tmp_mame_exe;
 	}
-	
+
 	if( !config_mame_exe || (strlen(config_mame_exe) == 0) ) {
 		printf("'executable' is empty or missing\n");
 		cleanup_and_exit(1, "aborting");
@@ -1570,17 +1570,17 @@ int main(int argc, char *argv[])
 	append_string(&listxml_output, config_output_folder);
 	append_string(&listxml_output, FILESLASH);
 	append_string(&listxml_output, "listxml.xml");
-	
+
 	if( config_verbose ) {
 		printf("str: %s\n", config_str_str);
 		printf("pause interval: %d\n", config_pause_at);
-	
+
 		if( config_gamelist_xml_file && (strlen(config_gamelist_xml_file) > 0) ) {
 			printf("using custom list: %s\n", config_gamelist_xml_file);
 		}
-	
+
 		printf("autosave: %d\n", config_use_autosave);
-	
+
 		printf("ramsize: %d\n", config_use_ramsize);
 	}
 
@@ -1608,7 +1608,7 @@ int main(int argc, char *argv[])
 			cleanup_and_exit(1, "aborting");
 		}
 	}
-	
+
 	append_string(&temp_folder, current_path);
 	append_string(&temp_folder, FILESLASH);
 	append_string(&temp_folder, "mrt_temp");
@@ -1638,11 +1638,11 @@ int main(int argc, char *argv[])
 	append_string(&dummy_ini_folder, temp_folder);
 	append_string(&dummy_ini_folder, FILESLASH);
 	append_string(&dummy_ini_folder, "dummy_ini");
-	
+
 #if USE_VALGRIND
 	if( config_verbose )
 		printf("valgrind: %d\n", config_use_valgrind);
-	
+
 	if( config_use_valgrind )
 	{
 		if( !config_valgrind_binary || (strlen(config_valgrind_binary) == 0) )
@@ -1659,7 +1659,7 @@ int main(int argc, char *argv[])
 	if( config_verbose ) {
 		if( config_rompath_folder && (strlen(config_rompath_folder) > 0) )
 			printf("using rompath folder: %s\n", config_rompath_folder);
-	
+
 		printf("bios: %d\n", config_use_bios);
 		printf("sound: %d\n", config_use_sound);
 		printf("throttle: %d\n", config_use_throttle);
@@ -1681,13 +1681,13 @@ int main(int argc, char *argv[])
 		printf("test_softreset: %d\n", config_test_softreset);
 		printf("write_avi: %d\n", config_write_avi);
 		printf("verbose: %d\n", config_verbose);
-	
+
 		printf("hack_ftr: %d\n", config_hack_ftr);
 		printf("hack_biospath: %d\n", config_hack_biospath);
 		printf("hack_debug: %d\n", config_hack_debug);
 		printf("hack_mngwrite: %d\n", config_hack_mngwrite);
 		printf("hack_pinmame: %d\n", config_hack_pinmame);
-		
+
 		printf("\n"); /* for output formating */
 	}
 
@@ -1708,7 +1708,7 @@ int main(int argc, char *argv[])
 
 	if( !config_gamelist_xml_file || (strlen(config_gamelist_xml_file) == 0) ) {
 		append_string(&config_gamelist_xml_file, listxml_output); 
-	
+
 		printf("writing -listxml output\n");
 		char* mame_call = NULL;
 		get_executable(&mame_call, NULL, "listxml");
@@ -1719,7 +1719,7 @@ int main(int argc, char *argv[])
 			printf("system call: %s\n", mame_call);
 
 		system(mame_call);
-	
+
 		if( config_hack_pinmame ) {
 			char* tmp_gamelist_xml = NULL;
 			/* TODO: quoting */
@@ -1735,13 +1735,13 @@ int main(int argc, char *argv[])
 			free(tmp_gamelist_xml);
 			tmp_gamelist_xml = NULL;
 		}
-	
+
 		free(mame_call);
 		mame_call = NULL;
 	}
-	
+
 	struct driver_info* driv_inf = NULL;
-	
+
 	printf("\n"); /* for output formating */
 	printf("parsing -listxml output\n")	;
 	parse_listxml(config_gamelist_xml_file, &driv_inf);
@@ -1762,7 +1762,7 @@ int main(int argc, char *argv[])
 		free(mame_call);
 		mame_call = NULL;
 	}
-		
+
 	if( driv_inf == NULL )
 		cleanup_and_exit(0, "finished");
 
@@ -1772,8 +1772,8 @@ int main(int argc, char *argv[])
 	if( (config_hack_debug || is_debug) && config_use_debug ) {
 		append_string(&debugscript_file, temp_folder);
 		append_string(&debugscript_file, FILESLASH);
-		append_string(&debugscript_file, "mrt_debugscript");		
-		
+		append_string(&debugscript_file, "mrt_debugscript");
+
 		FILE* debugscript_fd = fopen(debugscript_file, "w");
 		if( !debugscript_fd ) {
 			printf("could not open %s\n", debugscript_file);
@@ -1789,12 +1789,12 @@ int main(int argc, char *argv[])
 	printf("\n"); /* for output formating */
 	if( !create_dummy_root_ini() )
 		cleanup_and_exit(1, "aborted");
-		
+
 	/* setup OSDPROCESSORS */
 	char osdprocessors_tmp[128];
 	snprintf(osdprocessors_tmp, sizeof(osdprocessors_tmp), "OSDPROCESSORS=%d", config_osdprocessors);
 	putenv(osdprocessors_tmp);
-	
+
 	printf("\n");
 	process_driver_info_list(driv_inf);	
 	printf("\n"); /* for output formating */
