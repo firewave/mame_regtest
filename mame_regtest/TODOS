@@ -91,11 +91,6 @@ mame_regtest
 				void* root;
 				config_entries[]
 			}
-		- create default configuration for create_report to match removed options
-			- result_file
-			- stdout_file
-			- stderr_file
-			- add some useful reports from old create_report
 		- rename CFG_STR_PTR to CFG_STR
 		- handle all options as string (use atoi() to convert to integers)
 		- use register function to add config values?
@@ -128,7 +123,6 @@ mame_regtest
 				- new files
 				- stdout/stderr differs
 		- add documentation for configuration
-		- crashes when an invalid report is specified
 		- crashes when "compare_folder" is missing
 		- HTML report
 			- create HTML report (different variants)
@@ -153,6 +147,10 @@ mame_regtest
 		- properly handle sets with autosave (use index in XPath to access the second set of nodes when both support autosave)
 		- handle missing attributes properly
 		- add the various XPaths as options in the configuration
+		- create default configuration for create_report to match removed options
+			- result_file
+			- add some useful reports from old create_report
+		- clean up the mess, that decides when to write something
 
 	Linux:
 		- add a signal handler for linux?
