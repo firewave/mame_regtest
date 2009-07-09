@@ -111,6 +111,7 @@ mame_regtest
 			- the different builds
 			- how the results are created
 			- the machine the tests are run on
+			- the resulting command-line
 		- fix Fedora Core 10 compilation (MAX_PATH)
 		- "output_folder" doesn't work
 		- test setcwd() on start-up and bail out when it fails
