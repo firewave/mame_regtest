@@ -11,7 +11,6 @@ mame_regtest
 		- use transparent crosshair?
 		- avoid duplicated slashes
 		- make pointers const (or const * const)
-		- add verbose mode (logging command-line string etc.)
 		- add "hang"/deadlock detection (-watchdog)
 		- mark the different autosave calls (load / save)
 		- multipass XPath (e.g. first select m6502 cpus and then all with autosave from those nodes)
@@ -108,7 +107,7 @@ mame_regtest
 		- fix Fedora Core 10 compilation (MAX_PATH)
 		- "output_folder" doesn't work (CFG_STR doesn't work)
 		- test chdir() on start-up and bail out when it fails
-		- make doesn't work when the additional files already exist	
+		- make doesn't work when the additional files already exist and you compile by target (e.g. mame_regtest.exe)
 		- factor out duplicated PNG/MNG code
 		- get rid of "please report" in log messages
 		- create open_mng_and_skip_sig() for PNG

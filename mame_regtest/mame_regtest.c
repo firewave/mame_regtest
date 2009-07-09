@@ -159,6 +159,7 @@ static int config_print_xpath_results = 0;
 static int config_test_softreset = 0;
 static int config_hack_pinmame = 0;
 static int config_write_avi = 0;
+static int config_verbose = 0;
 
 struct config_entry mrt_config[] =
 {
@@ -199,6 +200,7 @@ struct config_entry mrt_config[] =
 	{ "test_softreset",			CFG_INT,		&config_test_softreset },
 	{ "hack_pinmame",			CFG_INT,		&config_hack_pinmame },
 	{ "write_avi",				CFG_INT,		&config_write_avi },
+	{ "verbose",				CFG_INT,		&config_verbose },
 	{ NULL,						-1,				NULL }
 };
 
@@ -929,11 +931,8 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 	/* the whole command-line has to be quoted - end */
 	append_string(&sys, " \"");
 
-	/*
-	printf("system call: %s\n", sys);
-	printf("press any key to continue\n");
-	mrt_getch();
-	*/
+	if( config_verbose )
+		printf("system call: %s\n", sys);
 
 	/* TODO: errorhandling */
 	mrt_mkdir(dummy_root_str);
@@ -1565,22 +1564,25 @@ int main(int argc, char *argv[])
 		printf("'%s' does not exist\n", config_mame_exe);
 		cleanup_and_exit(1, "aborting");
 	}
-	printf("executable: %s\n", config_mame_exe);
+	if( config_verbose )
+		printf("executable: %s\n", config_mame_exe);
 
 	append_string(&listxml_output, config_output_folder);
 	append_string(&listxml_output, FILESLASH);
 	append_string(&listxml_output, "listxml.xml");
 	
-	printf("str: %s\n", config_str_str);
-	printf("pause interval: %d\n", config_pause_at);
+	if( config_verbose ) {
+		printf("str: %s\n", config_str_str);
+		printf("pause interval: %d\n", config_pause_at);
 	
-	if( config_gamelist_xml_file && (strlen(config_gamelist_xml_file) > 0) ) {
-		printf("using custom list: %s\n", config_gamelist_xml_file);
+		if( config_gamelist_xml_file && (strlen(config_gamelist_xml_file) > 0) ) {
+			printf("using custom list: %s\n", config_gamelist_xml_file);
+		}
+	
+		printf("autosave: %d\n", config_use_autosave);
+	
+		printf("ramsize: %d\n", config_use_ramsize);
 	}
-
-	printf("autosave: %d\n", config_use_autosave);
-
-	printf("ramsize: %d\n", config_use_ramsize);
 
 	if( config_write_mng ) {
 		if( config_hack_mngwrite ) {
@@ -1590,7 +1592,8 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
-	printf("write mng: %d\n", config_write_mng);
+	if( config_verbose )
+		printf("write mng: %d\n", config_write_mng);
 
 	if( (access(config_output_folder, F_OK) != 0) && mrt_mkdir(config_output_folder) != 0 ) {
 		printf("could not create folder '%s'\n", config_output_folder);
@@ -1598,9 +1601,10 @@ int main(int argc, char *argv[])
 	}
 
 	if( strlen(config_output_folder) > 0 ) {
-		printf("using output folder: %s\n", config_output_folder);
+		if( config_verbose )
+			printf("using output folder: %s\n", config_output_folder);
 		if( access(config_output_folder, F_OK) != 0 ) {
-			printf("output folder not found\n");
+			printf("output folder '%s' not found\n", config_output_folder);
 			cleanup_and_exit(1, "aborting");
 		}
 	}
@@ -1615,9 +1619,10 @@ int main(int argc, char *argv[])
 	}
 
 	if( strlen(temp_folder) > 0 ) {
-		printf("using output folder: %s\n", temp_folder);
+		if( config_verbose )
+			printf("using output folder: %s\n", temp_folder);
 		if( access(temp_folder, F_OK) != 0 ) {
-			printf("temp folder not found\n");
+			printf("temp folder '%s' not found\n", temp_folder);
 			cleanup_and_exit(1, "aborting");
 		}
 	}
@@ -1635,50 +1640,56 @@ int main(int argc, char *argv[])
 	append_string(&dummy_ini_folder, "dummy_ini");
 	
 #if USE_VALGRIND
-	printf("valgrind: %d\n", config_use_valgrind);
+	if( config_verbose )
+		printf("valgrind: %d\n", config_use_valgrind);
 	
 	if( config_use_valgrind )
 	{
 		if( !config_valgrind_binary || (strlen(config_valgrind_binary) == 0) )
 			append_string(&config_valgrind_binary, "valgrind");
-		printf("valgrind_binary: %s\n", config_valgrind_binary);
+		if( config_verbose )
+			printf("valgrind_binary: %s\n", config_valgrind_binary);
 		if( !config_valgrind_parameters || (strlen(config_valgrind_parameters) == 0) )
 			append_string(&config_valgrind_parameters, "--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --leak-resolution=med");
-		printf("valgrind_parameters: %s\n", config_valgrind_parameters);
+		if( config_verbose )
+			printf("valgrind_parameters: %s\n", config_valgrind_parameters);
 	}
 #endif
 
-	if( config_rompath_folder && (strlen(config_rompath_folder) > 0) )
-		printf("using rompath folder: %s\n", config_rompath_folder);
-
-	printf("bios: %d\n", config_use_bios);
-	printf("sound: %d\n", config_use_sound);
-	printf("throttle: %d\n", config_use_throttle);
-	printf("debug: %d\n", config_use_debug);
-	printf("xpath_expr: %s\n", config_xpath_expr ? config_xpath_expr : "");
-	printf("use_devices: %d\n", config_use_devices);
-	printf("use_nonrunnable: %d\n", config_use_nonrunnable);
-	if( config_global_device_file && (strlen(config_global_device_file) > 0) )
-		printf("using device_file: %s\n", config_global_device_file);
-	printf("use_isbios: %d\n", config_use_isbios);
-	printf("store_output: %d\n", config_store_output);
-	printf("clear_output_folder: %d\n", config_clear_output_folder);
-	printf("test_createconfig: %d\n", config_test_createconfig);
-	if( config_additional_options )
-		printf("additional_options: %s\n", config_additional_options);
-	printf("skip_mandatory: %d\n", config_skip_mandatory);
-	printf("osdprocessors: %d\n", config_osdprocessors);
-	printf("print_xpath_results: %d\n", config_print_xpath_results);
-	printf("test_softreset: %d\n", config_test_softreset);
-	printf("write_avi: %d\n", config_write_avi);
-
-	printf("hack_ftr: %d\n", config_hack_ftr);
-	printf("hack_biospath: %d\n", config_hack_biospath);
-	printf("hack_debug: %d\n", config_hack_debug);
-	printf("hack_mngwrite: %d\n", config_hack_mngwrite);
-	printf("hack_pinmame: %d\n", config_hack_pinmame);
+	if( config_verbose ) {
+		if( config_rompath_folder && (strlen(config_rompath_folder) > 0) )
+			printf("using rompath folder: %s\n", config_rompath_folder);
 	
-	printf("\n"); /* for output formating */
+		printf("bios: %d\n", config_use_bios);
+		printf("sound: %d\n", config_use_sound);
+		printf("throttle: %d\n", config_use_throttle);
+		printf("debug: %d\n", config_use_debug);
+		printf("xpath_expr: %s\n", config_xpath_expr ? config_xpath_expr : "");
+		printf("use_devices: %d\n", config_use_devices);
+		printf("use_nonrunnable: %d\n", config_use_nonrunnable);
+		if( config_global_device_file && (strlen(config_global_device_file) > 0) )
+			printf("using device_file: %s\n", config_global_device_file);
+		printf("use_isbios: %d\n", config_use_isbios);
+		printf("store_output: %d\n", config_store_output);
+		printf("clear_output_folder: %d\n", config_clear_output_folder);
+		printf("test_createconfig: %d\n", config_test_createconfig);
+		if( config_additional_options )
+			printf("additional_options: %s\n", config_additional_options);
+		printf("skip_mandatory: %d\n", config_skip_mandatory);
+		printf("osdprocessors: %d\n", config_osdprocessors);
+		printf("print_xpath_results: %d\n", config_print_xpath_results);
+		printf("test_softreset: %d\n", config_test_softreset);
+		printf("write_avi: %d\n", config_write_avi);
+		printf("verbose: %d\n", config_verbose);
+	
+		printf("hack_ftr: %d\n", config_hack_ftr);
+		printf("hack_biospath: %d\n", config_hack_biospath);
+		printf("hack_debug: %d\n", config_hack_debug);
+		printf("hack_mngwrite: %d\n", config_hack_mngwrite);
+		printf("hack_pinmame: %d\n", config_hack_pinmame);
+		
+		printf("\n"); /* for output formating */
+	}
 
 	if( config_hack_ftr && (atoi(config_str_str) < 2)) {
 		printf("'str' value has to be at least '2' when used with 'hack_ftr'\n");

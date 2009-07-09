@@ -55,6 +55,7 @@
 
 		<!-- additional options -->
 		<option name='test_createconfig' value='1'/>
+		<option name='verbose' value='0'/>
 
 		<!-- hacks -->
 		<option name='hack_debug' value='0'/>
