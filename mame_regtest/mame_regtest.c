@@ -1715,11 +1715,8 @@ int main(int argc, char *argv[])
 		append_string(&mame_call, " -listxml > ");
 		append_string(&mame_call, config_gamelist_xml_file);
 
-		/*
-		printf("system call: %s\n", mame_call);
-		printf("press any key to continue\n");
-		mrt_getch();
-		*/
+		if( config_verbose )
+			printf("system call: %s\n", mame_call);
 
 		system(mame_call);
 	
