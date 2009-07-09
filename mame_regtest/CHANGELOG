@@ -407,3 +407,4 @@
 	- added option "report_type" (0 = result report / 1 = comparison report)
 	- added option "compare_folder" (used for comparison report to compare "xml_folder" against)
 	- implemented comparison report (checks "exitcode", "stderr" and "png_crc")
+	- fixed crash when invalid configuration was specified

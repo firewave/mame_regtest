@@ -462,8 +462,16 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	
-	config_init("create_report.xml", "create_report");
-	config_read(report_config, argv[1]);
+	if( !config_init("create_report.xml", "create_report") ) {
+		printf("aborting\n");
+		exit(1);
+}
+
+	if( !config_read(report_config, argv[1]) ) {
+		printf("aborting\n");
+		config_free(report_config);
+		exit(1);
+	}
 	
 	create_report();
 	
