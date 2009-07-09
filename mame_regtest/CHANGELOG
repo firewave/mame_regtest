@@ -410,3 +410,4 @@
 	- fixed crash when invalid configuration was specified
 	- added option "print_stdout" to add stdout data to report
 	- made it possible to simply use "print_stdout" and "print_stderr"
+	- added "stdout_file" and "stderr_file" to default configuration to match old reports
