@@ -1,6 +1,6 @@
 /*
 mame_regtest
-(c) Copyright 2005-2008 by Oliver Stoeneberg
+(c) Copyright 2005-2009 by Oliver Stoeneberg
 
 http://mess.toseciso.org/tools:mame_regtest
 http://mess.toseciso.org/tools:mame_regtest:config (documentation of the options in the XML)
@@ -107,11 +107,11 @@ static const char* const xpath_placeholder = "DRIVER_ROOT";
 static const char* const dummy_root_str = "dummy_root";
 
 /* PNG/MNG signatures */
-static unsigned const char png_sig[8] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
-static unsigned const char mng_sig[8] = { 0x8a, 0x4d, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
-static unsigned const char IDAT_name[4] = { 'I', 'D', 'A', 'T' };
-static unsigned const char IEND_name[4] = { 'I', 'E', 'N', 'D' };
-static unsigned const char MEND_name[4] = { 'M', 'E', 'N', 'D' };
+static const unsigned char png_sig[8] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
+static const unsigned char mng_sig[8] = { 0x8a, 0x4d, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
+static const unsigned char IDAT_name[4] = { 'I', 'D', 'A', 'T' };
+static const unsigned char IEND_name[4] = { 'I', 'E', 'N', 'D' };
+static const unsigned char MEND_name[4] = { 'M', 'E', 'N', 'D' };
 
 enum {
 	APP_UNKNOWN = 0,
@@ -200,7 +200,7 @@ struct config_entry mrt_config[] =
 
 static int get_png_IDAT_data(const char* png_name, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void open_mng_and_skip_header(const char* mng_name, FILE** mng_fd);
-static int internal_get_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc);
+static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void cleanup_and_exit(int errcode, const char* errstr);
 
 static void append_driver_info(char** str, struct driver_entry* de)
@@ -301,7 +301,7 @@ static int parse_mng(const char* file, xmlNodePtr filenode)
 	int res = 0;
 
 	do {
-		res = internal_get_IDAT_data(mng_fd, &IDAT_size, &IDAT_crc);
+		res = internal_get_next_IDAT_data(mng_fd, &IDAT_size, &IDAT_crc);
 
 		if( res == 1 ) {
 			/* found IDAT chunk */
@@ -317,7 +317,7 @@ static int parse_mng(const char* file, xmlNodePtr filenode)
 			xmlNewProp(framenode, (const xmlChar*)"crc", (const xmlChar*)tmp);
 
 			/* jump to IEND chunk */
-			internal_get_IDAT_data(mng_fd, &IDAT_size, &IDAT_crc);
+			internal_get_next_IDAT_data(mng_fd, &IDAT_size, &IDAT_crc);
 			continue;
 		}
 		else if( res == 2 ) {
@@ -625,53 +625,53 @@ static int read_image_entries(const xmlNodePtr node, struct image_entry** images
 	return 1;
 }
 
-static int internal_get_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc)
+static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc)
 {
-	unsigned int block_size = 0;
-	unsigned int reversed_block_size = 0;
-	unsigned char block_name[4] = "";
+	unsigned int chunk_size = 0;
+	unsigned int reversed_chunk_size = 0;
+	unsigned char chunk_name[4] = "";
 	
 	do {
-		if( fread(&block_size, sizeof(unsigned int), 1, in_fd) != 1 ) {
-			printf("could not read block size\n");
+		if( fread(&chunk_size, sizeof(unsigned int), 1, in_fd) != 1 ) {
+			printf("could not read chunk size\n");
 			return 0;
 		}
 				
-		reversed_block_size = htonl(block_size);
+		reversed_chunk_size = htonl(chunk_size);
 		
-		if( fread(block_name, sizeof(unsigned char), 4, in_fd) != 4 ) {
-			printf("could not read block name\n");
+		if( fread(chunk_name, sizeof(unsigned char), 4, in_fd) != 4 ) {
+			printf("could not read chunk name\n");
 			return 0;
 		}
 		
-		if( memcmp(IDAT_name, block_name, 4) == 0 ) {			
-			fseek(in_fd, reversed_block_size, SEEK_CUR); /* jump data block */
+		if( memcmp(IDAT_name, chunk_name, 4) == 0 ) {
+			fseek(in_fd, reversed_chunk_size, SEEK_CUR); /* jump IDAT chunk */
 			
-			unsigned int block_crc = 0;
-			if( fread(&block_crc, sizeof(unsigned int), 1, in_fd) != 1 ) {
-				printf("could not read block CRC\n");
+			unsigned int chunk_crc = 0;
+			if( fread(&chunk_crc, sizeof(unsigned int), 1, in_fd) != 1 ) {
+				printf("could not read IDAT chunk CRC\n");
 				return 0;
 			}
 			else {
-				*IDAT_size = reversed_block_size;
-				*IDAT_crc = block_crc;
+				*IDAT_size = reversed_chunk_size;
+				*IDAT_crc = chunk_crc;
 				return 1;
 			}
 		}
 		
-		if( memcmp(IEND_name, block_name, 4) == 0 ) {
-			fseek(in_fd, reversed_block_size, SEEK_CUR); /* jump data block */
+		if( memcmp(IEND_name, chunk_name, 4) == 0 ) {
+			fseek(in_fd, reversed_chunk_size, SEEK_CUR); /* jump IEND chunk */
 			fseek(in_fd, 4, SEEK_CUR); /* jump CRC */
 			return 0;
 		}
 		
-		if( memcmp(MEND_name, block_name, 4) == 0 ) {
-			fseek(in_fd, reversed_block_size, SEEK_CUR); /* jump data block */
+		if( memcmp(MEND_name, chunk_name, 4) == 0 ) {
+			fseek(in_fd, reversed_chunk_size, SEEK_CUR); /* jump MEND chunk */
 			fseek(in_fd, 4, SEEK_CUR); /* jump CRC */
 			return 2;
 		}
 		
-		fseek(in_fd, reversed_block_size, SEEK_CUR); /* jump data block */
+		fseek(in_fd, reversed_chunk_size, SEEK_CUR); /* jump chunk */
 		fseek(in_fd, 4, SEEK_CUR); /* jump CRC */
 	} while(1);
 }
@@ -700,7 +700,7 @@ static int get_png_IDAT_data(const char* png_name, unsigned int *IDAT_size, unsi
 		return 0;		
 	}
 	
-	int IDAT_res = internal_get_IDAT_data(png_fd, IDAT_size, IDAT_crc);
+	int IDAT_res = internal_get_next_IDAT_data(png_fd, IDAT_size, IDAT_crc);
 	if( IDAT_res != 1 ) 
 		printf("error getting IDAT data: %s\n", png_name);
 	
