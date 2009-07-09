@@ -197,7 +197,7 @@ struct config_entry mrt_config[] =
 	{ "print_xpath_results",	CFG_INT,		&config_print_xpath_results },
 	{ "test_softreset",			CFG_INT,		&config_test_softreset },
 	{ "hack_pinmame",			CFG_INT,		&config_hack_pinmame },
-	{ "write_avi",			CFG_INT,		&config_write_avi },
+	{ "write_avi",				CFG_INT,		&config_write_avi },
 	{ NULL,						-1,				NULL }
 };
 
