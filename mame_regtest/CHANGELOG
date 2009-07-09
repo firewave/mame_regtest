@@ -408,6 +408,7 @@
 	- added option "verbose" to enable more logging
 	- move some log messages to "verbose" mode
 	- improved some error messages
+	- disabled logging of configuration entries
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)

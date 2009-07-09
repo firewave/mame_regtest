@@ -137,24 +137,24 @@ int config_read(struct config_entry config_entries[], const char* config_name)
 	for( ; config_entries[i].name != NULL; ++i )
 	{
 		struct config_entry* ce = &config_entries[i];
-		printf("entry - %s - %d - ", ce->name, ce->type);
+		/* printf("entry - %s - %d - ", ce->name, ce->type); */
 		if( ce->type == CFG_INT ) {
 			int* value = (int*)ce->value;
 			config_read_option_int(global_config_child, ce->name, value);
-			printf("%d\n", *value);
+			/* printf("%d\n", *value); */
 		}
 		else if( ce->type == CFG_STR ) {
 			char* value = (char*)ce->value;
 			config_read_option_str(global_config_child, ce->name, value, sizeof(value));
-			printf("%s\n", value);
+			/* printf("%s\n", value); */
 		}
 		else if( ce->type == CFG_STR_PTR ) {
 			char** value = (char**)ce->value;
 			config_read_option_str_ptr(global_config_child, ce->name, value);
-			printf("%s\n", *value ? *value : "");
+			/* printf("%s\n", *value ? *value : ""); */
 		}
 		else
-			printf("unknown config_entry type\n");
+			printf("unknown config_entry type %d\n", ce->type);
 	}
 
 	return 1;
