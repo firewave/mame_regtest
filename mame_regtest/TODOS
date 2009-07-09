@@ -108,9 +108,11 @@ mame_regtest
 		- fix Fedora Core 10 compilation (MAX_PATH)
 		- "output_folder" doesn't work (CFG_STR doesn't work)
 		- test chdir() on start-up and bail out when it fails
-		- add the MNG sizes (e.g. 640x480) to the output XML
 		- make doesn't work when the additional files already exist	
 		- factor out duplicated PNG/MNG code
+		- get rid of "please report" in log messages
+		- create open_mng_and_skip_sig() for PNG
+		- get MEND reference out of IDAT function
 		
 	create_report:
 		- write comparison tool

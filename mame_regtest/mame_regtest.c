@@ -112,6 +112,7 @@ static const unsigned char mng_sig[8] = { 0x8a, 0x4d, 0x4e, 0x47, 0x0d, 0x0a, 0x
 static const unsigned char IHDR_name[4] = { 'I', 'H', 'D', 'R' };
 static const unsigned char IDAT_name[4] = { 'I', 'D', 'A', 'T' };
 static const unsigned char IEND_name[4] = { 'I', 'E', 'N', 'D' };
+static const unsigned char MHDR_name[4] = { 'M', 'H', 'D', 'R' };
 static const unsigned char MEND_name[4] = { 'M', 'E', 'N', 'D' };
 
 enum {
@@ -205,6 +206,7 @@ static int get_png_data(const char* png_name, unsigned int *IHDR_width, unsigned
 static void open_mng_and_skip_sig(const char* mng_name, FILE** mng_fd);
 static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void cleanup_and_exit(int errcode, const char* errstr);
+static int get_MHDR_data(FILE* in_fd, unsigned int* MHDR_width, unsigned int* MHDR_height);
 
 static void append_driver_info(char** str, struct driver_entry* de)
 {
@@ -300,8 +302,21 @@ static int parse_mng(const char* file, xmlNodePtr filenode)
 	if( mng_fd == NULL )
 		return frame;
 
-	unsigned int IDAT_size, IDAT_crc;
-	int res = 0;
+	unsigned int MHDR_width, MHDR_height, IDAT_size, IDAT_crc;
+
+	int res = get_MHDR_data(mng_fd, &MHDR_width, &MHDR_height);
+	if( res == 0 ) {
+		printf("could not get MHDR data from '%s'\n", file);
+		return frame;
+	}
+
+	{
+		char tmp[128];
+		snprintf(tmp, sizeof(tmp), "%u", MHDR_width);
+		xmlNewProp(filenode, (const xmlChar*)"width", (const xmlChar*)tmp);
+		snprintf(tmp, sizeof(tmp), "%u", MHDR_height);
+		xmlNewProp(filenode, (const xmlChar*)"height", (const xmlChar*)tmp);
+	}
 
 	do {
 		res = internal_get_next_IDAT_data(mng_fd, &IDAT_size, &IDAT_crc);
@@ -629,6 +644,51 @@ static int read_image_entries(const xmlNodePtr node, struct image_entry** images
 	}
 	
 	return 1;
+}
+
+static int get_MHDR_data(FILE* in_fd, unsigned int* MHDR_width, unsigned int* MHDR_height)
+{
+	unsigned int chunk_size = 0;
+	unsigned int reversed_chunk_size = 0;
+	unsigned char chunk_name[4] = "";
+
+	if( fread(&chunk_size, sizeof(unsigned int), 1, in_fd) != 1 ) {
+		printf("could not read chunk size\n");
+		return 0;
+	}
+
+	reversed_chunk_size = htonl(chunk_size);
+
+	if( fread(chunk_name, sizeof(unsigned char), 4, in_fd) != 4 ) {
+		printf("could not read chunk name\n");
+		return 0;
+	}
+
+	if( memcmp(MHDR_name, chunk_name, 4) == 0 ) {
+		unsigned int width = 0, height = 0;
+
+		if( fread(&width, sizeof(unsigned int), 1, in_fd) != 1 ) {
+				printf("could not read MHDR chunk width\n");
+				return 0;
+		}
+
+		if( fread(&height, sizeof(unsigned int), 1, in_fd) != 1 ) {
+				printf("could not read MHDR chunk height\n");
+				return 0;
+		}
+
+		*MHDR_width = htonl(width);
+		*MHDR_height = htonl(height);
+
+		fseek(in_fd, reversed_chunk_size - (2 * sizeof(unsigned int)), SEEK_CUR); /* jump remaining MHDR chunk */
+		fseek(in_fd, 4, SEEK_CUR); /* jump CRC */
+
+		return 1;
+	}
+
+	printf("could not find MHDR chunk\n");
+
+	return 0;
 }
 
 static int get_IHDR_data(FILE* in_fd, unsigned int* IHDR_width, unsigned int* IHDR_height)
