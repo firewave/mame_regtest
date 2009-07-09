@@ -202,7 +202,7 @@ struct config_entry mrt_config[] =
 };
 
 static int get_png_data(const char* png_name, unsigned int *IHDR_width, unsigned int* IHDR_height, unsigned int *IDAT_size, unsigned int* IDAT_crc);
-static void open_mng_and_skip_header(const char* mng_name, FILE** mng_fd);
+static void open_mng_and_skip_sig(const char* mng_name, FILE** mng_fd);
 static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void cleanup_and_exit(int errcode, const char* errstr);
 
@@ -296,7 +296,7 @@ static int parse_mng(const char* file, xmlNodePtr filenode)
 	int frame = 0;
 
 	FILE *mng_fd = NULL;
-	open_mng_and_skip_header(file, &mng_fd);
+	open_mng_and_skip_sig(file, &mng_fd);
 	if( mng_fd == NULL )
 		return frame;
 
@@ -305,7 +305,6 @@ static int parse_mng(const char* file, xmlNodePtr filenode)
 
 	do {
 		res = internal_get_next_IDAT_data(mng_fd, &IDAT_size, &IDAT_crc);
-
 		if( res == 1 ) {
 			/* found IDAT chunk */
 			++frame;
@@ -672,6 +671,8 @@ static int get_IHDR_data(FILE* in_fd, unsigned int* IHDR_width, unsigned int* IH
 		return 1;
 	}
 	
+	printf("could not find IHDR chunk\n");
+	
 	return 0;
 }
 
@@ -766,7 +767,7 @@ static int get_png_data(const char* png_name, unsigned int *IHDR_width, unsigned
 	return IDAT_res;
 }
 
-static void open_mng_and_skip_header(const char* mng_name, FILE** mng_fd)
+static void open_mng_and_skip_sig(const char* mng_name, FILE** mng_fd)
 {
 	*mng_fd = fopen(mng_name, "rb");
 	if( *mng_fd == NULL ) {
@@ -791,8 +792,6 @@ static void open_mng_and_skip_header(const char* mng_name, FILE** mng_fd)
 		*mng_fd = NULL;
 		return;
 	}
-	
-	return;
 }
 
 static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
@@ -1611,7 +1610,7 @@ int main(int argc, char *argv[])
 	printf("osdprocessors: %d\n", config_osdprocessors);
 	printf("print_xpath_results: %d\n", config_print_xpath_results);
 	printf("test_softreset: %d\n", config_test_softreset);
-	printf("write_avi: %d", config_write_avi);
+	printf("write_avi: %d\n", config_write_avi);
 
 	printf("hack_ftr: %d\n", config_hack_ftr);
 	printf("hack_biospath: %d\n", config_hack_biospath);

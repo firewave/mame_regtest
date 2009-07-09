@@ -402,6 +402,7 @@
 	- added "png_width" and "png_height" for PNGs to XML output
 	- renamed get_png_IDAT_data() to get_png_data()
 	- added option "write_avi" to control creation of .avi files
+	- renamed open_mng_and_skip_header() to open_mng_and_skip_sig()
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)
