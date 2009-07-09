@@ -408,3 +408,5 @@
 	- added option "compare_folder" (used for comparison report to compare "xml_folder" against)
 	- implemented comparison report (checks "exitcode", "stderr" and "png_crc")
 	- fixed crash when invalid configuration was specified
+	- added option "print_stdout" to add stdout data to report
+	- made it possible to simply use "print_stdout" and "print_stderr"

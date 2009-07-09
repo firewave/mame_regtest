@@ -146,6 +146,7 @@ static int config_show_clipped = 0;
 static int config_group_data = 0;
 static int config_report_type = 0; /* 0 = result report - 1 = comparison report */
 static char* config_compare_folder = NULL;
+static int config_print_stdout = 0;
 
 struct config_entry report_config[] =
 {
@@ -159,6 +160,7 @@ struct config_entry report_config[] =
 	{ "group_data", 		CFG_INT, 		&config_group_data },
 	{ "report_type",		CFG_INT,		&config_report_type },
 	{ "compare_folder",		CFG_STR_PTR,	&config_compare_folder }, /* comparison report specific */
+	{ "print_stdout", 		CFG_INT, 		&config_print_stdout },
 	{ NULL, 				-1, 			NULL }
 };
 
@@ -172,6 +174,7 @@ struct report_cb_data
 	int show_clipped;
 	int report_type;
 	const char* compare_folder;
+	int print_stdout;
 };
 
 /* TODO - handle multiple occurances */
@@ -251,12 +254,14 @@ static int create_report_from_filename(const char *const filename, const struct 
 							if( r_cb_data->print_stderr )
 								stderr_key = xmlGetProp(output_childs, (const xmlChar*)"stderr");
 							xmlChar* stdout_key = NULL;
-							if( r_cb_data->show_clipped )
+							if( r_cb_data->show_clipped || r_cb_data->print_stdout )
 								stdout_key = xmlGetProp(output_childs, (const xmlChar*)"stdout");
 		
 							if( (exitcode_key && (xmlStrcmp(exitcode_key, (const xmlChar*)"0") != 0) && 
 								!(r_cb_data->ignore_exitcode_4 && (xmlStrcmp(exitcode_key, (const xmlChar*)"4") == 0))) || 
 								(stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"--- memory leak warning ---") && r_cb_data->show_memleaks) ||
+								(r_cb_data->print_stdout && stdout_key  && xmlStrlen(stdout_key) > 0) ||
+								(r_cb_data->print_stderr && stderr_key  && xmlStrlen(stderr_key) > 0) ||
 								(r_cb_data->show_clipped && stdout_key && xmlStrstr(stdout_key, (const xmlChar*)"clipped") && xmlStrstr(stdout_key, (const xmlChar*)" 0% samples clipped") == NULL) ) {
 			
 								if( r_cb_data->dokuwiki_format )
@@ -284,10 +289,10 @@ static int create_report_from_filename(const char *const filename, const struct 
 										fprintf(r_cb_data->report_fd, " (autosave)");
 									fprintf(r_cb_data->report_fd, "  * Error code: ''%s''\n", exitcode_key);
 		
-									if( stdout_key )
+									if( stdout_key && xmlStrlen(stderr_key) > 0 )
 										fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n", stdout_key);
 			
-									if( stderr_key )
+									if( stderr_key && xmlStrlen(stderr_key) > 0 )
 										fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n\n", stderr_key); // TODO: why two '\n'
 								}
 								else
@@ -310,10 +315,10 @@ static int create_report_from_filename(const char *const filename, const struct 
 										fprintf(r_cb_data->report_fd, " (autosave)");
 									fprintf(r_cb_data->report_fd, " (%s)\n", exitcode_key);
 		
-									if( stdout_key )
+									if( stdout_key && xmlStrlen(stderr_key) > 0 )
 										fprintf(r_cb_data->report_fd, "%s\n", stdout_key);
 			
-									if( stderr_key )
+									if( stderr_key && xmlStrlen(stderr_key) > 0 )
 										fprintf(r_cb_data->report_fd, "%s\n", stderr_key);
 								}
 			
@@ -436,6 +441,7 @@ static void create_report()
 	r_cb_data.show_clipped = config_show_clipped;
 	r_cb_data.report_type = config_report_type;
 	r_cb_data.compare_folder = config_compare_folder;
+	r_cb_data.print_stdout = config_print_stdout;
 
 	if( config_group_data ) {
 		struct group_data* gd = NULL;
