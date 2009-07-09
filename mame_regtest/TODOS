@@ -71,7 +71,6 @@ mame_regtest
 			- test frontend functions (-listfull etc.)
 			- call -validate?
 			- call "-listdevices" for MESS?
-		- use -aviwrite
 		- add soft/hardreset tests after each call like "autosave" test?
 			- how will it work with -autosave?
 		- use grep to diff each file
@@ -113,7 +112,7 @@ mame_regtest
 			- runs with the usual builds on the u-releases			
 		- fix Fedora Core 10 compilation (MAX_PATH)
 		- "output_folder" doesn't work
-		- test setcwd() on start-up and bail out when it fails
+		- test chdir() on start-up and bail out when it fails
 		- add the MNG sizes (e.g. 640x480) to the output XML
 		- make doesn't work when the additional files already exist	
 		

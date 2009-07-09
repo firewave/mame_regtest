@@ -39,6 +39,7 @@
 		<option name='use_throttle' value='0'/>
 		<option name='use_debug' value='0'/>
 		<option name='write_mng' value='0'/>
+		<option name='write_avi' value='0'/>
 		<option name='additional_options' value=''/>
 		
 		<!-- output files -->

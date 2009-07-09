@@ -157,6 +157,7 @@ static int config_osdprocessors = 1;
 static int config_print_xpath_results = 0;
 static int config_test_softreset = 0;
 static int config_hack_pinmame = 0;
+static int config_write_avi = 0;
 
 struct config_entry mrt_config[] =
 {
@@ -196,6 +197,7 @@ struct config_entry mrt_config[] =
 	{ "print_xpath_results",	CFG_INT,		&config_print_xpath_results },
 	{ "test_softreset",			CFG_INT,		&config_test_softreset },
 	{ "hack_pinmame",			CFG_INT,		&config_hack_pinmame },
+	{ "write_avi",			CFG_INT,		&config_write_avi },
 	{ NULL,						-1,				NULL }
 };
 
@@ -842,6 +844,11 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 			append_string(&sys, " -mngwrite ");
 		append_driver_info(&sys, de);
 		append_string(&sys, ".mng");
+	}
+	if( config_write_avi ) {
+		append_string(&sys, " -aviwrite ");
+		append_driver_info(&sys, de);
+		append_string(&sys, ".avi");
 	}
 	if( config_additional_options && (strlen(config_additional_options) > 0) ) {
 		append_string(&sys, " ");
@@ -1604,6 +1611,7 @@ int main(int argc, char *argv[])
 	printf("osdprocessors: %d\n", config_osdprocessors);
 	printf("print_xpath_results: %d\n", config_print_xpath_results);
 	printf("test_softreset: %d\n", config_test_softreset);
+	printf("write_avi: %d", config_write_avi);
 
 	printf("hack_ftr: %d\n", config_hack_ftr);
 	printf("hack_biospath: %d\n", config_hack_biospath);
