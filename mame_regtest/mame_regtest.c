@@ -109,6 +109,7 @@ static const char* const dummy_root_str = "dummy_root";
 /* PNG/MNG signatures */
 static const unsigned char png_sig[8] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
 static const unsigned char mng_sig[8] = { 0x8a, 0x4d, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
+static const unsigned char IHDR_name[4] = { 'I', 'H', 'D', 'R' };
 static const unsigned char IDAT_name[4] = { 'I', 'D', 'A', 'T' };
 static const unsigned char IEND_name[4] = { 'I', 'E', 'N', 'D' };
 static const unsigned char MEND_name[4] = { 'M', 'E', 'N', 'D' };
@@ -198,7 +199,7 @@ struct config_entry mrt_config[] =
 	{ NULL,						-1,				NULL }
 };
 
-static int get_png_IDAT_data(const char* png_name, unsigned int *IDAT_size, unsigned int* IDAT_crc);
+static int get_png_IDAT_data(const char* png_name, unsigned int *IHDR_width, unsigned int* IHDR_height, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void open_mng_and_skip_header(const char* mng_name, FILE** mng_fd);
 static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void cleanup_and_exit(int errcode, const char* errstr);
@@ -401,8 +402,12 @@ static void parse_callback(struct parse_callback_data* pcd)
 		xmlNewProp(filenode, (const xmlChar*)"name", (const xmlChar*)pcd->entry_name);
 		char tmp[128];
 		if( strstr(pcd->entry_name, ".png") ) {
-			unsigned int IDAT_size, IDAT_crc;
-			if( get_png_IDAT_data(pcd->fullname, &IDAT_size, &IDAT_crc) ) {
+			unsigned int IHDR_width, IHDR_height, IDAT_size, IDAT_crc;
+			if( get_png_IDAT_data(pcd->fullname, &IHDR_width, &IHDR_height, &IDAT_size, &IDAT_crc) ) {
+				snprintf(tmp, sizeof(tmp), "%u", IHDR_width);
+				xmlNewProp(filenode, (const xmlChar*)"png_width", (const xmlChar*)tmp);
+				snprintf(tmp, sizeof(tmp), "%u", IHDR_height);
+				xmlNewProp(filenode, (const xmlChar*)"png_height", (const xmlChar*)tmp);
 				snprintf(tmp, sizeof(tmp), "%u", IDAT_size);
 				xmlNewProp(filenode, (const xmlChar*)"png_size", (const xmlChar*)tmp);
 				snprintf(tmp, sizeof(tmp), "%x", IDAT_crc);
@@ -625,6 +630,49 @@ static int read_image_entries(const xmlNodePtr node, struct image_entry** images
 	return 1;
 }
 
+static int get_IHDR_data(FILE* in_fd, unsigned int* IHDR_width, unsigned int* IHDR_height)
+{
+	unsigned int chunk_size = 0;
+	unsigned int reversed_chunk_size = 0;
+	unsigned char chunk_name[4] = "";
+
+	if( fread(&chunk_size, sizeof(unsigned int), 1, in_fd) != 1 ) {
+		printf("could not read chunk size\n");
+		return 0;
+	}
+
+	reversed_chunk_size = htonl(chunk_size);
+	
+	if( fread(chunk_name, sizeof(unsigned char), 4, in_fd) != 4 ) {
+		printf("could not read chunk name\n");
+		return 0;
+	}
+
+	if( memcmp(IHDR_name, chunk_name, 4) == 0 ) {
+		unsigned int width = 0, height = 0;
+		
+		if( fread(&width, sizeof(unsigned int), 1, in_fd) != 1 ) {
+				printf("could not read IHDR chunk width\n");
+				return 0;
+		}
+		
+		if( fread(&height, sizeof(unsigned int), 1, in_fd) != 1 ) {
+				printf("could not read IHDR chunk height\n");
+				return 0;
+		}
+
+		*IHDR_width = htonl(width);
+		*IHDR_height = htonl(height);
+		
+		fseek(in_fd, reversed_chunk_size - (2 * sizeof(unsigned int)), SEEK_CUR); /* jump remaining IHDR chunk */
+		fseek(in_fd, 4, SEEK_CUR); /* jump CRC */
+		
+		return 1;
+	}
+	
+	return 0;
+}
+
 static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc)
 {
 	unsigned int chunk_size = 0;
@@ -676,7 +724,7 @@ static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, uns
 	} while(1);
 }
 
-static int get_png_IDAT_data(const char* png_name, unsigned int *IDAT_size, unsigned int* IDAT_crc)
+static int get_png_IDAT_data(const char* png_name, unsigned int *IHDR_width, unsigned int* IHDR_height, unsigned int *IDAT_size, unsigned int* IDAT_crc)
 {
 	FILE* png_fd = fopen(png_name, "rb");
 	if( png_fd == NULL ) {
@@ -698,6 +746,13 @@ static int get_png_IDAT_data(const char* png_name, unsigned int *IDAT_size, unsi
 		printf("contains no PNG signature: %s\n", png_name);
 		fclose(png_fd);
 		return 0;		
+	}
+	
+	int IHDR_res = get_IHDR_data(png_fd, IHDR_width, IHDR_height);
+	if( IHDR_res != 1 ) {
+		printf("error getting IHDR data: %s\n", png_name);
+		fclose(png_fd);
+		return IHDR_res;
 	}
 	
 	int IDAT_res = internal_get_next_IDAT_data(png_fd, IDAT_size, IDAT_crc);

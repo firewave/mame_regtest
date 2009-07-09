@@ -104,19 +104,18 @@ mame_regtest
 		- bail out when invalid config type found
 		- replace "pause_at" with a signal file (add pid to it to support multiple instances?)
 		- add memory dumps to the output files for -debug runs?
-		- change tests to do
-			- a run on the official binary once the cycle is completed
-			- runs with the usual builds on the u-releases
 		- document on the wiki
 			- the different builds
 			- how the results are created
 			- the machine the tests are run on
 			- the resulting command-line
+			- a run on the official binary once the cycle is completed
+			- runs with the usual builds on the u-releases			
 		- fix Fedora Core 10 compilation (MAX_PATH)
 		- "output_folder" doesn't work
 		- test setcwd() on start-up and bail out when it fails
-		- add the PNG/MNG sizes (e.g. 640x480) to the output XML
-		- make doesn't work when the additional files already exist		
+		- add the MNG sizes (e.g. 640x480) to the output XML
+		- make doesn't work when the additional files already exist	
 		
 	create_report:
 		- write comparison tool

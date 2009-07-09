@@ -398,7 +398,8 @@
 	- updated copyright
 	- renamed "block" to "chunk"
 	- renamed internal_get_IDAT_data() to internal_get_next_IDAT_data()
-	- changed variable declarations	
+	- changed variable declarations
+	- added "png_width" and "png_height" for PNGs to XML output
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)
