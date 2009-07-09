@@ -199,7 +199,7 @@ struct config_entry mrt_config[] =
 	{ NULL,						-1,				NULL }
 };
 
-static int get_png_IDAT_data(const char* png_name, unsigned int *IHDR_width, unsigned int* IHDR_height, unsigned int *IDAT_size, unsigned int* IDAT_crc);
+static int get_png_data(const char* png_name, unsigned int *IHDR_width, unsigned int* IHDR_height, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void open_mng_and_skip_header(const char* mng_name, FILE** mng_fd);
 static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void cleanup_and_exit(int errcode, const char* errstr);
@@ -403,7 +403,7 @@ static void parse_callback(struct parse_callback_data* pcd)
 		char tmp[128];
 		if( strstr(pcd->entry_name, ".png") ) {
 			unsigned int IHDR_width, IHDR_height, IDAT_size, IDAT_crc;
-			if( get_png_IDAT_data(pcd->fullname, &IHDR_width, &IHDR_height, &IDAT_size, &IDAT_crc) ) {
+			if( get_png_data(pcd->fullname, &IHDR_width, &IHDR_height, &IDAT_size, &IDAT_crc) ) {
 				snprintf(tmp, sizeof(tmp), "%u", IHDR_width);
 				xmlNewProp(filenode, (const xmlChar*)"png_width", (const xmlChar*)tmp);
 				snprintf(tmp, sizeof(tmp), "%u", IHDR_height);
@@ -724,7 +724,7 @@ static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, uns
 	} while(1);
 }
 
-static int get_png_IDAT_data(const char* png_name, unsigned int *IHDR_width, unsigned int* IHDR_height, unsigned int *IDAT_size, unsigned int* IDAT_crc)
+static int get_png_data(const char* png_name, unsigned int *IHDR_width, unsigned int* IHDR_height, unsigned int *IDAT_size, unsigned int* IDAT_crc)
 {
 	FILE* png_fd = fopen(png_name, "rb");
 	if( png_fd == NULL ) {
