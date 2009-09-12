@@ -415,6 +415,7 @@
 	- bail out when "output_folder" was found and "clear_output_folder" is not set
 	- print a message when valgrind options are not supported
 	- added disabled code to support gdb calls
+	- removed "please report" from log message
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)

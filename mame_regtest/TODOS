@@ -108,7 +108,6 @@ mame_regtest
 		- test chdir() on start-up and bail out when it fails
 		- make doesn't work when the additional files already exist and you compile by target (e.g. mame_regtest.exe)
 		- factor out duplicated PNG/MNG code
-		- get rid of "please report" in log messages
 		- create open_mng_and_skip_sig() for PNG
 		- get MEND reference out of IDAT function
 		- test with path with whitespaces

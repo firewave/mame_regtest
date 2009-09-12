@@ -350,8 +350,8 @@ static int parse_mng(const char* file, xmlNodePtr filenode)
 			/* end of file reached - do nothing - exit loop */
 			break;
 		}
-		else if(res == 0 ) {
-			printf("unexpected error parsing MNG '%s' - please report\n", file);
+		else if( res == 0 ) {
+			printf("unexpected error parsing MNG '%s'\n", file);
 			break;
 		}
 	} while( 1 );
