@@ -91,7 +91,6 @@ mame_regtest
 		- rename CFG_STR_PTR to CFG_STR
 		- handle all options as string (use atoi() to convert to integers)
 		- use register function to add config values?
-		- make it possible to run multiple instances of mame_regtest at the same time (create the temporary files with the process ID appended?)
 		- bail out when invalid config type found
 		- replace "pause_at" with a signal file (add pid to it to support multiple instances?)
 		- add memory dumps to the output files for -debug runs?

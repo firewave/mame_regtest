@@ -98,10 +98,10 @@ static char* stdout_temp_file = NULL;
 static char* stderr_temp_file = NULL;
 static char* dummy_ini_folder = NULL;
 static char current_path[MAX_PATH] = "";
+static char* dummy_root = NULL;
 
 /* constant string variables */
 static const char* const xpath_placeholder = "DRIVER_ROOT";
-static const char* const dummy_root_str = "dummy_root";
 
 /* PNG/MNG signatures */
 static const unsigned char png_sig[8] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
@@ -159,6 +159,7 @@ static int config_write_avi = 0;
 static int config_verbose = 0;
 /* static int config_use_gdb = 0; */
 static int config_write_wav = 0;
+static char pid_str[10] = "";
 
 struct config_entry mrt_config[] =
 {
@@ -578,7 +579,10 @@ static void cleanup_and_exit(int errcode, const char* errstr)
 	free(temp_folder);
 	temp_folder = NULL;
 
-	clear_directory(dummy_root_str, 1);
+	clear_directory(dummy_root, 1);
+	
+	free(dummy_root);
+	dummy_root = NULL;
 
 	printf("%s\n", errstr);
 	exit(errcode);
@@ -935,8 +939,8 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 		printf("system call: %s\n", sys);
 
 	/* TODO: errorhandling */
-	mrt_mkdir(dummy_root_str);
-	int ch_res = chdir(dummy_root_str);
+	mrt_mkdir(dummy_root);
+	int ch_res = chdir(dummy_root);
 	int sys_res = system(sys);
 	ch_res = chdir(current_path);
 	
@@ -1066,7 +1070,7 @@ static int execute_mame2(struct driver_entry* de)
 
 	if( result1 ) {
 		xmlAddChild(output_node, result1);
-		build_output_xml(dummy_root_str, result1);
+		build_output_xml(dummy_root, result1);
 	}
 
 	if( res == 1 && config_use_autosave && de->autosave ) {
@@ -1074,18 +1078,18 @@ static int execute_mame2(struct driver_entry* de)
 
 		if( result2 ) {
 			xmlAddChild(output_node, result2);
-			build_output_xml(dummy_root_str, result2);
+			build_output_xml(dummy_root, result2);
 		}
 	}
 
-	if( (config_store_output > 0) && (access(dummy_root_str, F_OK) == 0) ) {
+	if( (config_store_output > 0) && (access(dummy_root, F_OK) == 0) ) {
 		char* outputdir = NULL;
 		append_string(&outputdir, config_output_folder);
 		append_string(&outputdir, FILESLASH);
 		append_driver_info(&outputdir, de);
 
-		if( rename(dummy_root_str, outputdir) != 0 )
-			printf("could not rename '%s' to '%s'\n", dummy_root_str, outputdir);
+		if( rename(dummy_root, outputdir) != 0 )
+			printf("could not rename '%s' to '%s'\n", dummy_root, outputdir);
 			
 		/* clear everything but the "snap" folder */
 		if( config_store_output == 2)
@@ -1095,7 +1099,7 @@ static int execute_mame2(struct driver_entry* de)
 		outputdir = NULL;
 	}
 	else {
-		clear_directory(dummy_root_str, 0);
+		clear_directory(dummy_root, 0);
 	}
 
 	char* outputname = NULL;
@@ -1524,13 +1528,23 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
+	itoa(getpid(), pid_str, 10);
+	printf("\n");
+	printf("process: %s\n", pid_str);
+
 	if( getcwd(current_path, sizeof(current_path)) == NULL ) {
 		printf("could not get current working path\n");
 		exit(1);
 	}
+	
 	printf("\n");
 	printf("current path: %s\n", current_path);
 	printf("\n");
+
+	/* create dummy root with pid, so we can run multiple instances at the same time */
+	append_string(&dummy_root, "dummy_root");
+	append_string(&dummy_root, ".");
+	append_string(&dummy_root, pid_str);
 
 	printf("initializing configuration\n");
 	int config_res = config_init("mame_regtest.xml", "mame_regtest");
@@ -1617,9 +1631,12 @@ int main(int argc, char *argv[])
 			printf("using output folder: %s\n", config_output_folder);
 	}
 
+	/* create temporary folder with pid, so we can run multiple instances at the same time */
 	append_string(&temp_folder, current_path);
 	append_string(&temp_folder, FILESLASH);
 	append_string(&temp_folder, "mrt_temp");
+	append_string(&temp_folder, ".");
+	append_string(&temp_folder, pid_str);
 
 	if( (access(temp_folder, F_OK) != 0) && mrt_mkdir(temp_folder) != 0 ) {
 		printf("could not create folder '%s'\n", temp_folder);
@@ -1779,8 +1796,8 @@ int main(int argc, char *argv[])
 	if( driv_inf == NULL )
 		cleanup_and_exit(0, "finished");
 
-	printf("clearing existing dummy directories\n");
-	clear_directory(dummy_root_str, 1);
+	printf("clearing existing dummy directory\n");
+	clear_directory(dummy_root, 1);
 
 	if( (config_hack_debug || is_debug) && config_use_debug ) {
 		append_string(&debugscript_file, temp_folder);
