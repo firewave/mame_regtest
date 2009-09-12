@@ -87,7 +87,6 @@ struct driver_entry {
 
 static int app_type = 0;
 static int is_debug = 0;
-static unsigned int exec_counter = 0;
 static const int xpath_placeholder_size = 11;
 
 static xmlChar* app_ver = NULL;
@@ -99,6 +98,7 @@ static char* stderr_temp_file = NULL;
 static char* dummy_ini_folder = NULL;
 static char current_path[MAX_PATH] = "";
 static char* dummy_root = NULL;
+static char* pause_file = NULL;
 
 /* constant string variables */
 static const char* const xpath_placeholder = "DRIVER_ROOT";
@@ -120,7 +120,6 @@ enum {
 
 /* configuration variables */
 static char config_str_str[16] = "2";
-static int config_pause_at = 100;
 static char* config_mame_exe = NULL;
 static char* config_gamelist_xml_file = NULL;
 static int config_use_autosave = 0;
@@ -165,7 +164,6 @@ struct config_entry mrt_config[] =
 {
 	{ "executable",				CFG_STR_PTR,	&config_mame_exe },
 	{ "str",					CFG_STR,		config_str_str },
-	{ "pause_interval",			CFG_INT,		&config_pause_at },
 	{ "listxml_file",			CFG_STR_PTR,	&config_gamelist_xml_file },
 	{ "use_autosave",			CFG_INT,		&config_use_autosave },
 	{ "use_ramsize",			CFG_INT,		&config_use_ramsize },
@@ -580,6 +578,9 @@ static void cleanup_and_exit(int errcode, const char* errstr)
 	temp_folder = NULL;
 
 	clear_directory(dummy_root, 1);
+
+	free(pause_file);
+	pause_file = NULL;
 	
 	free(dummy_root);
 	dummy_root = NULL;
@@ -1025,9 +1026,12 @@ static int execute_mame2(struct driver_entry* de)
 		return 0;
 	}
 
-	if( (config_pause_at > 0) && ((++exec_counter % config_pause_at) == 0) ) {
+	if( access(pause_file, F_OK) == 0 ) {
+		printf("\n");
+		printf("found pause file\n");
 		printf("please press any key to continue\n");
 		mrt_getch();
+		printf("\n");
 	}
 
 	int res = 0;
@@ -1546,6 +1550,10 @@ int main(int argc, char *argv[])
 	append_string(&dummy_root, ".");
 	append_string(&dummy_root, pid_str);
 
+	append_string(&pause_file, "pause");
+	append_string(&pause_file, ".");
+	append_string(&pause_file, pid_str);
+
 	printf("initializing configuration\n");
 	int config_res = config_init("mame_regtest.xml", "mame_regtest");
 	if( !config_res )
@@ -1591,7 +1599,6 @@ int main(int argc, char *argv[])
 
 	if( config_verbose ) {
 		printf("str: %s\n", config_str_str);
-		printf("pause interval: %d\n", config_pause_at);
 
 		if( config_gamelist_xml_file && (strlen(config_gamelist_xml_file) > 0) ) {
 			printf("using custom list: %s\n", config_gamelist_xml_file);

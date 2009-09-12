@@ -92,7 +92,6 @@ mame_regtest
 		- handle all options as string (use atoi() to convert to integers)
 		- use register function to add config values?
 		- bail out when invalid config type found
-		- replace "pause_at" with a signal file (add pid to it to support multiple instances?)
 		- add memory dumps to the output files for -debug runs?
 		- document on the wiki
 			- the different builds

@@ -10,7 +10,6 @@
 		<option name='osdprocessors' value='1'/>
 
 		<!-- processing options -->
-		<option name='pause_interval' value='0'/>
 		<option name='use_devices' value='1'/>
 		<option name='use_nonrunnable' value='0'/>
 		<option name='xpath_expr' value=''/>

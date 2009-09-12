@@ -418,6 +418,8 @@
 	- removed "please report" from log message
 	- added option "write_wav" to control creation of .wav files
 	- temporary path and dummy root now contain the process ID to allow running of multiple instances from the same folder (NOTE: left-overs from frocefully termination and crashes cannot be cleared anymore)
+	- removed option "pause_interval"
+	- added check for signal file "pause.<pid>" to pause processing on the next entry (needs to be placed in working folder)
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)
