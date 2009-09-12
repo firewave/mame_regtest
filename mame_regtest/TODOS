@@ -2,7 +2,6 @@ mame_regtest
 	Features:
 		- per-cart configuration
 		- check every game with created files (re-run after clean run)
-		- add silent mode?
 		- add sanity checks for maximum bios, ramsize and device count
 		- add option for testing of .inp file writing/reading (-record/-playback)
 		- add "start_at" for devices
@@ -42,7 +41,6 @@ mame_regtest
 		- add printf-format support to append_string()
 		- switch to binaries/includes from http://www.zlatkovic.com/pub/libxml/
 		- run test_createconfig in dummy_root to avoid usage of existing mame.ini
-		- calls within gdb? (can gdb be scripted?)
 		- use the following debugger commands
 			- gtime <milliseconds in hex>
 			- hardreset (causes endless restarts of MAME)
@@ -109,6 +107,7 @@ mame_regtest
 		- get MEND reference out of IDAT function
 		- test with path with whitespaces
 		- add option to run MAME in gdb (gdb --batch --eval-command=run --args)
+		- disallow usage of gdb and valgrind at the same time
 		
 	create_report:
 		- write comparison tool
