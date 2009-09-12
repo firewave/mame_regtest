@@ -1581,20 +1581,23 @@ int main(int argc, char *argv[])
 	}
 	if( config_verbose )
 		printf("write mng: %d\n", config_write_mng);
-
-	if( (access(config_output_folder, F_OK) != 0) && mrt_mkdir(config_output_folder) != 0 ) {
-		printf("could not create folder '%s'\n", config_output_folder);
-		cleanup_and_exit(1, "aborting");
+		
+	if( access(config_output_folder, F_OK) == 0 ) {
+		if( !config_clear_output_folder ) {
+			printf("output folder '%s' found\n", config_output_folder);
+			cleanup_and_exit(1, "aborting");
+		}
+	}
+	else {
+		if( mrt_mkdir(config_output_folder) != 0 ) {
+			printf("could not create folder '%s'\n", config_output_folder);
+			cleanup_and_exit(1, "aborting");
+		}
 	}
 
 	if( strlen(config_output_folder) > 0 ) {
 		if( config_verbose )
 			printf("using output folder: %s\n", config_output_folder);
-	}
-
-	if( !config_clear_output_folder && (access(config_output_folder, F_OK) == 0) ) {
-		printf("output folder '%s' found\n", config_output_folder);
-		cleanup_and_exit(1, "aborting");
 	}
 
 	append_string(&temp_folder, current_path);
