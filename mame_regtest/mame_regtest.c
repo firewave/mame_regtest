@@ -126,8 +126,8 @@ static char* config_gamelist_xml_file = NULL;
 static int config_use_autosave = 0;
 static int config_use_ramsize = 0;
 static int config_write_mng = 0;
-#if USE_VALGRIND
 static int config_use_valgrind = 0;
+#if USE_VALGRIND
 static char* config_valgrind_binary = NULL;
 static char* config_valgrind_parameters = NULL;
 #endif
@@ -167,8 +167,8 @@ struct config_entry mrt_config[] =
 	{ "use_autosave",			CFG_INT,		&config_use_autosave },
 	{ "use_ramsize",			CFG_INT,		&config_use_ramsize },
 	{ "write_mng",				CFG_INT,		&config_write_mng },
-#if USE_VALGRIND
 	{ "use_valgrind",			CFG_INT,		&config_use_valgrind },
+#if USE_VALGRIND
 	{ "valgrind_binary",		CFG_STR_PTR,	&config_valgrind_binary },
 	{ "valgrind_parameters",	CFG_STR_PTR,	&config_valgrind_parameters },
 #endif
@@ -266,8 +266,8 @@ static const char* get_inifile()
 
 static void get_executable(char** sys, struct driver_entry* de, const char* callstr)
 {
-#if USE_VALGRIND
 	if( config_use_valgrind ) {
+#if USE_VALGRIND
 		append_string(sys, config_valgrind_binary);
 		append_string(sys, " ");
 		append_string(sys, config_valgrind_parameters);
@@ -283,8 +283,8 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 		}
 		append_string(sys, ".valgrind_%p");
 		append_string(sys, " ");
-	}
 #else
+	}
 	/* shut up compiler */
 	(void)de;
 	(void)callstr;
@@ -1627,12 +1627,13 @@ int main(int argc, char *argv[])
 	append_string(&dummy_ini_folder, FILESLASH);
 	append_string(&dummy_ini_folder, "dummy_ini");
 
-#if USE_VALGRIND
 	if( config_verbose )
 		printf("valgrind: %d\n", config_use_valgrind);
 
+
 	if( config_use_valgrind )
 	{
+#if USE_VALGRIND
 		if( !config_valgrind_binary || (strlen(config_valgrind_binary) == 0) )
 			append_string(&config_valgrind_binary, "valgrind");
 		if( config_verbose )
@@ -1641,8 +1642,10 @@ int main(int argc, char *argv[])
 			append_string(&config_valgrind_parameters, "--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --leak-resolution=med");
 		if( config_verbose )
 			printf("valgrind_parameters: %s\n", config_valgrind_parameters);
-	}
+#else
+		printf("valgrind support not available on this platform");
 #endif
+	}
 
 	if( config_verbose ) {
 		if( config_rompath_folder && (strlen(config_rompath_folder) > 0) )

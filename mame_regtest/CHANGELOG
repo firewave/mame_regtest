@@ -413,6 +413,7 @@
 	- added clear_callback_nosnap() and clear_directory_nosnap()
 	- changed option "store_output" to take value "2" to only store the "snap" folder
 	- bail out when "output_folder" was found and "clear_output_folder" is not set
+	- print a message when valgrind options are not supported
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)
