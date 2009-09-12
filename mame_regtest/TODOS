@@ -1,6 +1,5 @@
 mame_regtest
 	Features:
-		- logging of wavfiles to find sound regressions (empty files in case of no GAME_NO_SOUND flag)
 		- per-cart configuration
 		- check every game with created files (re-run after clean run)
 		- add silent mode?

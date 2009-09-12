@@ -416,6 +416,7 @@
 	- print a message when valgrind options are not supported
 	- added disabled code to support gdb calls
 	- removed "please report" from log message
+	- added option "write_wav" to control creation of .wav files
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)

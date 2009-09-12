@@ -158,6 +158,7 @@ static int config_hack_pinmame = 0;
 static int config_write_avi = 0;
 static int config_verbose = 0;
 /* static int config_use_gdb = 0; */
+static int config_write_wav = 0;
 
 struct config_entry mrt_config[] =
 {
@@ -200,6 +201,7 @@ struct config_entry mrt_config[] =
 	{ "write_avi",				CFG_INT,		&config_write_avi },
 	{ "verbose",				CFG_INT,		&config_verbose },
 /*	{ "use_gdb",				CFG_INT,		&config_use_gdb }, */
+	{ "write_wav",				CFG_INT,		&config_write_wav },
 	{ NULL,						-1,				NULL }
 };
 
@@ -903,6 +905,11 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 		append_string(&sys, " -aviwrite ");
 		append_driver_info(&sys, de);
 		append_string(&sys, ".avi");
+	}
+	if( config_write_wav ) {
+		append_string(&sys, " -wavwrite ");
+		append_driver_info(&sys, de);
+		append_string(&sys, ".wav");
 	}
 	if( config_additional_options && (strlen(config_additional_options) > 0) ) {
 		append_string(&sys, " ");
@@ -1686,6 +1693,7 @@ int main(int argc, char *argv[])
 		printf("write_avi: %d\n", config_write_avi);
 		printf("verbose: %d\n", config_verbose);
 		/* printf("use_gdb: %d\n", config_use_gdb); */
+		printf("write_wav: %d\n", config_write_wav);
 
 		printf("hack_ftr: %d\n", config_hack_ftr);
 		printf("hack_biospath: %d\n", config_hack_biospath);
