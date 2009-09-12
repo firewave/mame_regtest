@@ -368,6 +368,33 @@ static FILE* mrt_fopen(const char* filename, const char* attr)
 	return result;
 }
 
+static void clear_callback_nosnap(struct parse_callback_data* pcd)
+{
+	if( pcd->type == ENTRY_FILE ) {
+		remove(pcd->fullname);
+	}
+	/* do not delete the "snap" folder */
+	else if( (pcd->type == ENTRY_DIR_END) && (strcmp(pcd->entry_name, "snap") != 0) ) {
+		printf("dirname: %s\n", pcd->dirname);
+		printf("entry: %s\n", pcd->entry_name);
+		int delete_root = 1;
+		parse_directory(pcd->fullname, 0, clear_callback_nosnap, (void*)&delete_root);
+	}
+	else if( pcd->type == ENTRY_END ) {
+		int* delete_root = (int*)pcd->user_data;
+		if( *delete_root )
+			rmdir(pcd->dirname);
+	}
+}
+
+void clear_directory_nosnap(const char* dirname, int delete_root)
+{
+	parse_directory(dirname, 0, clear_callback_nosnap, (void*)&delete_root);
+
+	if( delete_root )
+		rmdir(dirname);
+}
+
 static void parse_callback(struct parse_callback_data* pcd)
 {
 	xmlNodePtr* node = (xmlNodePtr*)pcd->user_data;
@@ -1034,7 +1061,7 @@ static int execute_mame2(struct driver_entry* de)
 		}
 	}
 
-	if( config_store_output && (access(dummy_root_str, F_OK) == 0) ) {
+	if( (config_store_output > 0) && (access(dummy_root_str, F_OK) == 0) ) {
 		char* outputdir = NULL;
 		append_string(&outputdir, config_output_folder);
 		append_string(&outputdir, FILESLASH);
@@ -1042,6 +1069,10 @@ static int execute_mame2(struct driver_entry* de)
 
 		if( rename(dummy_root_str, outputdir) != 0 )
 			printf("could not rename '%s' to '%s'\n", dummy_root_str, outputdir);
+			
+		/* clear everything but the "snap" folder */
+		if( config_store_output == 2)
+			clear_directory_nosnap(outputdir, 0);
 
 		free(outputdir);
 		outputdir = NULL;

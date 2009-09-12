@@ -410,6 +410,8 @@
 	- improved some error messages
 	- disabled logging of configuration entries
 	- moved calc_crc32(), clear_directory() and clear_callback() to common.c/.h
+	- added clear_callback_nosnap() and clear_directory_nosnap()
+	- changed option "store_output" to take value "2" to only store the "snap" folder
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)
