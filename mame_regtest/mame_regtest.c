@@ -1593,6 +1593,24 @@ int main(int argc, char *argv[])
 	if( config_verbose )
 		printf("executable: %s\n", config_mame_exe);
 
+	if( access(config_output_folder, F_OK) == 0 ) {
+		if( !config_clear_output_folder ) {
+			printf("output folder '%s' found\n", config_output_folder);
+			cleanup_and_exit(1, "aborting");
+		}
+	}
+	else {
+		if( mrt_mkdir(config_output_folder) != 0 ) {
+			printf("could not create folder '%s'\n", config_output_folder);
+			cleanup_and_exit(1, "aborting");
+		}
+	}
+
+	if( strlen(config_output_folder) > 0 ) {
+		if( config_verbose )
+			printf("using output folder: %s\n", config_output_folder);
+	}
+
 	append_string(&listxml_output, config_output_folder);
 	append_string(&listxml_output, FILESLASH);
 	append_string(&listxml_output, "listxml.xml");
@@ -1620,24 +1638,6 @@ int main(int argc, char *argv[])
 	if( config_verbose )
 		printf("write mng: %d\n", config_write_mng);
 		
-	if( access(config_output_folder, F_OK) == 0 ) {
-		if( !config_clear_output_folder ) {
-			printf("output folder '%s' found\n", config_output_folder);
-			cleanup_and_exit(1, "aborting");
-		}
-	}
-	else {
-		if( mrt_mkdir(config_output_folder) != 0 ) {
-			printf("could not create folder '%s'\n", config_output_folder);
-			cleanup_and_exit(1, "aborting");
-		}
-	}
-
-	if( strlen(config_output_folder) > 0 ) {
-		if( config_verbose )
-			printf("using output folder: %s\n", config_output_folder);
-	}
-
 	/* create temporary folder with pid, so we can run multiple instances at the same time */
 	append_string(&temp_folder, current_path);
 	append_string(&temp_folder, FILESLASH);

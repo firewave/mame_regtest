@@ -422,6 +422,7 @@
 	- added check for signal file "pause.<pid>" to pause processing on the next entry (needs to be placed in working folder)
 	- fixed bug in is_absolute_path() - absolute paths for "executable" are working now
 	- do not treat path starting with "/" as absolute on windows
+	- moved "output_folder" check before first usage of it
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)
