@@ -112,9 +112,7 @@ mame_regtest
 		- create open_mng_and_skip_sig() for PNG
 		- get MEND reference out of IDAT function
 		- test with path with whitespaces
-		- add an option to just keep the snaps from the output files
 		- add option to run MAME in gdb (gdb --batch --eval-command=run --args)
-		- how to handle existing output folders - should not overwrite by default
 		
 	create_report:
 		- write comparison tool
