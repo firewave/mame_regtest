@@ -119,7 +119,7 @@ enum {
 };
 
 /* configuration variables */
-static char config_str_str[16] = "2";
+static char* config_str_str = NULL;
 static char* config_mame_exe = NULL;
 static char* config_gamelist_xml_file = NULL;
 static int config_use_autosave = 0;
@@ -142,7 +142,7 @@ static int config_hack_biospath = 0;
 static char* config_xpath_expr = NULL;
 static int config_hack_mngwrite = 0;
 static int config_use_nonrunnable = 0;
-static char config_output_folder[256] = "mrt_output";
+static char* config_output_folder = NULL;
 static char* config_global_device_file = NULL;
 static int config_use_isbios = 0;
 static int config_store_output = 0;
@@ -163,7 +163,7 @@ static char pid_str[10] = "";
 struct config_entry mrt_config[] =
 {
 	{ "executable",				CFG_STR_PTR,	&config_mame_exe },
-	{ "str",					CFG_STR,		config_str_str },
+	{ "str",					CFG_STR_PTR,	&config_str_str },
 	{ "listxml_file",			CFG_STR_PTR,	&config_gamelist_xml_file },
 	{ "use_autosave",			CFG_INT,		&config_use_autosave },
 	{ "use_ramsize",			CFG_INT,		&config_use_ramsize },
@@ -185,7 +185,7 @@ struct config_entry mrt_config[] =
 	{ "hack_debug",				CFG_INT,		&config_hack_debug },
 	{ "hack_mngwrite",			CFG_INT,		&config_hack_mngwrite },
 	{ "use_nonrunnable",		CFG_INT,		&config_use_nonrunnable },
-	{ "output_folder",			CFG_STR,		config_output_folder },
+	{ "output_folder",			CFG_STR_PTR,	&config_output_folder },
 	{ "device_file",			CFG_STR_PTR,	&config_global_device_file },
 	{ "use_isbios",				CFG_INT,		&config_use_isbios },
 	{ "store_output",			CFG_INT,		&config_store_output },
@@ -1726,6 +1726,11 @@ int main(int argc, char *argv[])
 		printf("hack_pinmame: %d\n", config_hack_pinmame);
 
 		printf("\n"); /* for output formating */
+	}
+
+	if( strlen(config_str_str) == 0 ) {
+		printf("'str' value cannot be empty\n");
+		cleanup_and_exit(1, "aborting");		
 	}
 
 	if( config_hack_ftr && (atoi(config_str_str) < 2)) {

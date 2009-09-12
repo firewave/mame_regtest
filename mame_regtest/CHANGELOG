@@ -423,6 +423,10 @@
 	- fixed bug in is_absolute_path() - absolute paths for "executable" are working now
 	- do not treat path starting with "/" as absolute on windows
 	- moved "output_folder" check before first usage of it
+	- changed options "str" and "output_folder" from CFG_STR to CFG_STR_PTR
+		- fixes reading of "output_folder" - it was only reading the first 4 characters
+		- they cannot be left empty anymore - the defaults in the source had to be removed
+	- removed config_entry_type CFG_STR from config.c/.h (it was never working properly)
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)

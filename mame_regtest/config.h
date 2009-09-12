@@ -3,8 +3,7 @@
 
 enum config_entry_type {
 	CFG_INT 	= 0,
-	CFG_STR 	= 1,
-	CFG_STR_PTR = 2
+	CFG_STR_PTR = 1
 };
 
 struct config_entry {

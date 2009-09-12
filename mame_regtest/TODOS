@@ -99,7 +99,6 @@ mame_regtest
 			- a run on the official binary once the cycle is completed
 			- runs with the usual builds on the u-releases			
 		- fix Fedora Core 10 compilation (MAX_PATH)
-		- "output_folder" doesn't work (CFG_STR doesn't work)
 		- test chdir() on start-up and bail out when it fails
 		- make doesn't work when the additional files already exist and you compile by target (e.g. mame_regtest.exe)
 		- factor out duplicated PNG/MNG code

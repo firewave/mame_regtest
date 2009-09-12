@@ -89,18 +89,6 @@ static void config_read_option_int(const xmlNodePtr config_node, const char* opt
 	xmlFree(opt);
 }
 
-static void config_read_option_str(const xmlNodePtr config_node, const char* opt_name, char* value, int size)
-{
-	xmlChar* opt = NULL;
-	if( config_read_option(config_node, opt_name, &opt) ) {
-		if( opt && xmlStrlen(opt) > 0 ) {
-			strncpy(value, (const char*)opt, size-1);
-			value[size-1] = '\0';
-		}
-	}
-	xmlFree(opt);
-}
-
 static void config_read_option_str_ptr(const xmlNodePtr config_node, const char* opt_name, char** value)
 {
 	xmlChar* opt = NULL;
@@ -142,11 +130,6 @@ int config_read(struct config_entry config_entries[], const char* config_name)
 			int* value = (int*)ce->value;
 			config_read_option_int(global_config_child, ce->name, value);
 			/* printf("%d\n", *value); */
-		}
-		else if( ce->type == CFG_STR ) {
-			char* value = (char*)ce->value;
-			config_read_option_str(global_config_child, ce->name, value, sizeof(value));
-			/* printf("%s\n", value); */
 		}
 		else if( ce->type == CFG_STR_PTR ) {
 			char** value = (char**)ce->value;
