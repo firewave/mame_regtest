@@ -420,6 +420,8 @@
 	- temporary path and dummy root now contain the process ID to allow running of multiple instances from the same folder (NOTE: left-overs from frocefully termination and crashes cannot be cleared anymore)
 	- removed option "pause_interval"
 	- added check for signal file "pause.<pid>" to pause processing on the next entry (needs to be placed in working folder)
+	- fixed bug in is_absolute_path() - absolute paths for "executable" are working now
+	- do not treat path starting with "/" as absolute on windows
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)

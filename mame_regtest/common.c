@@ -195,10 +195,13 @@ int is_absolute_path(const char* path)
 {
 	int len = strlen(path);
 
+#ifdef WIN32
+	if(len >= 3 && path[1] == ':' && path[2] == '\\')
+		return 1;
+#else
 	if(len >= 1 && path[0] == '/')
 		return 1;
-	if(len >= 3 && path[1] == ':' && path[2] == ':')
-		return 1;
+#endif
 
 	return 0;
 }
