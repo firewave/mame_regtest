@@ -157,6 +157,7 @@ static int config_test_softreset = 0;
 static int config_hack_pinmame = 0;
 static int config_write_avi = 0;
 static int config_verbose = 0;
+/* static int config_use_gdb = 0; */
 
 struct config_entry mrt_config[] =
 {
@@ -198,6 +199,7 @@ struct config_entry mrt_config[] =
 	{ "hack_pinmame",			CFG_INT,		&config_hack_pinmame },
 	{ "write_avi",				CFG_INT,		&config_write_avi },
 	{ "verbose",				CFG_INT,		&config_verbose },
+/*	{ "use_gdb",				CFG_INT,		&config_use_gdb }, */
 	{ NULL,						-1,				NULL }
 };
 
@@ -285,6 +287,14 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 		append_string(sys, " ");
 #else
 	}
+	/*
+	else if( config_use_gdb && (!callstr || (strcmp(callstr, "listxml") != 0)) ) {
+		append_string(sys, "gdb");
+		append_string(sys, " ");
+		append_string(sys, "--batch --eval-command=run --args");
+		append_string(sys, " ");
+	}
+	*/
 	/* shut up compiler */
 	(void)de;
 	(void)callstr;
@@ -1675,6 +1685,7 @@ int main(int argc, char *argv[])
 		printf("test_softreset: %d\n", config_test_softreset);
 		printf("write_avi: %d\n", config_write_avi);
 		printf("verbose: %d\n", config_verbose);
+		/* printf("use_gdb: %d\n", config_use_gdb); */
 
 		printf("hack_ftr: %d\n", config_hack_ftr);
 		printf("hack_biospath: %d\n", config_hack_biospath);
