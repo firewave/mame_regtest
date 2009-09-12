@@ -409,6 +409,7 @@
 	- move some log messages to "verbose" mode
 	- improved some error messages
 	- disabled logging of configuration entries
+	- moved calc_crc32(), clear_directory() and clear_callback() to common.c/.h
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)

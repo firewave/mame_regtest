@@ -69,4 +69,8 @@ int mrt_mkdir(const char* path);
 /* you have to free the result */
 char* get_filename(const char* filepath);
 
+void clear_directory(const char* dirname, int delete_root);
+
+void calc_crc32(const char* file, unsigned int* crc);
+
 #endif

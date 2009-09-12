@@ -48,9 +48,6 @@ mame_regtest returncodes:
 #include "libxml/parser.h"
 #include "libxml/xpath.h"
 
-/* zlib */
-#include "zlib.h"
-
 /* local */
 #include "common.h"
 #include "config.h"
@@ -355,23 +352,6 @@ static int parse_mng(const char* file, xmlNodePtr filenode)
 	return frame;
 }
 
-static void calc_crc32(const char* file, unsigned int* crc)
-{
-	char buffer[1024];
-	FILE* fd = fopen(file, "rb");
-	if( !fd )
-		return;
-
-	size_t bytesread;
-	*crc = crc32(0L, Z_NULL, 0);
-	while( (bytesread = fread(buffer, 1, 1024, fd)) != 0 ) {
-		*crc = crc32(*crc, (const Bytef*)buffer, bytesread);
-	}
-
-	fclose(fd);
-	fd = NULL;
-}
-
 static FILE* mrt_fopen(const char* filename, const char* attr)
 {
 	FILE* result = NULL;
@@ -386,30 +366,6 @@ static FILE* mrt_fopen(const char* filename, const char* attr)
 	free(outputfile);
 
 	return result;
-}
-
-static void clear_callback(struct parse_callback_data* pcd)
-{
-	if( pcd->type == ENTRY_FILE ) {
-		remove(pcd->fullname);
-	}
-	else if( pcd->type == ENTRY_DIR_END ) {
-		int delete_root = 1;
-		parse_directory(pcd->fullname, 0, clear_callback, (void*)&delete_root);
-	}
-	else if( pcd->type == ENTRY_END ) {
-		int* delete_root = (int*)pcd->user_data;
-		if( *delete_root )
-			rmdir(pcd->dirname);
-	}
-}
-
-static void clear_directory(const char* dirname, int delete_root)
-{
-	parse_directory(dirname, 0, clear_callback, (void*)&delete_root);
-	
-	if( delete_root )
-		rmdir(dirname);
 }
 
 static void parse_callback(struct parse_callback_data* pcd)
