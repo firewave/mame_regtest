@@ -119,7 +119,6 @@ mame_regtest
 				- new files
 				- stdout/stderr differs
 		- add documentation for configuration
-		- crashes when "compare_folder" is missing
 		- HTML report
 			- create HTML report (different variants)
 				Unexpected Returnvalues (sourcefile - driver - returncode - details [flags, stdout])
@@ -146,7 +145,6 @@ mame_regtest
 		- create default configuration for create_report to match removed options
 			- result_file
 			- add some useful reports from old create_report
-		- clean up the mess, that decides when to write something
 
 	Linux:
 		- add a signal handler for linux?
