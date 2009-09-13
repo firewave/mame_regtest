@@ -437,3 +437,4 @@
 	- made it possible to simply use "print_stdout" and "print_stderr"
 	- added "stdout_file" and "stderr_file" to default configuration to match old reports
 	- always print all available data in normal mode
+	- stdout was not printed was not added to report if stderr was missing
