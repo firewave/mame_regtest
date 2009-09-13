@@ -248,22 +248,22 @@ static int create_report_from_filename(const char *const filename, const struct 
 				while( output_childs ) {
 					if( output_childs->type == XML_ELEMENT_NODE ) {
 						if( xmlStrcmp(output_childs->name, (const xmlChar*)"result") == 0 ) {
-							xmlChar* exitcode_key = xmlGetProp(output_childs, (const xmlChar*)"exitcode");
-		
-							xmlChar* stderr_key = NULL;
-							if( r_cb_data->print_stderr )
-								stderr_key = xmlGetProp(output_childs, (const xmlChar*)"stderr");
-							xmlChar* stdout_key = NULL;
-							if( r_cb_data->show_clipped || r_cb_data->print_stdout )
-								stdout_key = xmlGetProp(output_childs, (const xmlChar*)"stdout");
-		
-							if( (exitcode_key && (xmlStrcmp(exitcode_key, (const xmlChar*)"0") != 0) && 
-								!(r_cb_data->ignore_exitcode_4 && (xmlStrcmp(exitcode_key, (const xmlChar*)"4") == 0))) || 
-								(stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"--- memory leak warning ---") && r_cb_data->show_memleaks) ||
-								(r_cb_data->print_stdout && stdout_key  && xmlStrlen(stdout_key) > 0) ||
-								(r_cb_data->print_stderr && stderr_key  && xmlStrlen(stderr_key) > 0) ||
-								(r_cb_data->show_clipped && stdout_key && xmlStrstr(stdout_key, (const xmlChar*)"clipped") && xmlStrstr(stdout_key, (const xmlChar*)" 0% samples clipped") == NULL) ) {
-			
+							xmlChar* exitcode_key = xmlGetProp(output_childs, (const xmlChar*)"exitcode");		
+							xmlChar* stderr_key = xmlGetProp(output_childs, (const xmlChar*)"stderr");
+							xmlChar* stdout_key = xmlGetProp(output_childs, (const xmlChar*)"stdout");
+								
+							int error_found = exitcode_key && (xmlStrcmp(exitcode_key, (const xmlChar*)"0") != 0);
+							int error4_found = xmlStrcmp(exitcode_key, (const xmlChar*)"4") == 0;							
+							int memleak_found = stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"--- memory leak warning ---");
+							int clipped_found = stdout_key && xmlStrstr(stdout_key, (const xmlChar*)"clipped") && (xmlStrstr(stdout_key, (const xmlChar*)" 0% samples clipped") == NULL);
+							
+							int report_error = (error_found && !(r_cb_data->ignore_exitcode_4 && error4_found));
+							int report_memleak = (memleak_found && r_cb_data->show_memleaks);
+							int report_stdout = (r_cb_data->print_stdout && stdout_key && xmlStrlen(stdout_key) > 0);
+							int report_stderr = (r_cb_data->print_stderr && stderr_key && xmlStrlen(stderr_key) > 0);
+							int report_clipped = (r_cb_data->show_clipped && clipped_found);
+							
+							if( report_error || report_memleak || report_stdout || report_stderr || report_clipped ) {
 								if( r_cb_data->dokuwiki_format )
 								{
 									if( write_src_header ) {
@@ -289,10 +289,10 @@ static int create_report_from_filename(const char *const filename, const struct 
 										fprintf(r_cb_data->report_fd, " (autosave)");
 									fprintf(r_cb_data->report_fd, "  * Error code: ''%s''\n", exitcode_key);
 		
-									if( stdout_key && xmlStrlen(stderr_key) > 0 )
+									if( (report_error || report_stdout || report_clipped) && stdout_key && xmlStrlen(stderr_key) > 0 )
 										fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n", stdout_key);
 			
-									if( stderr_key && xmlStrlen(stderr_key) > 0 )
+									if( (report_error || report_memleak || report_stderr) && stderr_key && xmlStrlen(stderr_key) > 0 )
 										fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n\n", stderr_key); // TODO: why two '\n'
 								}
 								else
@@ -315,10 +315,10 @@ static int create_report_from_filename(const char *const filename, const struct 
 										fprintf(r_cb_data->report_fd, " (autosave)");
 									fprintf(r_cb_data->report_fd, " (%s)\n", exitcode_key);
 		
-									if( stdout_key && xmlStrlen(stderr_key) > 0 )
+									if( (report_error || report_stdout || report_clipped) && stdout_key && xmlStrlen(stderr_key) > 0 )
 										fprintf(r_cb_data->report_fd, "%s\n", stdout_key);
 			
-									if( stderr_key && xmlStrlen(stderr_key) > 0 )
+									if( (report_error || report_memleak || report_stderr) && stderr_key && xmlStrlen(stderr_key) > 0 )
 										fprintf(r_cb_data->report_fd, "%s\n", stderr_key);
 								}
 			
