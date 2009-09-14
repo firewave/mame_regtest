@@ -386,8 +386,6 @@ static void clear_callback_nosnap(struct parse_callback_data* pcd)
 	}
 	/* do not delete the "snap" folder */
 	else if( (pcd->type == ENTRY_DIR_END) && (strcmp(pcd->entry_name, "snap") != 0) ) {
-		printf("dirname: %s\n", pcd->dirname);
-		printf("entry: %s\n", pcd->entry_name);
 		int delete_root = 1;
 		parse_directory(pcd->fullname, 0, clear_callback_nosnap, (void*)&delete_root);
 	}
