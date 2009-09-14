@@ -76,7 +76,6 @@ mame_regtest
 		- polystar shows just a "<" as result
 		- fix compilation on systems, that already have a htonl() function
 		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER? LSB_FIRST?)
-		- move the result pages on the wiki
 		- add option with folder for device XMLs?
 		- valgrind variables mix libc and libxml2 allocations
 		- config_gamelist_xml_file mixes libc and libxml2 allocations
