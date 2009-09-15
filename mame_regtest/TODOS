@@ -106,6 +106,8 @@ mame_regtest
 		- test with path with whitespaces
 		- add option to run MAME in gdb (gdb --batch --eval-command=run --args)
 		- disallow usage of gdb and valgrind at the same time
+		- add notes about dependencies between options in the documentation
+		- add note to "use_debug" about needing a build with USE_DEBUGGER=1 and about the version, that started to icnlude the debugger in non-debug builds
 		
 	create_report:
 		- write comparison tool
