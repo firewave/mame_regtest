@@ -427,6 +427,9 @@
 		- fixes reading of "output_folder" - it was only reading the first 4 characters
 		- they cannot be left empty anymore - the defaults in the source had to be removed
 	- removed config_entry_type CFG_STR from config.c/.h (it was never working properly)
+	- added message about "test_softreset" only working with "use_debug" enabled
+	- removed "hack_debug" as debugger can also be in non-debug builds now
+	- "use_debug" can now be used with non-debug builds
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)

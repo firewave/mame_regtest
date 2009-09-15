@@ -135,7 +135,6 @@ static int config_use_bios = 0;
 static int config_use_sound = 0;
 static int config_use_throttle = 0;
 static int config_use_debug = 0;
-static int config_hack_debug = 0;
 static int config_hack_ftr = 0;
 static int config_use_devices = 1;
 static int config_hack_biospath = 0;
@@ -182,7 +181,6 @@ struct config_entry mrt_config[] =
 	{ "use_devices",			CFG_INT,		&config_use_devices },
 	{ "hack_ftr",				CFG_INT,		&config_hack_ftr },
 	{ "hack_biospath",			CFG_INT,		&config_hack_biospath },
-	{ "hack_debug",				CFG_INT,		&config_hack_debug },
 	{ "hack_mngwrite",			CFG_INT,		&config_hack_mngwrite },
 	{ "use_nonrunnable",		CFG_INT,		&config_use_nonrunnable },
 	{ "output_folder",			CFG_STR_PTR,	&config_output_folder },
@@ -473,14 +471,12 @@ static int create_dummy_root_ini()
 				fprintf(fp, "sound              0\n"); /* disable sound output */
 			if( !config_use_throttle )
 				fprintf(fp, "throttle           0\n"); /* disable throttle */
-			if( config_hack_debug || is_debug ) {
-				if( !config_use_debug )
-					fprintf(fp, "debug              0\n"); /* disable debug window */
-				else {
-					fprintf(fp, "debug              1\n"); /* enable debug window */
-					/* pass debugscript, so so debugger won't block the execution */
-					fprintf(fp, "debugscript        %s\n", debugscript_file);
-				}
+			if( !config_use_debug )
+				fprintf(fp, "debug              0\n"); /* disable debug window */
+			else {
+				fprintf(fp, "debug              1\n"); /* enable debug window */
+				/* pass debugscript, so so debugger won't block the execution */
+				fprintf(fp, "debugscript        %s\n", debugscript_file);
 			}
 			fprintf(fp, "mouse              0\n"); /* disable "mouse" so it doesn't grabs the mouse pointer on window creation */
 			fprintf(fp, "window             1\n"); /* run it in windowed mode */
@@ -1719,7 +1715,6 @@ int main(int argc, char *argv[])
 
 		printf("hack_ftr: %d\n", config_hack_ftr);
 		printf("hack_biospath: %d\n", config_hack_biospath);
-		printf("hack_debug: %d\n", config_hack_debug);
 		printf("hack_mngwrite: %d\n", config_hack_mngwrite);
 		printf("hack_pinmame: %d\n", config_hack_pinmame);
 
@@ -1809,7 +1804,7 @@ int main(int argc, char *argv[])
 	printf("clearing existing dummy directory\n");
 	clear_directory(dummy_root, 1);
 
-	if( (config_hack_debug || is_debug) && config_use_debug ) {
+	if( config_use_debug ) {
 		append_string(&debugscript_file, temp_folder);
 		append_string(&debugscript_file, FILESLASH);
 		append_string(&debugscript_file, "mrt_debugscript");
@@ -1824,6 +1819,10 @@ int main(int argc, char *argv[])
 		fprintf(debugscript_fd, "go\n");
 		fclose(debugscript_fd);
 		debugscript_fd = NULL;
+	}
+	else {
+		if( config_test_softreset )
+			printf("'test_softreset' can only be used with 'use_debug'\n");
 	}
 
 	printf("\n"); /* for output formating */
