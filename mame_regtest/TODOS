@@ -1,24 +1,16 @@
 mame_regtest
-	Features:
+	features:
 		- per-cart configuration
 		- check every game with created files (re-run after clean run)
 		- add sanity checks for maximum bios, ramsize and device count
 		- add option for testing of .inp file writing/reading (-record/-playback)
 		- add "start_at" for devices
 		- use transparent crosshair?
-		- avoid duplicated slashes
-		- make pointers const (or const * const)
 		- add "hang"/deadlock detection (-watchdog)
 		- mark the different autosave calls (load / save)
 		- multipass XPath (e.g. first select m6502 cpus and then all with autosave from those nodes)
-		- add MAME version to hack_mngwrite description (change seems to be in 0.108u5)
-		- properly handle invalid XPath expressions (check for DRIVER_ROOT / react on libxml2 errors)
 		- add more input paths to configuration (like artwork and samples)
-		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
-		- move MNG frame parsing into seperate function
 		- multithreading mode
-		- change strcpy() to strncpy()
-		- change strcat() to strncat()
 		- configuration rewrite
 			- empty options will not properly overwrite/reset existing options to default values
 			- print config values in read function (or put in array and print function for array)
@@ -38,8 +30,6 @@ mame_regtest
 			- only use on relative path entries (x:\, /, \\, etc.)
 			- use folder node in-between to be able to switch folders
 		- test absolute paths in INI (debugfile / rompath)
-		- add printf-format support to append_string()
-		- switch to binaries/includes from http://www.zlatkovic.com/pub/libxml/
 		- run test_createconfig in dummy_root to avoid usage of existing mame.ini
 		- use the following debugger commands
 			- gtime <milliseconds in hex>
@@ -50,16 +40,7 @@ mame_regtest
 			- -listxml (strip duplicated "sampleof" attribute / has stray & in rom name)
 			- no "sourcefile" attribute
 			- OK screens (-skip_disclaimer / -skip_gameinfo)
-		- better way to align the dummy_root INI lines
 		- read images from folder with same name as device (look for XML first / specify folder in XML?)
-		- do not run drivers with mandatory devices without an image, if a device list exists
-		- use functions for lists
-			- list_create()
-			- list_next_entry()
-			- list_insert() - sorted
-			- list_append() - unsorted
-			- list_free()
-		- update building instructions in Wiki
 		- use more command-line options
 			- verify*
 			- list*
@@ -68,47 +49,74 @@ mame_regtest
 			- call "-listdevices" for MESS?
 		- add soft/hardreset tests after each call like "autosave" test?
 			- how will it work with -autosave?
-		- use grep to diff each file
-			- regex for auto.sta "^[+-].*auto.sta"
 		- add clean/merged configuration to output data
-		- check for "cheat expression" errors in stderr
-		- fix display of autosave drivers in reports
-		- polystar shows just a "<" as result
-		- fix compilation on systems, that already have a htonl() function
-		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER? LSB_FIRST?)
 		- add option with folder for device XMLs?
-		- valgrind variables mix libc and libxml2 allocations
-		- config_gamelist_xml_file mixes libc and libxml2 allocations
 		- make it possible to use multiple configurations
 			- config_object {
 				void* xml;
 				void* root;
 				config_entries[]
 			}
+		- use register function to add config values?
+		- add memory dumps to the output files for -debug runs?
+		- test with path with whitespaces
+		- add option to run MAME in gdb (gdb --batch --eval-command=run --args)
+			- disallow usage of gdb and valgrind at the same time
+		- add more output to create_image_xml
+		- png entries also need the normal file size
+		- make it possible set control affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
+	
+	internal:
+		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
+		- make pointers const (or const * const)
+		- move MNG frame parsing into seperate function
+		- change strcpy() to strncpy()
+		- change strcat() to strncat()
+		- add printf-format support to append_string()
+		- better way to align the dummy_root INI lines
+		- use functions for lists
+			- list_create()
+			- list_next_entry()
+			- list_insert() - sorted
+			- list_append() - unsorted
+			- list_free()
 		- rename CFG_STR_PTR to CFG_STR
 		- handle all options as string (use atoi() to convert to integers)
-		- use register function to add config values?
+		- factor out duplicated PNG/MNG code
+		- create open_mng_and_skip_sig() for PNG
+		- get MEND reference out of IDAT function
+		- change ram, bioses and devices from arrays to lists
+
+	issues/bugs/errorhandling:
+		- avoid duplicated slashes
+		- properly handle invalid XPath expressions (check for DRIVER_ROOT / react on libxml2 errors)
 		- bail out when invalid config type found
-		- add memory dumps to the output files for -debug runs?
-		- document on the wiki
+		- test chdir() on start-up and bail out when it fails
+		- valgrind variables mix libc and libxml2 allocations
+		- config_gamelist_xml_file mixes libc and libxml2 allocations
+
+	documentation:
+		- wiki
 			- the different builds
 			- how the results are created
 			- the machine the tests are run on
 			- the resulting command-line
 			- a run on the official binary once the cycle is completed
-			- runs with the usual builds on the u-releases			
+			- runs with the usual builds on the u-releases
+			- add MAME version to hack_mngwrite description (change seems to be in 0.108u5)
+			- add notes about dependencies between options in the documentation
+			- add note to "use_debug" about needing a build with USE_DEBUGGER=1 and about the version, that started to include the debugger in non-debug builds
+			- update building instructions in Wiki
+		- update URLs from toseciso.org to redump.net
+		- update old webpage with latest version and new links
+
+	compilation:
+		- fix compilation on systems, that already have a htonl() function
+		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER? LSB_FIRST?)
 		- fix Fedora Core 10 compilation (MAX_PATH)
-		- test chdir() on start-up and bail out when it fails
 		- make doesn't work when the additional files already exist and you compile by target (e.g. mame_regtest.exe)
-		- factor out duplicated PNG/MNG code
-		- create open_mng_and_skip_sig() for PNG
-		- get MEND reference out of IDAT function
-		- test with path with whitespaces
-		- add option to run MAME in gdb (gdb --batch --eval-command=run --args)
-		- disallow usage of gdb and valgrind at the same time
-		- add notes about dependencies between options in the documentation
-		- add note to "use_debug" about needing a build with USE_DEBUGGER=1 and about the version, that started to icnlude the debugger in non-debug builds
-		
+		- switch to binaries/includes from http://www.zlatkovic.com/pub/libxml/
+
 	create_report:
 		- write comparison tool
 			- parse dir A and check dir B for missing file
@@ -146,6 +154,10 @@ mame_regtest
 		- create default configuration for create_report to match removed options
 			- result_file
 			- add some useful reports from old create_report
+		- use proper formating for "(autosave)" string
+		- use grep to diff each file
+			- regex for auto.sta "^[+-].*auto.sta"
+		- check for "cheat expression" errors in stderr
 
 	Linux:
 		- add a signal handler for linux?
