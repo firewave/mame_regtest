@@ -54,6 +54,21 @@ mame_regtest returncodes:
 
 #define VERSION "0.69"
 
+struct dipvalue_info {
+	xmlChar* name;
+	unsigned int value;
+	void* next;
+};
+
+struct dipswitch_info {
+	xmlChar* name;
+	xmlChar* tag;
+	unsigned int mask;
+	unsigned int defvalue;
+	struct dipvalue_info* values;
+	void* next;
+};
+
 struct driver_info {
 	xmlChar* name;
 	xmlChar* sourcefile;
@@ -65,6 +80,7 @@ struct driver_info {
 	int device_count;
 	xmlChar* devices[32];
 	int device_mandatory;
+	struct dipswitch_info* dipswitches;
 	void* next;
 };
 
@@ -157,6 +173,7 @@ static int config_write_avi = 0;
 static int config_verbose = 0;
 /* static int config_use_gdb = 0; */
 static int config_write_wav = 0;
+static int config_use_dipswitches = 0;
 static char pid_str[10] = "";
 
 struct config_entry mrt_config[] =
@@ -199,6 +216,7 @@ struct config_entry mrt_config[] =
 	{ "verbose",				CFG_INT,		&config_verbose },
 /*	{ "use_gdb",				CFG_INT,		&config_use_gdb }, */
 	{ "write_wav",				CFG_INT,		&config_write_wav },
+	{ "use_dipswitches",		CFG_INT,		&config_use_dipswitches },
 	{ NULL,						-1,				NULL }
 };
 
@@ -850,6 +868,46 @@ static void open_mng_and_skip_sig(const char* mng_name, FILE** mng_fd)
 	}
 }
 
+static int create_cfg()
+{
+	/*
+	<?xml version="1.0"?>
+	<mameconfig version="10">
+	    <system name="a2600">
+	        <input>
+	            <port tag="SWB" type="DIPSWITCH" mask="64" defvalue="0" value="64" />
+	        </input>
+	    </system>
+	</mameconfig>
+	*/
+	
+	/* TODO: generate */
+	char* cfgname = NULL;
+
+	xmlDocPtr cfg_doc = xmlNewDoc((const xmlChar*)"1.0");
+	
+	xmlNodePtr cfg_node = xmlNewNode(NULL, (const xmlChar*)"mameconfig");
+	xmlNewProp(cfg_node, (const xmlChar*)"version", (const xmlChar*)"10"); 	/* TODO: how to detect this? add to listxml? */
+	
+	xmlDocSetRootElement(cfg_doc, cfg_node);
+	
+	xmlNodePtr system_node = xmlNewChild(cfg_node, NULL, (const xmlChar*)"system", NULL);
+	xmlNewProp(cfg_node, (const xmlChar*)"name", (const xmlChar*)"a2600"); /* TODO: get from outside */
+
+	xmlNodePtr input_node = xmlNewChild(system_node, NULL, (const xmlChar*)"input", NULL);
+
+	xmlNodePtr port_node = xmlNewChild(input_node, NULL, (const xmlChar*)"port", NULL);
+	xmlNewProp(port_node, (const xmlChar*)"tag", (const xmlChar*)"SWB"); /* TODO: get from outside */
+	xmlNewProp(port_node, (const xmlChar*)"type", (const xmlChar*)"DIPSWITCH");
+	xmlNewProp(port_node, (const xmlChar*)"mask", (const xmlChar*)"64"); /* TODO: get from outside */
+	xmlNewProp(port_node, (const xmlChar*)"defvalue", (const xmlChar*)"0"); /* TODO: get from outside */
+	xmlNewProp(port_node, (const xmlChar*)"value", (const xmlChar*)"64"); /* TODO: get from outside */
+
+	xmlSaveFormatFileEnc(cfgname, cfg_doc, "UTF-8", 1);
+
+	return 0;
+}
+
 static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 {
 	print_driver_info(de, stdout);
@@ -933,6 +991,8 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 	if( config_verbose )
 		printf("system call: %s\n", sys);
 
+	/* TODO: create .cfg file */
+
 	/* TODO: errorhandling */
 	mrt_mkdir(dummy_root);
 	int ch_res = chdir(dummy_root);
@@ -995,6 +1055,21 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 			for( ; i < actual_driv_inf->device_count; ++i ) {
 				xmlFree(actual_driv_inf->devices[i]);
 			}
+		}
+		if( actual_driv_inf->dipswitches ) {
+			struct dipswitch_info* dipswitch = actual_driv_inf->dipswitches;
+			while( dipswitch != NULL ) {
+				struct dipvalue_info* dip_value = dipswitch->values;
+				while( dip_value != NULL ) {
+					struct dipvalue_info* next_dip_value = dip_value->next;
+					free(dip_value);
+					dip_value = next_dip_value;
+				};
+				
+				struct dipswitch_info* next_dipswitch = dipswitch->next;
+				free(dipswitch);				
+				dipswitch = next_dipswitch;
+			};
 		}
 		if( actual_driv_inf->next ) {
 			struct driver_info* tmp_driv_inf = actual_driv_inf;
@@ -1316,11 +1391,12 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 		(*new_driv_inf)->name = xmlGetProp(game_child, (const xmlChar*)"name");
 		(*new_driv_inf)->sourcefile = sourcefile;
 
-		(*new_driv_inf)->ram_count = 0;
-		(*new_driv_inf)->bios_count = 0;
-		(*new_driv_inf)->device_count = 0;
-		(*new_driv_inf)->device_mandatory = 0;
+		struct dipswitch_info* last_dip_info = NULL;
+
 		xmlNodePtr game_children = game_child->children;
+
+		/* TODO: test code */
+		printf("%s\n", (*new_driv_inf)->name);
 
 		while( game_children ) {
 			if( xmlStrcmp(game_children->name, (const xmlChar*)"driver") == 0 ) {
@@ -1354,9 +1430,70 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 			if( config_use_bios ) {
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"biosset") == 0 ) {
 					xmlChar* bios_content = xmlGetProp(game_children, (const xmlChar*)"name");
-					if( bios_content ) {
+					if( bios_content )
 						(*new_driv_inf)->bioses[(*new_driv_inf)->bios_count++] = bios_content;
+				}
+			}
+			
+			if( config_use_dipswitches ) {
+				if( xmlStrcmp(game_children->name, (const xmlChar*)"dipswitch") == 0 ) {
+					xmlChar* dip_name = xmlGetProp(game_children, (const xmlChar*)"name");
+					xmlChar* dip_tag = xmlGetProp(game_children, (const xmlChar*)"tag");
+					xmlChar* dip_mask = xmlGetProp(game_children, (const xmlChar*)"mask");
+
+					struct dipswitch_info* new_dip_info = (struct dipswitch_info*)malloc(sizeof(struct dipswitch_info));
+					/* TODO: check allocation */
+					memset(new_dip_info, 0x00, sizeof(struct dipswitch_info));
+					
+					if( dip_name ) new_dip_info->name = dip_name;
+					if( dip_tag ) new_dip_info->tag = dip_tag;
+					if( dip_mask ) new_dip_info->mask = atoi((const char*)dip_mask);
+
+					struct dipvalue_info* last_dip_value = NULL;
+
+					xmlNodePtr dipswitch_children = game_children->children;					
+					while( dipswitch_children != NULL ) {
+						if( xmlStrcmp(dipswitch_children->name, (const xmlChar*)"dipvalue") == 0 ) {
+							xmlChar* dipvalue_default = xmlGetProp(dipswitch_children, (const xmlChar*)"default");
+							if( dipvalue_default ) {
+								if( xmlStrcmp(dipvalue_default, (const xmlChar*)"yes") == 0 ) {
+									xmlChar* dipvalue_value = xmlGetProp(dipswitch_children, (const xmlChar*)"value");
+									if( dipvalue_value ) new_dip_info->defvalue = atoi((const char*)dipvalue_value);
+									xmlFree(dipvalue_value);
+								}
+								else
+								{
+									xmlChar* dipvalue_name = xmlGetProp(dipswitch_children, (const xmlChar*)"name");
+									xmlChar* dipvalue_value = xmlGetProp(dipswitch_children, (const xmlChar*)"value");
+
+									struct dipvalue_info* new_dip_value = (struct dipvalue_info*)malloc(sizeof(struct dipvalue_info));
+									/* TODO: check allocation */
+									memset(new_dip_value, 0x00, sizeof(struct dipvalue_info));
+
+									if( dipvalue_name ) new_dip_value->name = dipvalue_name;
+									if( dipvalue_value ) new_dip_value->value = atoi((const char*)dipvalue_value);
+									
+									if( new_dip_info->values == NULL )
+										new_dip_info->values = new_dip_value;
+									
+									if( last_dip_value )
+										last_dip_value->next = (void*)new_dip_value;
+									last_dip_value = new_dip_value;
+								}
+								
+								xmlFree(dipvalue_default);
+							}
+						}
+						
+						dipswitch_children = dipswitch_children->next;
 					}
+					
+					if( (*new_driv_inf)->dipswitches == NULL)
+						(*new_driv_inf)->dipswitches = new_dip_info;
+					
+					if( last_dip_info )
+						last_dip_info->next = new_dip_info;
+					last_dip_info = new_dip_info;
 				}
 			}
 
@@ -1384,6 +1521,22 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 
 			game_children = game_children->next;
 		}
+
+		/* TODO: test code */
+		/*
+		struct dipswitch_info* dipswitch = (*new_driv_inf)->dipswitches;
+		while( dipswitch != NULL ) {
+			printf("name=%s tag=%s mask=%u\n", dipswitch->name, dipswitch->tag, dipswitch->mask);
+			struct dipvalue_info* dip_value = dipswitch->values;
+			while( dip_value != NULL ) {
+				printf("\t name=%s value=%u\n", dip_value->name, dip_value->value);
+				
+				dip_value = dip_value->next;
+			};
+			
+			dipswitch = dipswitch->next;
+		}
+		*/
 	}
 }
 
@@ -1712,6 +1865,7 @@ int main(int argc, char *argv[])
 		printf("verbose: %d\n", config_verbose);
 		/* printf("use_gdb: %d\n", config_use_gdb); */
 		printf("write_wav: %d\n", config_write_wav);
+		printf("use_dipswitches: %d\n", config_use_dipswitches);
 
 		printf("hack_ftr: %d\n", config_hack_ftr);
 		printf("hack_biospath: %d\n", config_hack_biospath);
