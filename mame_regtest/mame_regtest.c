@@ -2,8 +2,8 @@
 mame_regtest
 (c) Copyright 2005-2009 by Oliver Stoeneberg
 
-http://mess.toseciso.org/tools:mame_regtest
-http://mess.toseciso.org/tools:mame_regtest:config (documentation of the options in the XML)
+http://mess.redump.net/tools:mame_regtest
+http://mess.redump.net/tools:mame_regtest:config (documentation of the options in the XML)
 http://www.breaken.de/mame_regtest (outdated)
 
 notes:

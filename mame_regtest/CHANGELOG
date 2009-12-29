@@ -431,6 +431,7 @@
 	- removed "hack_debug" as debugger can also be in non-debug builds now
 	- "use_debug" can now be used with non-debug builds
 	- added option "use_dipswitches" to test all non-default dipswitch settings (not working yet / needs a patch to src/emu/info.c)
+	- updated URLs in comments from toseciso.org to redump.net
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)

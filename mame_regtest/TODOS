@@ -107,7 +107,6 @@ mame_regtest
 			- add notes about dependencies between options in the documentation
 			- add note to "use_debug" about needing a build with USE_DEBUGGER=1 and about the version, that started to include the debugger in non-debug builds
 			- update building instructions in Wiki
-		- update URLs from toseciso.org to redump.net
 		- update old webpage with latest version and new links
 
 	compilation:
