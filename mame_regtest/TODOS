@@ -21,7 +21,6 @@ mame_regtest
 			- report unknown options
 		- store both output file states in case of autosave
 		- add macro to output files/folders for version/revsion etc.
-		- how to test system configurations
 		- attribute to disable an image entry in the XML
 		- add base folder for images in XML (could also be used for parsing a folder?)
 			- read carts from a directory?
@@ -86,6 +85,7 @@ mame_regtest
 		- create open_mng_and_skip_sig() for PNG
 		- get MEND reference out of IDAT function
 		- change ram, bioses and devices from arrays to lists
+		- merge configuration/dipswitch code
 
 	issues/bugs/errorhandling:
 		- avoid duplicated slashes
