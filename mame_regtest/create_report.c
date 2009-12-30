@@ -242,6 +242,8 @@ static int create_report_from_filename(const char *const filename, const struct 
 				xmlChar* bios_key = xmlGetProp(output_node, (const xmlChar*)"bios");
 				xmlChar* ramsize_key = xmlGetProp(output_node, (const xmlChar*)"ramsize");
 				xmlChar* autosave_key = xmlGetProp(output_node, (const xmlChar*)"autosave");
+				xmlChar* dipswitch_key = xmlGetProp(output_node, (const xmlChar*)"dipswitch");
+				xmlChar* dipvalue_key = xmlGetProp(output_node, (const xmlChar*)"dipvalue");
 			
 				xmlNodePtr output_childs = output_node->children;
 				xmlNodePtr devices_node = NULL;
@@ -276,6 +278,8 @@ static int create_report_from_filename(const char *const filename, const struct 
 										fprintf(r_cb_data->report_fd, "  * BIOS: ''%s''\n", bios_key);
 									if( ramsize_key )
 										fprintf(r_cb_data->report_fd, "  * Ramsize: ''%s''\n", ramsize_key);
+									if( dipswitch_key && dipvalue_key )
+										fprintf(r_cb_data->report_fd, "  * Dipswitch: ''%s'' Value: ''%s'' \n", dipswitch_key, dipvalue_key);
 									if( devices_node )
 									{
 										xmlAttrPtr dev_attrs = devices_node->properties;
@@ -302,6 +306,8 @@ static int create_report_from_filename(const char *const filename, const struct 
 										fprintf(r_cb_data->report_fd, " (bios %s)", bios_key);
 									if( ramsize_key )
 										fprintf(r_cb_data->report_fd, " (ramsize %s)", ramsize_key);
+									if( dipswitch_key && dipvalue_key )
+										fprintf(r_cb_data->report_fd, " (dipswitch %s value %s)", dipswitch_key, dipvalue_key);
 									if( devices_node )
 									{
 										xmlAttrPtr dev_attrs = devices_node->properties;
@@ -341,6 +347,14 @@ static int create_report_from_filename(const char *const filename, const struct 
 					output_childs = output_childs->next;
 				}
 			
+				xmlFree(dipvalue_key);
+				dipvalue_key = NULL;
+				xmlFree(dipswitch_key);
+				dipswitch_key = NULL;
+				xmlFree(autosave_key);
+				autosave_key = NULL;
+				xmlFree(ramsize_key);
+				ramsize_key = NULL;
 				xmlFree(bios_key);
 				bios_key = NULL;
 				xmlFree(sourcefile_key);
