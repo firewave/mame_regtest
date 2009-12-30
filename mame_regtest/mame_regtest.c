@@ -99,6 +99,8 @@ struct driver_entry {
 	char postfix[1024];
 	int autosave;
 	int device_mandatory;
+	struct dipswitch_info* dipswitch;
+	struct dipvalue_info* dipvalue;
 };
 
 static int app_type = 0;
@@ -115,6 +117,8 @@ static char* dummy_ini_folder = NULL;
 static char current_path[MAX_PATH] = "";
 static char* dummy_root = NULL;
 static char* pause_file = NULL;
+static char pid_str[10] = "";
+static int mameconfig_ver = 10;
 
 /* constant string variables */
 static const char* const xpath_placeholder = "DRIVER_ROOT";
@@ -174,7 +178,6 @@ static int config_verbose = 0;
 /* static int config_use_gdb = 0; */
 static int config_write_wav = 0;
 static int config_use_dipswitches = 0;
-static char pid_str[10] = "";
 
 struct config_entry mrt_config[] =
 {
@@ -608,6 +611,8 @@ static void print_driver_info(struct driver_entry* de, FILE* print_fd)
 		fprintf(print_fd, " (bios %s)", de->bios);
 	if( de->ramsize > 0 )
 		fprintf(print_fd, " (ramsize %d)", de->ramsize);
+	if( de->dipswitch && de->dipswitch->name && de->dipvalue && de->dipvalue->name )
+		fprintf(print_fd, " (dipswitch %s value %s)", de->dipswitch->name, de->dipvalue->name);
 	struct image_entry* images = de->images;
 	while( images ) {
 		if( (images->device_type && xmlStrlen(images->device_type) > 0) &&
@@ -868,7 +873,7 @@ static void open_mng_and_skip_sig(const char* mng_name, FILE** mng_fd)
 	}
 }
 
-static int create_cfg()
+static int create_cfg(struct driver_entry* de)
 {
 	/*
 	<?xml version="1.0"?>
@@ -881,28 +886,52 @@ static int create_cfg()
 	</mameconfig>
 	*/
 	
-	/* TODO: generate */
+	if( !de->dipswitch || !de->dipvalue )
+		return 0;
+	
 	char* cfgname = NULL;
+	append_string(&cfgname, dummy_root);
+	append_string(&cfgname, FILESLASH);
+	append_string(&cfgname, "cfg");
+	
+	mrt_mkdir(cfgname);
+	
+	append_string(&cfgname, FILESLASH);
+	append_string(&cfgname, de->name);
+	append_string(&cfgname, ".cfg");
 
 	xmlDocPtr cfg_doc = xmlNewDoc((const xmlChar*)"1.0");
 	
-	xmlNodePtr cfg_node = xmlNewNode(NULL, (const xmlChar*)"mameconfig");
-	xmlNewProp(cfg_node, (const xmlChar*)"version", (const xmlChar*)"10"); 	/* TODO: how to detect this? add to listxml? */
+	if( mameconfig_ver == 10 ) {
+		xmlNodePtr cfg_node = xmlNewNode(NULL, (const xmlChar*)"mameconfig");
+		char tmp[10];
+		itoa(mameconfig_ver, tmp, 10);
+		xmlNewProp(cfg_node, (const xmlChar*)"version", (const xmlChar*)tmp);
+		
+		xmlDocSetRootElement(cfg_doc, cfg_node);
+		
+		xmlNodePtr system_node = xmlNewChild(cfg_node, NULL, (const xmlChar*)"system", NULL);
+		xmlNewProp(system_node, (const xmlChar*)"name", (const xmlChar*)de->name);
 	
-	xmlDocSetRootElement(cfg_doc, cfg_node);
+		xmlNodePtr input_node = xmlNewChild(system_node, NULL, (const xmlChar*)"input", NULL);
 	
-	xmlNodePtr system_node = xmlNewChild(cfg_node, NULL, (const xmlChar*)"system", NULL);
-	xmlNewProp(cfg_node, (const xmlChar*)"name", (const xmlChar*)"a2600"); /* TODO: get from outside */
-
-	xmlNodePtr input_node = xmlNewChild(system_node, NULL, (const xmlChar*)"input", NULL);
-
-	xmlNodePtr port_node = xmlNewChild(input_node, NULL, (const xmlChar*)"port", NULL);
-	xmlNewProp(port_node, (const xmlChar*)"tag", (const xmlChar*)"SWB"); /* TODO: get from outside */
-	xmlNewProp(port_node, (const xmlChar*)"type", (const xmlChar*)"DIPSWITCH");
-	xmlNewProp(port_node, (const xmlChar*)"mask", (const xmlChar*)"64"); /* TODO: get from outside */
-	xmlNewProp(port_node, (const xmlChar*)"defvalue", (const xmlChar*)"0"); /* TODO: get from outside */
-	xmlNewProp(port_node, (const xmlChar*)"value", (const xmlChar*)"64"); /* TODO: get from outside */
-
+		xmlNodePtr port_node = xmlNewChild(input_node, NULL, (const xmlChar*)"port", NULL);
+		xmlNewProp(port_node, (const xmlChar*)"tag", (const xmlChar*)de->dipswitch->tag);
+		xmlNewProp(port_node, (const xmlChar*)"type", (const xmlChar*)"DIPSWITCH");
+		itoa(de->dipswitch->mask, tmp, 10);
+		xmlNewProp(port_node, (const xmlChar*)"mask", (const xmlChar*)tmp);
+		itoa(de->dipswitch->defvalue, tmp, 10);
+		xmlNewProp(port_node, (const xmlChar*)"defvalue", (const xmlChar*)tmp);
+		itoa(de->dipvalue->value, tmp, 10);
+		xmlNewProp(port_node, (const xmlChar*)"value", (const xmlChar*)tmp);
+	}
+	/*
+	else {
+		printf("unknown 'mameconfig' version\n");
+		return 1;
+	}
+	*/
+	
 	xmlSaveFormatFileEnc(cfgname, cfg_doc, "UTF-8", 1);
 
 	return 0;
@@ -991,10 +1020,9 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 	if( config_verbose )
 		printf("system call: %s\n", sys);
 
-	/* TODO: create .cfg file */
-
 	/* TODO: errorhandling */
 	mrt_mkdir(dummy_root);
+	create_cfg(de);
 	int ch_res = chdir(dummy_root);
 	int sys_res = system(sys);
 	ch_res = chdir(current_path);
@@ -1122,6 +1150,10 @@ static int execute_mame2(struct driver_entry* de)
 		sprintf(tmp, "%d", de->ramsize);
 		xmlNewProp(output_node, (const xmlChar*)"ramsize", (const xmlChar*)tmp);
 	}
+	if( de->dipswitch && de->dipswitch->name && de->dipvalue && de->dipvalue->name ) {
+		xmlNewProp(output_node, (const xmlChar*)"dipswitch", (const xmlChar*)de->dipswitch->name);
+		xmlNewProp(output_node, (const xmlChar*)"dipvalue", (const xmlChar*)de->dipvalue->name);
+	}		
 	if( de->device_mandatory )
 		xmlNewProp(output_node, (const xmlChar*)"mandatory", (const xmlChar*)"yes");
 
@@ -1268,12 +1300,9 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 	int res = 0;
 	do {
 		struct driver_entry de;
+		memset(&de, 0x00, sizeof(struct driver_entry));
 		de.name = (const char*)actual_driv_inf->name;
 		de.sourcefile = (const char*)actual_driv_inf->sourcefile;
-		de.ramsize = 0;
-		de.bios = NULL;
-		de.images = NULL;
-		de.postfix[0] = '\0';
 		de.autosave = actual_driv_inf->savestate;
 		de.device_mandatory = actual_driv_inf->device_mandatory;
 
@@ -1309,6 +1338,34 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 			}
 
 			de.ramsize = 0;
+		}
+		
+		if( actual_driv_inf->dipswitches ) {
+			int dipswitch_count = -1;
+			struct dipswitch_info* dipswitch = actual_driv_inf->dipswitches;
+			while( dipswitch != NULL ) {
+				++dipswitch_count;
+				de.dipswitch = dipswitch;
+
+				int dipvalue_count = 0;
+				struct dipvalue_info* dipvalue = dipswitch->values;
+				while( dipvalue != NULL ) {
+					++dipvalue_count;
+
+					snprintf(de.postfix, sizeof(de.postfix), "dip%05dval%05d", dipswitch_count, dipvalue_count);
+
+					de.dipvalue = dipvalue;
+					
+					res = execute_mame3(&de, actual_driv_inf);
+					
+					dipvalue = dipvalue->next;
+				};
+
+				dipswitch = dipswitch->next;
+			};
+			
+			de.dipswitch = NULL;
+			de.dipvalue = NULL;
 		}
 
 		if( actual_driv_inf->bios_count > 0 &&
@@ -1396,7 +1453,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 		xmlNodePtr game_children = game_child->children;
 
 		/* TODO: test code */
-		printf("%s\n", (*new_driv_inf)->name);
+		/* printf("%s\n", (*new_driv_inf)->name); */
 
 		while( game_children ) {
 			if( xmlStrcmp(game_children->name, (const xmlChar*)"driver") == 0 ) {

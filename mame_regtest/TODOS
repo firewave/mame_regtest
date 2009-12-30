@@ -22,7 +22,6 @@ mame_regtest
 		- store both output file states in case of autosave
 		- add macro to output files/folders for version/revsion etc.
 		- how to test system configurations
-		- how to test dipswitches
 		- attribute to disable an image entry in the XML
 		- add base folder for images in XML (could also be used for parsing a folder?)
 			- read carts from a directory?
@@ -65,6 +64,7 @@ mame_regtest
 		- add more output to create_image_xml
 		- png entries also need the normal file size
 		- make it possible set control affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
+		- are there dipswitches, that are depending on multiple ports?
 	
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
