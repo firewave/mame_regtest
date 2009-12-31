@@ -103,7 +103,7 @@ struct driver_entry {
 	struct dipswitch_info* dipswitch;
 	struct dipvalue_info* dipvalue;
 	struct dipswitch_info* configuration;
-	struct dipvalue_info* confvalue;
+	struct dipvalue_info* confsetting;
 };
 
 static int app_type = 0;
@@ -618,8 +618,8 @@ static void print_driver_info(struct driver_entry* de, FILE* print_fd)
 		fprintf(print_fd, " (ramsize %d)", de->ramsize);
 	if( de->dipswitch && de->dipswitch->name && de->dipvalue && de->dipvalue->name )
 		fprintf(print_fd, " (dipswitch %s value %s)", de->dipswitch->name, de->dipvalue->name);
-	if( de->configuration && de->configuration->name && de->confvalue && de->confvalue->name )
-		fprintf(print_fd, " (configuration %s value %s)", de->configuration->name, de->confvalue->name);
+	if( de->configuration && de->configuration->name && de->confsetting && de->confsetting->name )
+		fprintf(print_fd, " (configuration %s value %s)", de->configuration->name, de->confsetting->name);
 	struct image_entry* images = de->images;
 	while( images ) {
 		if( (images->device_type && xmlStrlen(images->device_type) > 0) &&
@@ -957,7 +957,7 @@ static int create_cfg_cfg(struct driver_entry* de)
 	</mameconfig>
 	*/
 	
-	if( !de->configuration || !de->confvalue )
+	if( !de->configuration || !de->confsetting )
 		return 0;
 	
 	char* cfgname = NULL;
@@ -993,7 +993,7 @@ static int create_cfg_cfg(struct driver_entry* de)
 		xmlNewProp(port_node, (const xmlChar*)"mask", (const xmlChar*)tmp);
 		itoa(de->configuration->defvalue, tmp, 10);
 		xmlNewProp(port_node, (const xmlChar*)"defvalue", (const xmlChar*)tmp);
-		itoa(de->confvalue->value, tmp, 10);
+		itoa(de->confsetting->value, tmp, 10);
 		xmlNewProp(port_node, (const xmlChar*)"value", (const xmlChar*)tmp);
 	}
 	/*
@@ -1159,11 +1159,11 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 		if( actual_driv_inf->dipswitches ) {
 			struct dipswitch_info* dipswitch = actual_driv_inf->dipswitches;
 			while( dipswitch != NULL ) {
-				struct dipvalue_info* dip_value = dipswitch->values;
-				while( dip_value != NULL ) {
-					struct dipvalue_info* next_dip_value = dip_value->next;
-					free(dip_value);
-					dip_value = next_dip_value;
+				struct dipvalue_info* dipvalue = dipswitch->values;
+				while( dipvalue != NULL ) {
+					struct dipvalue_info* next_dipvalue = dipvalue->next;
+					free(dipvalue);
+					dipvalue = next_dipvalue;
 				};
 				
 				struct dipswitch_info* next_dipswitch = dipswitch->next;
@@ -1174,11 +1174,11 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 		if( actual_driv_inf->configurations ) {
 			struct dipswitch_info* configuration = actual_driv_inf->configurations;
 			while( configuration != NULL ) {
-				struct dipvalue_info* conf_value = configuration->values;
-				while( conf_value != NULL ) {
-					struct dipvalue_info* next_conf_value = conf_value->next;
-					free(conf_value);
-					conf_value = next_conf_value;
+				struct dipvalue_info* confsetting = configuration->values;
+				while( confsetting != NULL ) {
+					struct dipvalue_info* next_confsetting = confsetting->next;
+					free(confsetting);
+					confsetting = next_confsetting;
 				};
 				
 				struct dipswitch_info* next_configuration = configuration->next;
@@ -1241,9 +1241,9 @@ static int execute_mame2(struct driver_entry* de)
 		xmlNewProp(output_node, (const xmlChar*)"dipswitch", (const xmlChar*)de->dipswitch->name);
 		xmlNewProp(output_node, (const xmlChar*)"dipvalue", (const xmlChar*)de->dipvalue->name);
 	}
-	if( de->configuration && de->configuration->name && de->confvalue && de->confvalue->name ) {
+	if( de->configuration && de->configuration->name && de->confsetting && de->confsetting->name ) {
 		xmlNewProp(output_node, (const xmlChar*)"configuration", (const xmlChar*)de->configuration->name);
-		xmlNewProp(output_node, (const xmlChar*)"confsetting", (const xmlChar*)de->confvalue->name);
+		xmlNewProp(output_node, (const xmlChar*)"confsetting", (const xmlChar*)de->confsetting->name);
 	}
 	if( de->device_mandatory )
 		xmlNewProp(output_node, (const xmlChar*)"mandatory", (const xmlChar*)"yes");
@@ -1466,25 +1466,25 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				++configuration_count;
 				de.configuration = configuration;
 
-				int confvalue_count = 0;
-				struct dipvalue_info* confvalue = configuration->values;
-				while( confvalue != NULL ) {
-					++confvalue_count;
+				int confsetting_count = 0;
+				struct dipvalue_info* confsetting = configuration->values;
+				while( confsetting != NULL ) {
+					++confsetting_count;
 
-					snprintf(de.postfix, sizeof(de.postfix), "cfg%05dval%05d", configuration_count, confvalue_count);
+					snprintf(de.postfix, sizeof(de.postfix), "cfg%05dval%05d", configuration_count, confsetting_count);
 
-					de.confvalue = confvalue;
+					de.confsetting = confsetting;
 					
 					res = execute_mame3(&de, actual_driv_inf);
 					
-					confvalue = confvalue->next;
+					confsetting = confsetting->next;
 				};
 
 				configuration = configuration->next;
 			};
 			
 			de.configuration = NULL;
-			de.confvalue = NULL;
+			de.confsetting = NULL;
 		}
 
 		if( actual_driv_inf->bios_count > 0 &&
@@ -1626,7 +1626,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					if( dip_tag ) new_dip_info->tag = dip_tag;
 					if( dip_mask ) new_dip_info->mask = atoi((const char*)dip_mask);
 
-					struct dipvalue_info* last_dip_value = NULL;
+					struct dipvalue_info* last_dipvalue = NULL;
 
 					xmlNodePtr dipswitch_children = game_children->children;					
 					while( dipswitch_children != NULL ) {
@@ -1643,19 +1643,19 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 									xmlChar* dipvalue_name = xmlGetProp(dipswitch_children, (const xmlChar*)"name");
 									xmlChar* dipvalue_value = xmlGetProp(dipswitch_children, (const xmlChar*)"value");
 
-									struct dipvalue_info* new_dip_value = (struct dipvalue_info*)malloc(sizeof(struct dipvalue_info));
+									struct dipvalue_info* new_dipvalue = (struct dipvalue_info*)malloc(sizeof(struct dipvalue_info));
 									/* TODO: check allocation */
-									memset(new_dip_value, 0x00, sizeof(struct dipvalue_info));
+									memset(new_dipvalue, 0x00, sizeof(struct dipvalue_info));
 
-									if( dipvalue_name ) new_dip_value->name = dipvalue_name;
-									if( dipvalue_value ) new_dip_value->value = atoi((const char*)dipvalue_value);
+									if( dipvalue_name ) new_dipvalue->name = dipvalue_name;
+									if( dipvalue_value ) new_dipvalue->value = atoi((const char*)dipvalue_value);
 									
 									if( new_dip_info->values == NULL )
-										new_dip_info->values = new_dip_value;
+										new_dip_info->values = new_dipvalue;
 									
-									if( last_dip_value )
-										last_dip_value->next = (void*)new_dip_value;
-									last_dip_value = new_dip_value;
+									if( last_dipvalue )
+										last_dipvalue->next = (void*)new_dipvalue;
+									last_dipvalue = new_dipvalue;
 								}
 								
 								xmlFree(dipvalue_default);
@@ -1688,39 +1688,39 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					if( conf_tag ) new_conf_info->tag = conf_tag;
 					if( conf_mask ) new_conf_info->mask = atoi((const char*)conf_mask);
 
-					struct dipvalue_info* last_conf_value = NULL;
+					struct dipvalue_info* last_confsetting = NULL;
 
 					xmlNodePtr configuration_children = game_children->children;					
 					while( configuration_children != NULL ) {
 						if( xmlStrcmp(configuration_children->name, (const xmlChar*)"confsetting") == 0 ) {
-							xmlChar* confvalue_default = xmlGetProp(configuration_children, (const xmlChar*)"default");
-							if( confvalue_default ) {
-								if( xmlStrcmp(confvalue_default, (const xmlChar*)"yes") == 0 ) {
-									xmlChar* confvalue_value = xmlGetProp(configuration_children, (const xmlChar*)"value");
-									if( confvalue_value ) new_conf_info->defvalue = atoi((const char*)confvalue_value);
-									xmlFree(confvalue_value);
+							xmlChar* confsetting_default = xmlGetProp(configuration_children, (const xmlChar*)"default");
+							if( confsetting_default ) {
+								if( xmlStrcmp(confsetting_default, (const xmlChar*)"yes") == 0 ) {
+									xmlChar* confsetting_value = xmlGetProp(configuration_children, (const xmlChar*)"value");
+									if( confsetting_value ) new_conf_info->defvalue = atoi((const char*)confsetting_value);
+									xmlFree(confsetting_value);
 								}
 								else
 								{
-									xmlChar* confvalue_name = xmlGetProp(configuration_children, (const xmlChar*)"name");
-									xmlChar* confvalue_value = xmlGetProp(configuration_children, (const xmlChar*)"value");
+									xmlChar* confsetting_name = xmlGetProp(configuration_children, (const xmlChar*)"name");
+									xmlChar* confsetting_value = xmlGetProp(configuration_children, (const xmlChar*)"value");
 
-									struct dipvalue_info* new_conf_value = (struct dipvalue_info*)malloc(sizeof(struct dipvalue_info));
+									struct dipvalue_info* new_confsetting = (struct dipvalue_info*)malloc(sizeof(struct dipvalue_info));
 									/* TODO: check allocation */
-									memset(new_conf_value, 0x00, sizeof(struct dipvalue_info));
+									memset(new_confsetting, 0x00, sizeof(struct dipvalue_info));
 
-									if( confvalue_name ) new_conf_value->name = confvalue_name;
-									if( confvalue_value ) new_conf_value->value = atoi((const char*)confvalue_value);
+									if( confsetting_name ) new_confsetting->name = confsetting_name;
+									if( confsetting_value ) new_confsetting->value = atoi((const char*)confsetting_value);
 									
 									if( new_conf_info->values == NULL )
-										new_conf_info->values = new_conf_value;
+										new_conf_info->values = new_confsetting;
 									
-									if( last_conf_value )
-										last_conf_value->next = (void*)new_conf_value;
-									last_conf_value = new_conf_value;
+									if( last_confsetting )
+										last_confsetting->next = (void*)new_confsetting;
+									last_confsetting = new_confsetting;
 								}
 								
-								xmlFree(confvalue_default);
+								xmlFree(confsetting_default);
 							}
 						}
 						
@@ -1766,11 +1766,11 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 		struct dipswitch_info* dipswitch = (*new_driv_inf)->dipswitches;
 		while( dipswitch != NULL ) {
 			printf("name=%s tag=%s mask=%u\n", dipswitch->name, dipswitch->tag, dipswitch->mask);
-			struct dipvalue_info* dip_value = dipswitch->values;
-			while( dip_value != NULL ) {
-				printf("\t name=%s value=%u\n", dip_value->name, dip_value->value);
+			struct dipvalue_info* dipvalue = dipswitch->values;
+			while( dipvalue != NULL ) {
+				printf("\t name=%s value=%u\n", dipvalue->name, dipvalue->value);
 				
-				dip_value = dip_value->next;
+				dipvalue = dipvalue->next;
 			};
 			
 			dipswitch = dipswitch->next;
@@ -1780,11 +1780,11 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 		struct dipswitch_info* configuration = (*new_driv_inf)->configurations;
 		while( configuration != NULL ) {
 			printf("name=%s tag=%s mask=%u\n", configuration->name, configuration->tag, configuration->mask);
-			struct dipvalue_info* conf_value = configuration->values;
-			while( conf_value != NULL ) {
-				printf("\t name=%s value=%u\n", conf_value->name, conf_value->value);
+			struct dipvalue_info* confsetting = configuration->values;
+			while( confsetting != NULL ) {
+				printf("\t name=%s value=%u\n", confsetting->name, confsetting->value);
 				
-				conf_value = conf_value->next;
+				confsetting = confsetting->next;
 			};
 			
 			configuration = configuration->next;
