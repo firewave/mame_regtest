@@ -260,6 +260,8 @@ static int create_report_from_filename(const char *const filename, const struct 
 							int error4_found = xmlStrcmp(exitcode_key, (const xmlChar*)"4") == 0;							
 							int memleak_found = stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"--- memory leak warning ---");
 							int clipped_found = stdout_key && xmlStrstr(stdout_key, (const xmlChar*)"clipped") && (xmlStrstr(stdout_key, (const xmlChar*)" 0% samples clipped") == NULL);
+							/* TODO: replace with option */
+							int reset_scope_found = stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"called within reset scope by");
 							
 							int report_error = (error_found && !(r_cb_data->ignore_exitcode_4 && error4_found));
 							int report_memleak = (memleak_found && r_cb_data->show_memleaks);
@@ -267,7 +269,7 @@ static int create_report_from_filename(const char *const filename, const struct 
 							int report_stderr = (r_cb_data->print_stderr && stderr_key && xmlStrlen(stderr_key) > 0);
 							int report_clipped = (r_cb_data->show_clipped && clipped_found);
 							
-							if( report_error || report_memleak || report_stdout || report_stderr || report_clipped ) {
+							if( report_error || report_memleak || report_stdout || report_stderr || report_clipped || reset_scope_found ) {
 								if( r_cb_data->dokuwiki_format )
 								{
 									if( write_src_header ) {
@@ -300,8 +302,10 @@ static int create_report_from_filename(const char *const filename, const struct 
 									if( (report_error || report_stdout || report_clipped) && stdout_key && xmlStrlen(stdout_key) > 0 )
 										fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n", stdout_key);
 			
-									if( (report_error || report_memleak || report_stderr) && stderr_key && xmlStrlen(stderr_key) > 0 )
-										fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n\n", stderr_key); // TODO: why two '\n'
+									if( (report_error || report_memleak || report_stderr || reset_scope_found) && stderr_key && xmlStrlen(stderr_key) > 0 )
+										fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n", stderr_key);
+									
+									fprintf(r_cb_data->report_fd, "\n");
 								}
 								else
 								{

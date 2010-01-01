@@ -447,3 +447,5 @@
 	- added support for dipswitches
 	- fixed some memory leaks
 	- added support for configurations
+	- added hard-coded reporting of "called within reset scope by" for now
+	- fixed formating of output when no stderr exists
