@@ -430,9 +430,9 @@
 	- added message about "test_softreset" only working with "use_debug" enabled
 	- removed "hack_debug" as debugger can also be in non-debug builds now
 	- "use_debug" can now be used with non-debug builds
-	- added option "use_dipswitches" to test all non-default dipswitch settings (needs a patch to src/emu/info.c)
+	- added option "use_dipswitches" to test all non-default dipswitch settings
 	- updated URLs in comments from toseciso.org to redump.net
-	- added option "use_configurations" to test all non-default configurations settings (needs a patch to src/emu/info.c)
+	- added option "use_configurations" to test all non-default configurations settings
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)
