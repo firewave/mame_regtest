@@ -880,9 +880,15 @@ static void open_mng_and_skip_sig(const char* mng_name, FILE** mng_fd)
 	}
 }
 
-static int create_dip_cfg(struct driver_entry* de)
+/*
+	types:
+		1 - dipswitch
+		2 - configuration
+*/
+static int create_cfg(struct driver_entry* de, int type)
 {
 	/*
+	dipswitch:	
 	<?xml version="1.0"?>
 	<mameconfig version="10">
 	    <system name="a2600">
@@ -891,62 +897,8 @@ static int create_dip_cfg(struct driver_entry* de)
 	        </input>
 	    </system>
 	</mameconfig>
-	*/
 	
-	if( !de->dipswitch || !de->dipvalue )
-		return 0;
-	
-	char* cfgname = NULL;
-	append_string(&cfgname, dummy_root);
-	append_string(&cfgname, FILESLASH);
-	append_string(&cfgname, "cfg");
-	
-	mrt_mkdir(cfgname);
-	
-	append_string(&cfgname, FILESLASH);
-	append_string(&cfgname, de->name);
-	append_string(&cfgname, ".cfg");
-
-	xmlDocPtr cfg_doc = xmlNewDoc((const xmlChar*)"1.0");
-	
-	if( mameconfig_ver == 10 ) {
-		xmlNodePtr cfg_node = xmlNewNode(NULL, (const xmlChar*)"mameconfig");
-		char tmp[10];
-		itoa(mameconfig_ver, tmp, 10);
-		xmlNewProp(cfg_node, (const xmlChar*)"version", (const xmlChar*)tmp);
-		
-		xmlDocSetRootElement(cfg_doc, cfg_node);
-		
-		xmlNodePtr system_node = xmlNewChild(cfg_node, NULL, (const xmlChar*)"system", NULL);
-		xmlNewProp(system_node, (const xmlChar*)"name", (const xmlChar*)de->name);
-	
-		xmlNodePtr input_node = xmlNewChild(system_node, NULL, (const xmlChar*)"input", NULL);
-	
-		xmlNodePtr port_node = xmlNewChild(input_node, NULL, (const xmlChar*)"port", NULL);
-		xmlNewProp(port_node, (const xmlChar*)"tag", (const xmlChar*)de->dipswitch->tag);
-		xmlNewProp(port_node, (const xmlChar*)"type", (const xmlChar*)"DIPSWITCH");
-		itoa(de->dipswitch->mask, tmp, 10);
-		xmlNewProp(port_node, (const xmlChar*)"mask", (const xmlChar*)tmp);
-		itoa(de->dipswitch->defvalue, tmp, 10);
-		xmlNewProp(port_node, (const xmlChar*)"defvalue", (const xmlChar*)tmp);
-		itoa(de->dipvalue->value, tmp, 10);
-		xmlNewProp(port_node, (const xmlChar*)"value", (const xmlChar*)tmp);
-	}
-	/*
-	else {
-		printf("unknown 'mameconfig' version\n");
-		return 1;
-	}
-	*/
-	
-	xmlSaveFormatFileEnc(cfgname, cfg_doc, "UTF-8", 1);
-
-	return 0;
-}
-
-static int create_cfg_cfg(struct driver_entry* de)
-{
-	/*
+	configuration:
 	<?xml version="1.0"?>
 	<mameconfig version="10">
 	    <system name="a5200">
@@ -957,19 +909,34 @@ static int create_cfg_cfg(struct driver_entry* de)
 	</mameconfig>
 	*/
 	
-	if( !de->configuration || !de->confsetting )
+	struct dipswitch_info* inp_name = NULL;
+	struct dipvalue_info* inp_value = NULL;
+	const char* type_str = NULL;
+	
+	if( type == 1 ) {
+		inp_name = de->dipswitch;
+		inp_value = de->dipvalue;
+		type_str = "DIPSWITCH";
+	}
+	else if ( type == 2 ) {
+		inp_name = de->configuration;
+		inp_value = de->confsetting;
+		type_str = "CONFIG";
+	}
+	
+	if( !inp_name || !inp_value )
 		return 0;
 	
-	char* cfgname = NULL;
-	append_string(&cfgname, dummy_root);
-	append_string(&cfgname, FILESLASH);
-	append_string(&cfgname, "cfg");
+	char* cfgfile = NULL;
+	append_string(&cfgfile, dummy_root);
+	append_string(&cfgfile, FILESLASH);
+	append_string(&cfgfile, "cfg");
 	
-	mrt_mkdir(cfgname);
+	mrt_mkdir(cfgfile);
 	
-	append_string(&cfgname, FILESLASH);
-	append_string(&cfgname, de->name);
-	append_string(&cfgname, ".cfg");
+	append_string(&cfgfile, FILESLASH);
+	append_string(&cfgfile, de->name);
+	append_string(&cfgfile, ".cfg");
 
 	xmlDocPtr cfg_doc = xmlNewDoc((const xmlChar*)"1.0");
 	
@@ -987,13 +954,13 @@ static int create_cfg_cfg(struct driver_entry* de)
 		xmlNodePtr input_node = xmlNewChild(system_node, NULL, (const xmlChar*)"input", NULL);
 	
 		xmlNodePtr port_node = xmlNewChild(input_node, NULL, (const xmlChar*)"port", NULL);
-		xmlNewProp(port_node, (const xmlChar*)"tag", (const xmlChar*)de->configuration->tag);
-		xmlNewProp(port_node, (const xmlChar*)"type", (const xmlChar*)"CONFIG");
-		itoa(de->configuration->mask, tmp, 10);
+		xmlNewProp(port_node, (const xmlChar*)"tag", (const xmlChar*)inp_name->tag);
+		xmlNewProp(port_node, (const xmlChar*)"type", (const xmlChar*)type_str);
+		itoa(inp_name->mask, tmp, 10);
 		xmlNewProp(port_node, (const xmlChar*)"mask", (const xmlChar*)tmp);
-		itoa(de->configuration->defvalue, tmp, 10);
+		itoa(inp_name->defvalue, tmp, 10);
 		xmlNewProp(port_node, (const xmlChar*)"defvalue", (const xmlChar*)tmp);
-		itoa(de->confsetting->value, tmp, 10);
+		itoa(inp_value->value, tmp, 10);
 		xmlNewProp(port_node, (const xmlChar*)"value", (const xmlChar*)tmp);
 	}
 	/*
@@ -1003,7 +970,7 @@ static int create_cfg_cfg(struct driver_entry* de)
 	}
 	*/
 	
-	xmlSaveFormatFileEnc(cfgname, cfg_doc, "UTF-8", 1);
+	xmlSaveFormatFileEnc(cfgfile, cfg_doc, "UTF-8", 1);
 
 	return 0;
 }
@@ -1093,8 +1060,8 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 
 	/* TODO: errorhandling */
 	mrt_mkdir(dummy_root);
-	create_dip_cfg(de);
-	create_cfg_cfg(de);
+	create_cfg(de, 1);
+	create_cfg(de, 2);
 	int ch_res = chdir(dummy_root);
 	int sys_res = system(sys);
 	ch_res = chdir(current_path);
@@ -1813,16 +1780,15 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 				xmlXPathObjectPtr xpathObj = NULL;
 
 				xmlChar* debug_attr = xmlGetProp(root, (const xmlChar*)"debug");
-				if( xmlStrcmp(debug_attr, (const xmlChar*)"yes") == 0 ) {
+				if( xmlStrcmp(debug_attr, (const xmlChar*)"yes") == 0 )
 					is_debug = 1;
-				}
 				xmlFree(debug_attr);
 				debug_attr = NULL;
 
 				app_ver = xmlGetProp(root, (const xmlChar*)"build");
-				if( app_ver ) {
+				if( app_ver )
 					printf("build: %s%s\n", app_ver, is_debug ? " (debug)" : "");
-				}
+
 
 				if( config_xpath_expr && (strlen(config_xpath_expr) > 0) ) {
 					xpathCtx = xmlXPathNewContext(doc);
