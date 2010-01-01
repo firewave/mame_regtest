@@ -6,7 +6,7 @@ mame_regtest
 		- add option for testing of .inp file writing/reading (-record/-playback)
 		- add "start_at" for devices
 		- use transparent crosshair?
-		- add "hang"/deadlock detection (-watchdog)
+		- add "hang"/deadlock detection (-watchdog / usable from 0.136)
 		- mark the different autosave calls (load / save)
 		- multipass XPath (e.g. first select m6502 cpus and then all with autosave from those nodes)
 		- add more input paths to configuration (like artwork and samples)
@@ -64,6 +64,7 @@ mame_regtest
 		- png entries also need the normal file size
 		- make it possible set control affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
 		- are there dipswitches, that are depending on multiple ports?
+		- make dipswitches/configurations work with ramsizes and bioses
 	
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -157,6 +158,9 @@ mame_regtest
 		- use grep to diff each file
 			- regex for auto.sta "^[+-].*auto.sta"
 		- check for "cheat expression" errors in stderr
+		- add check for a specific string as option 
+			- replace "called within reset scope by" with it -> field="stderr" string="called within reset scope by"
+			- allow multiple ones
 
 	Linux:
 		- add a signal handler for linux?
