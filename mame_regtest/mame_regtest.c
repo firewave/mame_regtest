@@ -1530,9 +1530,6 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 
 		xmlNodePtr game_children = game_child->children;
 
-		/* TODO: test code */
-		/* printf("%s\n", (*new_driv_inf)->name); */
-
 		while( game_children ) {
 			if( xmlStrcmp(game_children->name, (const xmlChar*)"driver") == 0 ) {
 				/*
@@ -1718,36 +1715,6 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 
 			game_children = game_children->next;
 		}
-
-		/* TODO: test code */
-		/*
-		struct dipswitch_info* dipswitch = (*new_driv_inf)->dipswitches;
-		while( dipswitch != NULL ) {
-			printf("name=%s tag=%s mask=%u\n", dipswitch->name, dipswitch->tag, dipswitch->mask);
-			struct dipvalue_info* dipvalue = dipswitch->values;
-			while( dipvalue != NULL ) {
-				printf("\t name=%s value=%u\n", dipvalue->name, dipvalue->value);
-				
-				dipvalue = dipvalue->next;
-			};
-			
-			dipswitch = dipswitch->next;
-		}
-		*/
-		/*
-		struct dipswitch_info* configuration = (*new_driv_inf)->configurations;
-		while( configuration != NULL ) {
-			printf("name=%s tag=%s mask=%u\n", configuration->name, configuration->tag, configuration->mask);
-			struct dipvalue_info* confsetting = configuration->values;
-			while( confsetting != NULL ) {
-				printf("\t name=%s value=%u\n", confsetting->name, confsetting->value);
-				
-				confsetting = confsetting->next;
-			};
-			
-			configuration = configuration->next;
-		}
-		*/
 	}
 }
 
