@@ -1307,7 +1307,7 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 				int j = 0;
 
 				char initial_postfix[1024];
-				strcpy(initial_postfix, de->postfix);
+				snprintf(initial_postfix, sizeof(initial_postfix), "%s", de->postfix);
 
 				xmlNodePtr device_root = xmlDocGetRootElement(device_doc);
 				xmlNodePtr device_node = device_root->children;

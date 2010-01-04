@@ -64,8 +64,6 @@ mame_regtest
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
 		- make pointers const (or const * const)
 		- move MNG frame parsing into seperate function
-		- change strcpy() to strncpy()
-		- change strcat() to strncat()
 		- add printf-format support to append_string()
 		- better way to align the dummy_root INI lines
 		- use functions for lists
