@@ -8,7 +8,8 @@ ZLIB_INC = -I./zlib/include
 #LIBS = -lxml2 -lz
 LIBS = ./libxml2/libxml2.lib ./zlib/lib/zdll.lib
 
-WARNINGS = -Wformat=2 -Wall -Wextra -Wshadow -Wcast-qual -Wwrite-strings -Wunreachable-code
+WARNINGS = -Wall -Wextra -Wformat=2 -Wshadow -Wcast-qual -Wwrite-strings
+#CFLAGS += -Wunreachable-code
 
 #CFLAGS = -g $(WARNINGS)
 CFLAGS = -O3 -s $(WARNINGS)
