@@ -93,10 +93,12 @@ static void config_read_option_str_ptr(const xmlNodePtr config_node, const char*
 {
 	xmlChar* opt = NULL;
 	if( config_read_option(config_node, opt_name, &opt) ) {
-		xmlChar** tmp = (xmlChar**)value;
+		char** tmp = (char**)value;
 		if( *tmp )
-			xmlFree(*tmp);
-		*tmp = opt;
+			free(*tmp);
+		*tmp = strdup((const char*)opt);
+		xmlFree(opt);
+		opt = NULL;
 	}
 }
 
@@ -151,9 +153,7 @@ void config_free(struct config_entry config_entries[])
 		struct config_entry* ce = &config_entries[i];
 		if( ce->type == CFG_STR_PTR ) {
 			char** value = (char**)ce->value;
-			xmlChar* xml_value = (xmlChar*)*value;
-			xmlFree(xml_value);
-			xml_value = NULL;
+			free(*value);
 		}
 	}
 	

@@ -436,6 +436,7 @@
 	- removed -Wunreachable-code from compilation options since it causes spurious warnings with newer GCC versions
 	- removed duplicated freeing of valgrind variables
 	- fixed mixture of libc and libxml2 allocation when using "hack_pinmame"
+	- fixed mixture of libc and libxml2 allocations in configuration code
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)
