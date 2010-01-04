@@ -2,7 +2,6 @@ mame_regtest
 	features:
 		- per-cart configuration
 		- check every game with created files (re-run after clean run)
-		- add sanity checks for maximum bios, ramsize and device count
 		- add option for testing of .inp file writing/reading (-record/-playback)
 		- add "start_at" for devices
 		- use transparent crosshair?
@@ -19,6 +18,7 @@ mame_regtest
 			- move variables into the structure (only one dynamic string type)
 			- read all options as const to avoid modifications outside the config
 			- report unknown options
+			- use register function to add config values?
 		- store both output file states in case of autosave
 		- add macro to output files/folders for version/revsion etc.
 		- attribute to disable an image entry in the XML
@@ -55,16 +55,14 @@ mame_regtest
 				void* root;
 				config_entries[]
 			}
-		- use register function to add config values?
 		- add memory dumps to the output files for -debug runs?
-		- test with path with whitespaces
 		- add option to run MAME in gdb (gdb --batch --eval-command=run --args)
 			- disallow usage of gdb and valgrind at the same time
 		- add more output to create_image_xml
 		- png entries also need the normal file size
-		- make it possible set control affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
-		- are there dipswitches, that are depending on multiple ports?
+		- make it possible to set affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
 		- make dipswitches/configurations work with ramsizes and bioses
+		- add signal/abort handler and cleanup in it
 	
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -86,15 +84,18 @@ mame_regtest
 		- create open_mng_and_skip_sig() for PNG
 		- get MEND reference out of IDAT function
 		- change ram, bioses and devices from arrays to lists
+			- add sanity checks for maximum bios, ramsize and device count
 		- merge configuration/dipswitch code
 
 	issues/bugs/errorhandling:
 		- avoid duplicated slashes
 		- properly handle invalid XPath expressions (check for DRIVER_ROOT / react on libxml2 errors)
-		- bail out when invalid config type found
+		- bail out when invalid config_entry_type found?
 		- test chdir() on start-up and bail out when it fails
-		- valgrind variables mix libc and libxml2 allocations
-		- config_gamelist_xml_file mixes libc and libxml2 allocations
+		- do not test dipswitch/configurations when additional information is missing in -listxml
+		- abort when output directory could not be renamed/moved
+		- test with path with whitespaces
+		- are there dipswitches, that are depending on multiple ports?
 
 	documentation:
 		- wiki
@@ -161,9 +162,6 @@ mame_regtest
 		- add check for a specific string as option 
 			- replace "called within reset scope by" with it -> field="stderr" string="called within reset scope by"
 			- allow multiple ones
-
-	Linux:
-		- add a signal handler for linux?
 
 	Known Issues:
 		- not everything is properly encoded by xmlEncodeEntitiesReentrant()
