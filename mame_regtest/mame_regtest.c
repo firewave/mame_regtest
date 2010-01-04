@@ -563,17 +563,6 @@ static void cleanup_and_exit(int errcode, const char* errstr)
 		debugscript_file = NULL;
 	}	
 
-#if USE_VALGRIND
-	if( config_valgrind_parameters ) {
-		free(config_valgrind_parameters);
-		config_valgrind_parameters = NULL;
-	}
-	if( config_valgrind_binary ) {
-		free(config_valgrind_binary);
-		config_valgrind_binary = NULL;
-	}
-#endif
-	
 	if( listxml_output ) {
 		free(listxml_output);
 		listxml_output = NULL;

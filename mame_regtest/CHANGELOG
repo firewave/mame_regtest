@@ -434,6 +434,7 @@
 	- updated URLs in comments from toseciso.org to redump.net
 	- added option "use_configurations" to test all non-default configurations settings
 	- removed -Wunreachable-code from compilation options since it causes spurious warnings with newer GCC versions
+	- removed duplicated freeing of valgrind variables
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)
