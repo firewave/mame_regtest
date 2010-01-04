@@ -1398,7 +1398,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				++dipswitch_count;
 				de.dipswitch = dipswitch;
 
-				int dipvalue_count = 0;
+				int dipvalue_count = -1;
 				struct dipvalue_info* dipvalue = dipswitch->values;
 				while( dipvalue != NULL ) {
 					++dipvalue_count;
@@ -1426,7 +1426,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				++configuration_count;
 				de.configuration = configuration;
 
-				int confsetting_count = 0;
+				int confsetting_count = -1;
 				struct dipvalue_info* confsetting = configuration->values;
 				while( confsetting != NULL ) {
 					++confsetting_count;
