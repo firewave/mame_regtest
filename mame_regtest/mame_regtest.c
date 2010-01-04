@@ -972,6 +972,9 @@ static int create_cfg(struct driver_entry* de, int type)
 	
 	xmlSaveFormatFileEnc(cfgfile, cfg_doc, "UTF-8", 1);
 
+	free(cfgfile);
+	cfgfile = NULL;
+
 	return 0;
 }
 
