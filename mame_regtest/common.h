@@ -35,7 +35,9 @@ int mrt_getch();
 void append_string(char** str, const char* str_to_append);
 void append_quoted_string(char** str, const char* str_to_append);
 
+/* you have to free the content */
 int read_file(const char* file, char** content);
+
 int copy_file(const char* source, const char* dest);
 
 enum
