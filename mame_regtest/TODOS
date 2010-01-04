@@ -34,10 +34,6 @@ mame_regtest
 			- hardreset (causes endless restarts of MAME)
 			- snap
 		- add option to use a specific debugscript?
-		- add hack for PinMAME
-			- -listxml (strip duplicated "sampleof" attribute / has stray & in rom name)
-			- no "sourcefile" attribute
-			- OK screens (-skip_disclaimer / -skip_gameinfo)
 		- read images from folder with same name as device (look for XML first / specify folder in XML?)
 		- use more command-line options
 			- verify*
@@ -96,6 +92,7 @@ mame_regtest
 		- abort when output directory could not be renamed/moved
 		- test with path with whitespaces
 		- are there dipswitches, that are depending on multiple ports?
+		- make "hack_pinmame" fully working
 
 	documentation:
 		- wiki
