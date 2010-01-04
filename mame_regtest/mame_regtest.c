@@ -1243,6 +1243,7 @@ static int execute_mame2(struct driver_entry* de)
 		append_string(&outputdir, FILESLASH);
 		append_driver_info(&outputdir, de);
 
+		/* TODO: bail out on error */
 		if( rename(dummy_root, outputdir) != 0 )
 			printf("could not rename '%s' to '%s'\n", dummy_root, outputdir);
 			
@@ -1506,9 +1507,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 		if( !sourcefile ) {
 			if( config_hack_pinmame ) {
 				/* set a dummy sourcefile for PinMAME */
-				char* sourcefile_c = NULL;
-				append_string(&sourcefile_c, "pinmame.c");
-				sourcefile = (xmlChar*)sourcefile_c;
+				sourcefile = xmlStrdup((const xmlChar*)"pinmame.c");
 			}
 			else {
 				printf("'sourcefile' attribute is empty\n");
