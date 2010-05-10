@@ -50,6 +50,10 @@ mame_regtest returncodes:
 #define itoa _itoa
 #undef chdir
 #define chdir _chdir
+#undef getcwd
+#define getcwd _getcwd
+#undef putenv
+#define putenv _putenv
 #endif
 #define F_OK 00
 #endif
