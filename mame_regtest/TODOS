@@ -63,6 +63,7 @@ mame_regtest
 		- add microsoft versions for the GCC specific code
 		- move the Microsoft-specific defines into common.h
 		- tag releases in the future
+		- get proper libxml2 DLL to get Visual Studio working
 	
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
