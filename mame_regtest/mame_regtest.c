@@ -182,6 +182,7 @@ static int config_verbose = 0;
 static int config_write_wav = 0;
 static int config_use_dipswitches = 0;
 static int config_use_configurations = 0;
+static char* config_hashpath_folder = NULL;
 
 struct config_entry mrt_config[] =
 {
@@ -225,6 +226,7 @@ struct config_entry mrt_config[] =
 	{ "write_wav",				CFG_INT,		&config_write_wav },
 	{ "use_dipswitches",		CFG_INT,		&config_use_dipswitches },
 	{ "use_configurations",		CFG_INT,		&config_use_configurations },
+	{ "hashpath",				CFG_STR_PTR,	&config_hashpath_folder },
 	{ NULL,						-1,				NULL }
 };
 
@@ -516,6 +518,8 @@ static int create_dummy_root_ini()
 				else
 					fprintf(fp, "biospath           %s\n", config_rompath_folder); /* old biospath for MESS */
 			}
+			if( (app_type == APP_MESS) && config_hashpath_folder && (strlen(config_hashpath_folder) > 0) )
+				fprintf(fp, "hashpath            %s\n", config_hashpath_folder); /* hashpath for MESS */
 			fclose(fp);
 			res = 1;
 		}
@@ -2044,6 +2048,8 @@ int main(int argc, char *argv[])
 		printf("write_wav: %d\n", config_write_wav);
 		printf("use_dipswitches: %d\n", config_use_dipswitches);
 		printf("use_configurations: %d\n", config_use_configurations);
+		if( config_hashpath_folder && (strlen(config_hashpath_folder) > 0) )
+			printf("using hashpath folder: %s\n", config_hashpath_folder);
 
 		printf("hack_ftr: %d\n", config_hack_ftr);
 		printf("hack_biospath: %d\n", config_hack_biospath);

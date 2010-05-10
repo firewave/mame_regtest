@@ -59,6 +59,8 @@ mame_regtest
 		- make it possible to set affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
 		- make dipswitches/configurations work with ramsizes and bioses
 		- add signal/abort handler and cleanup in it
+		- add Visual Studio 2010 solution and project files
+		- add support for the softlists
 	
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -91,6 +93,7 @@ mame_regtest
 		- test with path with whitespaces
 		- are there dipswitches, that are depending on multiple ports?
 		- make "hack_pinmame" fully working
+		- add errorhandling to all libxml2 functions
 
 	documentation:
 		- wiki
@@ -105,6 +108,10 @@ mame_regtest
 			- add note to "use_debug" about needing a build with USE_DEBUGGER=1 and about the version, that started to include the debugger in non-debug builds
 			- update building instructions in Wiki
 		- update old webpage with latest version and new links
+		- document what "DRIVER_ROOT" stands for
+		- document, that only XPath 1.0 is supported
+		- document upper limit of dipswitches/devices/etc. of 100000
+		- document "use_dipswitches" and "use_configurations" is available from 0.136
 
 	compilation:
 		- fix compilation on systems, that already have a htonl() function
@@ -157,6 +164,8 @@ mame_regtest
 		- add check for a specific string as option 
 			- replace "called within reset scope by" with it -> field="stderr" string="called within reset scope by"
 			- allow multiple ones
+		- support multiple input folders
+			- support subfolders
 
 	Known Issues:
 		- not everything is properly encoded by xmlEncodeEntitiesReentrant()
@@ -169,6 +178,7 @@ mame_regtest
 		- test with SDLMAME/SDLMESS
 		- test on PPC
 		- create testset with images for each device in each driver
+		- split up MAME test into #-z
 
 	Misc:
 		- create patch to write show_ui() in a file

@@ -437,6 +437,8 @@
 	- removed duplicated freeing of valgrind variables
 	- fixed mixture of libc and libxml2 allocation when using "hack_pinmame"
 	- fixed mixture of libc and libxml2 allocations in configuration code
+	- fixed compilation with new toolchain
+	- added option "hashpath" to specify the location of the MESS hash files
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)
