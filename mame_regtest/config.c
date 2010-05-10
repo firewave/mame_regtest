@@ -7,6 +7,14 @@
 #include <unistd.h>
 #endif
 
+#ifdef _MSC_VER
+#include <io.h>
+#if _MSC_VER >= 1400
+#define access _access
+#endif
+#define F_OK 00
+#endif
+
 /* libxml2 */
 #include "libxml/parser.h"
 

@@ -3,7 +3,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#ifndef _MSC_VER
 #include <dirent.h>
+#else
+#include <direct.h>
+#include <io.h>
+#if _MSC_VER >= 1400
+#define access _access
+#define rmdir _rmdir
+#undef mkdir
+#define mkdir _mkdir
+#endif
+#define F_OK 00
+#endif
 
 #ifndef WIN32
 #include <termios.h>
@@ -32,13 +44,13 @@ void append_string(char** str, const char* str_to_append)
 {
 	size_t applen = strlen(str_to_append);
 	if( *str == NULL ) {
-		*str = malloc(applen+1);
+		*str = (char*)malloc(applen+1);
 		memcpy(*str, str_to_append, applen);
 		(*str)[applen] = '\0';
 	}
 	else {
 		size_t length = strlen(*str);
-		*str = realloc(*str, length+applen+1);
+		*str = (char*)realloc(*str, length+applen+1);
 		memcpy(*str+length, str_to_append, applen);
 		(*str)[length+applen] = '\0';
 	}
@@ -61,14 +73,14 @@ int read_file(const char* file, char** content)
 		int count = 0;
 		while( (read_bytes = fread(buf, 1, sizeof(buf), fd)) ) {
 			bufsize = (count * sizeof(buf)) + read_bytes;
-			*content = realloc(*content, bufsize);
+			*content = (char*)realloc(*content, bufsize);
 			memcpy(*content + (count * sizeof(buf)), buf, read_bytes);
 			buf[0] = '\0';
 			++count;
 		}
 
 		/* terminate content */
-		*content = realloc(*content, bufsize + 1);
+		*content = (char*)realloc(*content, bufsize + 1);
 		(*content)[bufsize] = '\0';
 
 		fclose(fd);
@@ -134,6 +146,7 @@ void parse_directory(const char* dirname,
 	if( access(dirname, F_OK) != 0 )
 		return;
 
+#ifndef _MSC_VER
 	DIR* d = opendir(dirname);
 	if( d ) {
 		struct parse_callback_data pcd;
@@ -189,6 +202,12 @@ void parse_directory(const char* dirname,
 	}
 	else
 		printf("parse_directory() - could not open '%s'\n", dirname);
+#else
+	(void)user_data;
+	(void)callback;
+	(void)recursive;
+	// TODO
+#endif
 }
 
 int is_absolute_path(const char* path)
@@ -219,7 +238,7 @@ char* get_filename(const char* filepath)
 {
 	char* result = NULL;
 	
-	char* pos = strrchr(filepath, FILESLASH[0]);
+	const char* pos = strrchr(filepath, FILESLASH[0]);
 	if( pos )
 		append_string(&result, pos+1);
 

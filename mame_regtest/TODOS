@@ -59,8 +59,10 @@ mame_regtest
 		- make it possible to set affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
 		- make dipswitches/configurations work with ramsizes and bioses
 		- add signal/abort handler and cleanup in it
-		- add Visual Studio 2010 solution and project files
 		- add support for the softlists
+		- add microsoft versions for the GCC specific code
+		- move the Microsoft-specific defines into common.h
+		- tag releases in the future
 	
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()

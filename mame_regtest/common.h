@@ -1,15 +1,20 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
+#include <sys/stat.h>
+
 #ifdef WIN32
 #include <conio.h>
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)
+#undef getch
+#define getch _getch
+#endif
 #define mrt_getch getch
 #define FILESLASH "\\"
 #else
+int mrt_getch();
 #define FILESLASH "/"
 #endif
-
-#include <sys/stat.h>
 
 #if !defined(LITTLE_ENDIAN) && !defined(BIG_ENDIAN)
 /* #define BIG_ENDIAN */
@@ -28,8 +33,6 @@
 					(((unsigned int)(A) & 0x000000ff) << 24))
 
 #endif
-
-int mrt_getch();
 
 /* you have to free the pointer you append the string to */
 void append_string(char** str, const char* str_to_append);

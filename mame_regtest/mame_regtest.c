@@ -37,6 +37,23 @@ mame_regtest returncodes:
 #include <unistd.h>
 #endif
 
+#ifdef _MSC_VER
+#include <direct.h>
+#include <io.h>
+#if _MSC_VER >= 1400
+#define access _access
+#define rmdir _rmdir
+#define snprintf _snprintf
+#undef strdup
+#define strdup _strdup
+#undef itoa
+#define itoa _itoa
+#undef chdir
+#define chdir _chdir
+#endif
+#define F_OK 00
+#endif
+
 #ifndef WIN32
 #include <arpa/inet.h>
 #define USE_VALGRIND 1
@@ -57,7 +74,7 @@ mame_regtest returncodes:
 struct dipvalue_info {
 	xmlChar* name;
 	unsigned int value;
-	void* next;
+	struct dipvalue_info* next;
 };
 
 struct dipswitch_info {
@@ -66,7 +83,7 @@ struct dipswitch_info {
 	unsigned int mask;
 	unsigned int defvalue;
 	struct dipvalue_info* values;
-	void* next;
+	struct dipswitch_info* next;
 };
 
 struct driver_info {
@@ -82,13 +99,13 @@ struct driver_info {
 	int device_mandatory;
 	struct dipswitch_info* dipswitches;
 	struct dipswitch_info* configurations;
-	void* next;
+	struct driver_info* next;
 };
 
 struct image_entry {
 	const xmlChar* device_type;
 	const xmlChar* device_file;
-	void* next;
+	struct image_entry* next;
 };
 
 struct driver_entry {
@@ -227,7 +244,7 @@ struct config_entry mrt_config[] =
 	{ "use_dipswitches",		CFG_INT,		&config_use_dipswitches },
 	{ "use_configurations",		CFG_INT,		&config_use_configurations },
 	{ "hashpath",				CFG_STR_PTR,	&config_hashpath_folder },
-	{ NULL,						-1,				NULL }
+	{ NULL,						CFG_UNK,		NULL }
 };
 
 static int get_png_data(const char* png_name, unsigned int *IHDR_width, unsigned int* IHDR_height, unsigned int *IDAT_size, unsigned int* IDAT_crc);
@@ -1151,7 +1168,7 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 		}
 		if( actual_driv_inf->next ) {
 			struct driver_info* tmp_driv_inf = actual_driv_inf;
-			actual_driv_inf = (struct driver_info*)actual_driv_inf->next;
+			actual_driv_inf = actual_driv_inf->next;
 			free(tmp_driv_inf);
 		}
 		else {
@@ -1471,7 +1488,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 		}
 
 		if( actual_driv_inf->next )
-			actual_driv_inf = (struct driver_info*)actual_driv_inf->next;
+			actual_driv_inf = actual_driv_inf->next;
 		else
 			break;
 	} while(res == 1);
@@ -1613,7 +1630,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 										new_dip_info->values = new_dipvalue;
 									
 									if( last_dipvalue )
-										last_dipvalue->next = (void*)new_dipvalue;
+										last_dipvalue->next = new_dipvalue;
 									last_dipvalue = new_dipvalue;
 								}
 								
@@ -1675,7 +1692,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 										new_conf_info->values = new_confsetting;
 									
 									if( last_confsetting )
-										last_confsetting->next = (void*)new_confsetting;
+										last_confsetting->next = new_confsetting;
 									last_confsetting = new_confsetting;
 								}
 								
@@ -1860,7 +1877,11 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
+#ifndef _MSC_VER
 	itoa(getpid(), pid_str, 10);
+#else
+	// TODO
+#endif
 	printf("\n");
 	printf("process: %s\n", pid_str);
 

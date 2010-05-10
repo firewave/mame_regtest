@@ -2,6 +2,7 @@
 #define CONFIG_H_
 
 enum config_entry_type {
+	CFG_UNK		= -1,
 	CFG_INT 	= 0,
 	CFG_STR_PTR = 1
 };
