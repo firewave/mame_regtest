@@ -9,7 +9,9 @@
 #include <direct.h>
 #include <io.h>
 #if _MSC_VER >= 1400
+#undef access
 #define access _access
+#undef rmdir
 #define rmdir _rmdir
 #undef mkdir
 #define mkdir _mkdir
@@ -71,7 +73,7 @@ int read_file(const char* file, char** content)
 		size_t bufsize = 0;
 		size_t read_bytes;
 		int count = 0;
-		while( (read_bytes = fread(buf, 1, sizeof(buf), fd)) ) {
+		while( (read_bytes = fread(buf, 1, sizeof(buf), fd)) != 0 ) {
 			bufsize = (count * sizeof(buf)) + read_bytes;
 			*content = (char*)realloc(*content, bufsize);
 			memcpy(*content + (count * sizeof(buf)), buf, read_bytes);
@@ -117,7 +119,7 @@ int copy_file(const char* source, const char* dest)
 	char buf[1024];
 	size_t read_bytes;
 	size_t written_bytes;
-	while( (read_bytes = fread(buf, 1, sizeof(buf), in_fd)) ) {
+	while( (read_bytes = fread(buf, 1, sizeof(buf), in_fd)) != 0 ) {
 		written_bytes = fwrite(buf, 1, read_bytes, out_fd);
 		if( written_bytes != read_bytes ) {
 			printf("copy_file() - could not write to: %s\n", dest);

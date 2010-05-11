@@ -41,8 +41,11 @@ mame_regtest returncodes:
 #include <direct.h>
 #include <io.h>
 #if _MSC_VER >= 1400
+#undef access
 #define access _access
+#undef rmdir
 #define rmdir _rmdir
+#undef snprintf
 #define snprintf _snprintf
 #undef strdup
 #define strdup _strdup

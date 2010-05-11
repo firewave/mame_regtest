@@ -1,7 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef _MSC_VER
 #include <dirent.h>
+#else
+#include <io.h>
+#if _MSC_VER >= 1400
+#undef strdup
+#define strdup _strdup
+#undef access
+#define access _access
+#endif
+#define F_OK 00
+#endif
 
 /* libxml2 */
 #include "libxml/parser.h"
@@ -22,14 +33,14 @@
 struct driver_data
 {
 	char* filename;
-	void* next;
+	struct driver_data* next;
 };
 
 struct group_data
 {
 	xmlChar* srcfile;
 	struct driver_data* drivers;
-	void* next;	
+	struct group_data* next;	
 };
 
 struct build_group_cb_data
@@ -161,7 +172,7 @@ struct config_entry report_config[] =
 	{ "report_type",		CFG_INT,		&config_report_type },
 	{ "compare_folder",		CFG_STR_PTR,	&config_compare_folder }, /* comparison report specific */
 	{ "print_stdout", 		CFG_INT, 		&config_print_stdout },
-	{ NULL, 				-1, 			NULL }
+	{ NULL, 				CFG_UNK, 		NULL }
 };
 
 struct report_cb_data

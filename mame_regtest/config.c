@@ -10,7 +10,10 @@
 #ifdef _MSC_VER
 #include <io.h>
 #if _MSC_VER >= 1400
+#undef access
 #define access _access
+#undef strdup
+#define strdup _strdup
 #endif
 #define F_OK 00
 #endif
