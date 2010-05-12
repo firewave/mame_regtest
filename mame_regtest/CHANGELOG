@@ -441,6 +441,7 @@
 	- added option "hashpath" to specify the location of the MESS hash files
 	- added Visual Studio 2010 solution and project files
 	- fixes for compilation with Visual Studio 2010 (still not working completely)
+	- avoid duplicated runs for sets with bios and ram options
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)

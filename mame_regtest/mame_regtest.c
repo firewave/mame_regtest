@@ -1476,7 +1476,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 		}
 
 		if( actual_driv_inf->bios_count > 0 &&
-			actual_driv_inf->ram_count > 0 ) {
+			actual_driv_inf->ram_count > 1 ) {
 			int bios_i = 0;
 			for( ; bios_i < actual_driv_inf->bios_count; ++bios_i )
 			{

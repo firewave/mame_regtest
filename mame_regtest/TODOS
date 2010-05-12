@@ -64,6 +64,8 @@ mame_regtest
 		- move the Microsoft-specific defines into common.h
 		- tag releases in the future
 		- get proper libxml2 DLL to get Visual Studio working
+		- specify different output/object folders for the different executables in Visual Studio 2010 project files
+		- do not check the default ramsize again in bios/ram combination runs
 	
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -111,10 +113,8 @@ mame_regtest
 			- add note to "use_debug" about needing a build with USE_DEBUGGER=1 and about the version, that started to include the debugger in non-debug builds
 			- update building instructions in Wiki
 		- update old webpage with latest version and new links
-		- document what "DRIVER_ROOT" stands for
-		- document, that only XPath 1.0 is supported
 		- document upper limit of dipswitches/devices/etc. of 100000
-		- document "use_dipswitches" and "use_configurations" is available from 0.136
+		- document "use_dipswitches" and "use_configurations" are available from 0.136
 
 	compilation:
 		- fix compilation on systems, that already have a htonl() function
