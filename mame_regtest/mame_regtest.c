@@ -99,8 +99,10 @@ struct driver_info {
 	int savestate;
 	int ram_count;
 	int ramsizes[16];
+	int ram_default;
 	int bios_count;
 	xmlChar* bioses[32];
+	int bios_default;
 	int device_count;
 	xmlChar* devices[32];
 	int device_mandatory;
@@ -1582,6 +1584,12 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 						(*new_driv_inf)->ramsizes[(*new_driv_inf)->ram_count++] = atoi((const char*)ram_content);
 						xmlFree(ram_content);
 					}
+					xmlChar* ram_default = xmlGetProp(game_children, (const xmlChar*)"default");
+					if( ram_default ) {
+						if( xmlStrcmp(ram_default, (const xmlChar*)"1") == 0 )
+							(*new_driv_inf)->ram_default = (*new_driv_inf)->ram_count;
+						xmlFree(ram_default);
+					}
 				}
 			}
 
@@ -1590,6 +1598,13 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					xmlChar* bios_content = xmlGetProp(game_children, (const xmlChar*)"name");
 					if( bios_content )
 						(*new_driv_inf)->bioses[(*new_driv_inf)->bios_count++] = bios_content;
+
+					xmlChar* bios_default = xmlGetProp(game_children, (const xmlChar*)"default");
+					if( bios_default ) {
+						if( xmlStrcmp(bios_default, (const xmlChar*)"1") == 0 )
+							(*new_driv_inf)->bios_default = (*new_driv_inf)->bios_count;
+						xmlFree(bios_default);
+					}
 				}
 			}
 			
