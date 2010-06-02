@@ -461,6 +461,14 @@ static void parse_callback(struct parse_callback_data* pcd)
 		xmlNodePtr filenode = xmlNewChild(*node, NULL, (const xmlChar*)"file", NULL);
 		xmlNewProp(filenode, (const xmlChar*)"name", (const xmlChar*)pcd->entry_name);
 		char tmp[128];
+		snprintf(tmp, sizeof(tmp), "%ld", pcd->s->st_size);
+		xmlNewProp(filenode, (const xmlChar*)"size", (const xmlChar*)tmp);
+
+		unsigned int crc = 0;
+		calc_crc32(pcd->fullname, &crc);
+		snprintf(tmp, sizeof(tmp), "%x", crc);
+		xmlNewProp(filenode, (const xmlChar*)"crc", (const xmlChar*)tmp);
+
 		if( strstr(pcd->entry_name, ".png") ) {
 			unsigned int IHDR_width, IHDR_height, IDAT_size, IDAT_crc;
 			if( get_png_data(pcd->fullname, &IHDR_width, &IHDR_height, &IDAT_size, &IDAT_crc) ) {
@@ -478,16 +486,6 @@ static void parse_callback(struct parse_callback_data* pcd)
 			int frames = parse_mng(pcd->fullname, filenode);
 			snprintf(tmp, sizeof(tmp), "%d", frames);
 			xmlNewProp(filenode, (const xmlChar*)"frames", (const xmlChar*)tmp);
-		}
-		else {
-			/* only add file size and CRC for non-PNG and non-MNG files - it will differs for them, although they are identical */
-			snprintf(tmp, sizeof(tmp), "%ld", pcd->s->st_size);
-			xmlNewProp(filenode, (const xmlChar*)"size", (const xmlChar*)tmp);
-
-			unsigned int crc = 0;
-			calc_crc32(pcd->fullname, &crc);
-			snprintf(tmp, sizeof(tmp), "%x", crc);
-			xmlNewProp(filenode, (const xmlChar*)"crc", (const xmlChar*)tmp);
 		}
 	}
 	else if (pcd->type == ENTRY_DIR_START) {
