@@ -66,6 +66,8 @@ mame_regtest
 		- do not check the default ramsize again in bios/ram combination runs
 		- take a look at messtest for "hardreset" tests and extended image testing
 		- "device_mandatory" doesn't specify which device is the mandatory one
+		- "start_at" sample actually starts after the specified set
+		- create script to automatically create release archive
 	
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
