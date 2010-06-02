@@ -1,0 +1,191 @@
+mame_regtest
+	features:
+		- per-cart configuration
+		- check every game with created files (re-run after clean run)
+		- add option for testing of .inp file writing/reading (-record/-playback)
+		- add "start_at" for devices
+		- use transparent crosshair?
+		- add "hang"/deadlock detection (-watchdog / usable from 0.136)
+		- mark the different autosave calls (load / save)
+		- multipass XPath (e.g. first select m6502 cpus and then all with autosave from those nodes)
+		- add more input paths to configuration (like artwork and samples)
+		- multithreading mode
+		- configuration rewrite
+			- empty options will not properly overwrite/reset existing options to default values
+			- print config values in read function (or put in array and print function for array)
+			- cleanup post-loading code of configuration (checks, output etc.)
+			- proper handling of default values in config (add additional entry in struct)
+			- move variables into the structure (only one dynamic string type)
+			- read all options as const to avoid modifications outside the config
+			- report unknown options
+			- use register function to add config values?
+		- store both output file states in case of autosave
+		- add macro to output files/folders for version/revsion etc.
+		- attribute to disable an image entry in the XML
+		- add base folder for images in XML (could also be used for parsing a folder?)
+			- read carts from a directory?
+			- add parse flag?
+			- only use on relative path entries (x:\, /, \\, etc.)
+			- use folder node in-between to be able to switch folders
+		- test absolute paths in INI (debugfile / rompath)
+		- run test_createconfig in dummy_root to avoid usage of existing mame.ini
+		- use the following debugger commands
+			- gtime <milliseconds in hex>
+			- hardreset (causes endless restarts of MAME)
+			- snap
+		- add option to use a specific debugscript?
+		- read images from folder with same name as device (look for XML first / specify folder in XML?)
+		- use more command-line options
+			- -verify*
+			- -list*
+			- test frontend functions (-listfull etc.)
+			- call -validate?
+		- add soft/hardreset tests after each call like "autosave" test?
+			- how will it work with -autosave?
+		- add clean/merged configuration to output data
+		- add option with folder for device XMLs?
+		- make it possible to use multiple configurations
+			- config_object {
+				void* xml;
+				void* root;
+				config_entries[]
+			}
+		- add memory dumps to the output files for -debug runs?
+		- add option to run MAME in gdb (gdb --batch --eval-command=run --args)
+			- disallow usage of gdb and valgrind at the same time
+		- add more output to create_image_xml
+		- make it possible to set affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
+		- make dipswitches/configurations work with ramsizes and bioses
+		- add signal/abort handler and cleanup in it
+		- add support for the softlists
+		- add microsoft versions for the GCC specific code (FileFindFirst(), FileFindNext(), etc.)
+		- move the Microsoft-specific defines into a seperate header
+		- tag releases in the future
+		- get proper libxml2 DLL to get Visual Studio working
+		- specify different output/object folders for the different executables in Visual Studio 2010 project files
+		- do not check the default ramsize again in bios/ram combination runs
+		- take a look at messtest for "hardreset" tests and extended image testing
+		- "device_mandatory" doesn't specify which device is the mandatory one
+		- "start_at" sample actually starts after the specified set
+		- create script to automatically create release archive
+	
+	internal:
+		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
+		- make pointers const (or const * const)
+		- move MNG frame parsing into seperate function
+		- add printf-format support to append_string()
+		- better way to align the dummy_root INI lines
+		- use functions for lists
+			- list_create()
+			- list_next_entry()
+			- list_insert() - sorted
+			- list_append() - unsorted
+			- list_free()
+		- rename CFG_STR_PTR to CFG_STR
+		- handle all options as string (use atoi() to convert to integers)
+		- factor out duplicated PNG/MNG code
+		- create open_mng_and_skip_sig() for PNG
+		- get MEND reference out of IDAT function
+		- change ram, bioses and devices from arrays to lists
+			- add sanity checks for maximum bios, ramsize and device count
+		- merge configuration/dipswitch code
+
+	issues/bugs/errorhandling:
+		- avoid duplicated slashes
+		- properly handle invalid XPath expressions (check for DRIVER_ROOT / react on libxml2 errors)
+		- bail out when invalid config_entry_type found?
+		- test chdir() on start-up and bail out when it fails
+		- do not test dipswitch/configurations when additional information is missing in -listxml
+		- abort when output directory could not be renamed/moved
+		- test with path with whitespaces
+		- are there dipswitches, that are depending on multiple ports?
+		- make "hack_pinmame" fully working
+		- add errorhandling to all libxml2 functions
+
+	documentation:
+		- wiki
+			- the different builds
+			- how the results are created
+			- the machine the tests are run on
+			- the resulting command-line
+			- a run on the official binary once the cycle is completed
+			- runs with the usual builds on the u-releases
+			- add MAME version to hack_mngwrite description (change seems to be in 0.108u5)
+			- add notes about dependencies between options in the documentation
+			- add note to "use_debug" about needing a build with USE_DEBUGGER=1 and about the version, that started to include the debugger in non-debug builds
+			- update building instructions in Wiki
+		- update old webpage with latest version and new links
+		- document upper limit of dipswitches/devices/etc. of 100000
+		- document "use_dipswitches" and "use_configurations" are available from 0.136
+
+	compilation:
+		- fix compilation on systems, that already have a htonl() function
+		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER? LSB_FIRST?)
+		- fix Fedora Core 10 compilation (MAX_PATH)
+		- make doesn't work when the additional files already exist and you compile by target (e.g. mame_regtest.exe)
+		- switch to binaries/includes from http://www.zlatkovic.com/pub/libxml/
+
+	create_report:
+		- write comparison tool
+			- parse dir A and check dir B for missing file
+			- parse dir B and check dir A for new files
+			- show the following
+				- files differ (PNG/MNG frame diffs)
+				- exitcode differs
+				- files missing
+				- new files
+				- stdout/stderr differs
+		- add documentation for configuration
+		- HTML report
+			- create HTML report (different variants)
+				Unexpected Returnvalues (sourcefile - driver - returncode - details [flags, stdout])
+				Untested Games (sourcefile - driver)
+				Image Comparison results (sourcefile - driver / with images links - before and after)
+				All Result Images
+			- add paging to HTML report (by letters / x entries per page)
+			- add all messages to HTML report
+			- add all options to HTML report
+			- put HTML report into a folder and copy pictures in a <html_report_name>_new/<html_report_name>_ref folder
+			- add option for main HTML report folder
+			- make HTML report work in Mozilla ( use /ref and /new links)
+		- extract differing frames (also for HTML report)
+		- show PNG differences (use Aaron's code)
+		- color codes based on exitcodes
+		- expose the data (collect the necessary XMLs and add them to a subfolder?)
+		- wiki syntax
+			| row1 | row 2 |
+		- create an intermediate format to process, so it's not necessary to process all output again when a new version comes out
+			- add option to merge the output to a report
+		- properly handle sets with autosave (use index in XPath to access the second set of nodes when both support autosave)
+		- handle missing attributes properly
+		- add the various XPaths as options in the configuration
+		- create default configuration for create_report to match removed options
+			- result_file
+			- add some useful reports from old create_report
+		- use proper formating for "(autosave)" string
+		- use grep to diff each file
+			- regex for auto.sta "^[+-].*auto.sta"
+		- check for "cheat expression" errors in stderr
+		- add check for a specific string as option 
+			- replace "called within reset scope by" with it -> field="stderr" string="called within reset scope by"
+			- allow multiple ones
+		- support multiple input folders
+			- support subfolders
+
+	Known Issues:
+		- not everything is properly encoded by xmlEncodeEntitiesReentrant()
+		- using autosave will overwrite the initial valgrind log-file for the driver (well..not really, it adds the pid - still you want to differ them easily)
+
+	Test TODOs:
+		- test release and debug builds of MAME and MESS
+		- test 32-bit compile on 64-bit OS (windows and linux)
+		- test 64-bit compile
+		- test with SDLMAME/SDLMESS
+		- test on PPC
+		- create testset with images for each device in each driver
+		- split up MAME test into #-z
+
+	Misc:
+		- create patch to write show_ui() in a file
+		- MAME patches
+			- add "exit"/"run-and-hide" command to debugger
