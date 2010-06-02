@@ -36,11 +36,10 @@ mame_regtest
 		- add option to use a specific debugscript?
 		- read images from folder with same name as device (look for XML first / specify folder in XML?)
 		- use more command-line options
-			- verify*
-			- list*
+			- -verify*
+			- -list*
 			- test frontend functions (-listfull etc.)
 			- call -validate?
-			- call "-listdevices" for MESS?
 		- add soft/hardreset tests after each call like "autosave" test?
 			- how will it work with -autosave?
 		- add clean/merged configuration to output data
@@ -55,17 +54,18 @@ mame_regtest
 		- add option to run MAME in gdb (gdb --batch --eval-command=run --args)
 			- disallow usage of gdb and valgrind at the same time
 		- add more output to create_image_xml
-		- png entries also need the normal file size
 		- make it possible to set affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
 		- make dipswitches/configurations work with ramsizes and bioses
 		- add signal/abort handler and cleanup in it
 		- add support for the softlists
-		- add microsoft versions for the GCC specific code
-		- move the Microsoft-specific defines into common.h
+		- add microsoft versions for the GCC specific code (FileFindFirst(), FileFindNext(), etc.)
+		- move the Microsoft-specific defines into a seperate header
 		- tag releases in the future
 		- get proper libxml2 DLL to get Visual Studio working
 		- specify different output/object folders for the different executables in Visual Studio 2010 project files
 		- do not check the default ramsize again in bios/ram combination runs
+		- take a look at messtest for "hardreset" tests and extended image testing
+		- "device_mandatory" doesn't specify which device is the mandatory one
 	
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
