@@ -1201,7 +1201,7 @@ static int execute_mame2(struct driver_entry* de)
 		printf("\n");
 		printf("found pause file\n");
 		printf("please press any key to continue\n");
-		mrt_getch();
+		(void)mrt_getch();
 		printf("\n");
 	}
 
