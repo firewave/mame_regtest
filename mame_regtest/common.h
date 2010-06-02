@@ -3,6 +3,7 @@
 
 #include <sys/stat.h>
 
+/* getch */
 #ifdef WIN32
 #include <conio.h>
 #if defined(_MSC_VER) && (_MSC_VER >= 1400)
@@ -10,9 +11,13 @@
 #define getch _getch
 #endif
 #define mrt_getch getch
-#define FILESLASH "\\"
 #else
 int mrt_getch();
+#endif
+
+#ifdef WIN32
+#define FILESLASH "\\"
+#else
 #define FILESLASH "/"
 #endif
 
