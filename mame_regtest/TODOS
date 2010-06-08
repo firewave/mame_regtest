@@ -92,7 +92,7 @@ mame_regtest
 
 	issues/bugs/errorhandling:
 		- avoid duplicated slashes
-		- properly handle invalid XPath expressions (check for DRIVER_ROOT / react on libxml2 errors)
+		- properly handle invalid XPath expressions (check for DRIVER_ROOT)
 		- bail out when invalid config_entry_type found?
 		- test chdir() on start-up and bail out when it fails
 		- do not test dipswitch/configurations when additional information is missing in -listxml

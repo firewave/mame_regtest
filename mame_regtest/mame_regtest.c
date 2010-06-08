@@ -1801,60 +1801,65 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 						printf("using xpath expression: %s\n", real_xpath_expr);
 
 						xpathObj = xmlXPathEvalExpression((const xmlChar*)real_xpath_expr, xpathCtx);
-						if( xpathObj == NULL )
+						if( xpathObj ) {
+							if( xpathObj->nodesetval )
+							{
+								printf("xpath found %d nodes\n", xpathObj->nodesetval->nodeNr);
+		
+								xmlBufferPtr xmlBuf = NULL;
+								if( config_print_xpath_results )
+									xmlBuf = xmlBufferCreate();
+		
+								struct driver_info* last_driv_inf = NULL;
+		
+								int i = 0;
+								for( ; i < xpathObj->nodesetval->nodeNr; ++i )
+								{
+									if( config_print_xpath_results ) {
+										xmlBufferAdd(xmlBuf, (const xmlChar*)"\t", 1);
+										xmlNodeDump(xmlBuf, doc, xpathObj->nodesetval->nodeTab[i], 0, 1);
+										xmlBufferAdd(xmlBuf, (const xmlChar*)"\n", 1);
+									}
+		
+									struct driver_info* new_driv_inf = NULL;
+		
+									parse_listxml_element(xpathObj->nodesetval->nodeTab[i], &new_driv_inf);
+		
+									if( new_driv_inf != NULL )
+									{
+										if( last_driv_inf )
+											last_driv_inf->next = new_driv_inf;
+										else
+											*driv_inf = new_driv_inf;
+											
+										last_driv_inf = new_driv_inf;
+									}
+								}
+		
+								if( config_print_xpath_results ) {
+									FILE *xpath_result_fd = mrt_fopen("xpath_results.xml", "w");
+									fprintf(xpath_result_fd, "<xpath_result>\n");
+									xmlBufferDump(xpath_result_fd, xmlBuf);
+									fprintf(xpath_result_fd, "</xpath_result>\n");
+									fclose(xpath_result_fd);
+									xpath_result_fd = NULL;
+		
+									xmlBufferFree(xmlBuf);
+									xmlBuf = NULL;
+								}
+							}
+						}
+						else {
+							printf("could not evaluate XPath expression\n");
+
 							xmlXPathFreeContext(xpathCtx);
+						}
 
 						free(real_xpath_expr);
 						real_xpath_expr = NULL;
 					}
-				}
-
-				if( xpathObj ) {
-					if( xpathObj->nodesetval )
-					{
-						printf("xpath found %d nodes\n", xpathObj->nodesetval->nodeNr);
-
-						xmlBufferPtr xmlBuf = NULL;
-						if( config_print_xpath_results )
-							xmlBuf = xmlBufferCreate();
-
-						struct driver_info* last_driv_inf = NULL;
-
-						int i = 0;
-						for( ; i < xpathObj->nodesetval->nodeNr; ++i )
-						{
-							if( config_print_xpath_results ) {
-								xmlBufferAdd(xmlBuf, (const xmlChar*)"\t", 1);
-								xmlNodeDump(xmlBuf, doc, xpathObj->nodesetval->nodeTab[i], 0, 1);
-								xmlBufferAdd(xmlBuf, (const xmlChar*)"\n", 1);
-							}
-
-							struct driver_info* new_driv_inf = NULL;
-
-							parse_listxml_element(xpathObj->nodesetval->nodeTab[i], &new_driv_inf);
-
-							if( new_driv_inf != NULL )
-							{
-								if( last_driv_inf )
-									last_driv_inf->next = new_driv_inf;
-								else
-									*driv_inf = new_driv_inf;
-									
-								last_driv_inf = new_driv_inf;
-							}
-						}
-
-						if( config_print_xpath_results ) {
-							FILE *xpath_result_fd = mrt_fopen("xpath_results.xml", "w");
-							fprintf(xpath_result_fd, "<xpath_result>\n");
-							xmlBufferDump(xpath_result_fd, xmlBuf);
-							fprintf(xpath_result_fd, "</xpath_result>\n");
-							fclose(xpath_result_fd);
-							xpath_result_fd = NULL;
-
-							xmlBufferFree(xmlBuf);
-							xmlBuf = NULL;
-						}
+					else {
+						printf("could not create XPath context\n");
 					}
 				}
 				else {

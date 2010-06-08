@@ -465,3 +465,5 @@
 	- read "mameconfig" version from listxml when available
 	- report error in case of unsupported "mameconfig" version
 	- fixed return value of create_cfg() in case of success
+	- do not process any entries when "xpath_expr" is invalid
+	- added a few more XPath error messages
