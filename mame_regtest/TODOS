@@ -20,13 +20,7 @@ mame_regtest
 			- report unknown options
 			- use register function to add config values?
 		- store both output file states in case of autosave
-		- add macro to output files/folders for version/revsion etc.
-		- attribute to disable an image entry in the XML
-		- add base folder for images in XML (could also be used for parsing a folder?)
-			- read carts from a directory?
-			- add parse flag?
-			- only use on relative path entries (x:\, /, \\, etc.)
-			- use folder node in-between to be able to switch folders
+		- add macro to output files/folders for version/revision etc.
 		- test absolute paths in INI (debugfile / rompath)
 		- run test_createconfig in dummy_root to avoid usage of existing mame.ini
 		- use the following debugger commands
@@ -34,7 +28,6 @@ mame_regtest
 			- hardreset (causes endless restarts of MAME)
 			- snap
 		- add option to use a specific debugscript?
-		- read images from folder with same name as device (look for XML first / specify folder in XML?)
 		- use more command-line options
 			- -verify*
 			- -list*
@@ -43,7 +36,6 @@ mame_regtest
 		- add soft/hardreset tests after each call like "autosave" test?
 			- how will it work with -autosave?
 		- add clean/merged configuration to output data
-		- add option with folder for device XMLs?
 		- make it possible to use multiple configurations
 			- config_object {
 				void* xml;
@@ -53,22 +45,25 @@ mame_regtest
 		- add memory dumps to the output files for -debug runs?
 		- add option to run MAME in gdb (gdb --batch --eval-command=run --args)
 			- disallow usage of gdb and valgrind at the same time
-		- add more output to create_image_xml
 		- make it possible to set affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
 		- make dipswitches/configurations work with ramsizes and bioses
 		- add signal/abort handler and cleanup in it
 		- add support for the softlists
-		- add microsoft versions for the GCC specific code (FileFindFirst(), FileFindNext(), etc.)
-		- move the Microsoft-specific defines into a seperate header
-		- tag releases in the future
-		- get proper libxml2 DLL to get Visual Studio working
-		- specify different output/object folders for the different executables in Visual Studio 2010 project files
 		- do not check the default ramsize again in bios/ram combination runs
 		- take a look at messtest for "hardreset" tests and extended image testing
 		- "device_mandatory" doesn't specify which device is the mandatory one
 		- "start_at" sample actually starts after the specified set
 		- create script to automatically create release archive
-	
+		- image testing
+			- attribute to disable an image entry in the XML
+			- add base folder for images in XML (could also be used for parsing a folder?)
+				- read carts from a directory?
+				- add parse flag?
+				- only use on relative path entries (x:\, /, \\, etc.)
+				- use folder node in-between to be able to switch folders
+			- read images from folder with same name as device (look for XML first / specify folder in XML?)
+			- add option with folder for device XMLs?
+
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
 		- make pointers const (or const * const)
@@ -88,7 +83,7 @@ mame_regtest
 		- get MEND reference out of IDAT function
 		- change ram, bioses and devices from arrays to lists
 			- add sanity checks for maximum bios, ramsize and device count
-		- merge configuration/dipswitch code
+		- use different prefix for cfg_type enum / conflicts with config_entry
 
 	issues/bugs/errorhandling:
 		- avoid duplicated slashes
@@ -114,9 +109,7 @@ mame_regtest
 			- add notes about dependencies between options in the documentation
 			- add note to "use_debug" about needing a build with USE_DEBUGGER=1 and about the version, that started to include the debugger in non-debug builds
 			- update building instructions in Wiki
-		- update old webpage with latest version and new links
 		- document upper limit of dipswitches/devices/etc. of 100000
-		- document "use_dipswitches" and "use_configurations" are available from 0.136
 
 	compilation:
 		- fix compilation on systems, that already have a htonl() function
@@ -124,6 +117,16 @@ mame_regtest
 		- fix Fedora Core 10 compilation (MAX_PATH)
 		- make doesn't work when the additional files already exist and you compile by target (e.g. mame_regtest.exe)
 		- switch to binaries/includes from http://www.zlatkovic.com/pub/libxml/
+		
+	Visual Studio:
+		- add microsoft versions for the GCC specific code (FileFindFirst(), FileFindNext(), etc.)
+		- move the Microsoft-specific defines into a seperate header
+		- get proper libxml2 DLL to get Visual Studio working
+		- specify different output/object folders for the different executables in Visual Studio 2010 project files
+		
+	local SVN
+		- tag releases in the future
+		- add trunk/tags/branches structure
 
 	create_report:
 		- write comparison tool
@@ -171,6 +174,9 @@ mame_regtest
 			- allow multiple ones
 		- support multiple input folders
 			- support subfolders
+			
+	create_image_xml
+		- add more output to create_image_xml
 
 	Known Issues:
 		- not everything is properly encoded by xmlEncodeEntitiesReentrant()
