@@ -78,6 +78,11 @@ mame_regtest returncodes:
 
 #define VERSION "0.70"
 
+enum cfg_type {
+	CFG_DIP 	= 1,
+	CFG_CONF 	= 2
+};
+
 struct dipvalue_info {
 	xmlChar* name;
 	unsigned int value;
@@ -931,12 +936,12 @@ static int create_cfg(struct driver_entry* de, int type)
 	struct dipvalue_info* inp_value = NULL;
 	const char* type_str = NULL;
 	
-	if( type == 1 ) {
+	if( type == CFG_DIP ) {
 		inp_name = de->dipswitch;
 		inp_value = de->dipvalue;
 		type_str = "DIPSWITCH";
 	}
-	else if ( type == 2 ) {
+	else if ( type == CFG_CONF ) {
 		inp_name = de->configuration;
 		inp_value = de->confsetting;
 		type_str = "CONFIG";
@@ -1505,6 +1510,89 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 	} while(res == 1);
 }
 
+static void parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_info** new_driv_inf, int type)
+{
+	struct dipswitch_info* last_dip_info = NULL;
+	const xmlChar* cfg_xml_type_1 = NULL;
+	const xmlChar* cfg_xml_type_2 = NULL;
+	
+	if( type == CFG_DIP ) {
+		cfg_xml_type_1 = (const xmlChar*)"dipswitch";
+		cfg_xml_type_2 = (const xmlChar*)"dipvalue";
+	}
+	else if( type == CFG_CONF ) {
+		cfg_xml_type_1 = (const xmlChar*)"configuration";
+		cfg_xml_type_2 = (const xmlChar*)"confsetting";
+	}
+	
+	if( xmlStrcmp(game_children->name, cfg_xml_type_1) == 0 ) {
+		xmlChar* dip_name = xmlGetProp(game_children, (const xmlChar*)"name");
+		xmlChar* dip_tag = xmlGetProp(game_children, (const xmlChar*)"tag");
+		xmlChar* dip_mask = xmlGetProp(game_children, (const xmlChar*)"mask");
+
+		struct dipswitch_info* new_dip_info = (struct dipswitch_info*)malloc(sizeof(struct dipswitch_info));
+		/* TODO: check allocation */
+		memset(new_dip_info, 0x00, sizeof(struct dipswitch_info));
+		
+		if( dip_name ) new_dip_info->name = dip_name;
+		if( dip_tag ) new_dip_info->tag = dip_tag;
+		if( dip_mask ) new_dip_info->mask = atoi((const char*)dip_mask);
+
+		struct dipvalue_info* last_dipvalue = NULL;
+
+		xmlNodePtr dipswitch_children = game_children->children;					
+		while( dipswitch_children != NULL ) {
+			if( xmlStrcmp(dipswitch_children->name, cfg_xml_type_2) == 0 ) {
+				xmlChar* dipvalue_default = xmlGetProp(dipswitch_children, (const xmlChar*)"default");
+				if( dipvalue_default ) {
+					if( xmlStrcmp(dipvalue_default, (const xmlChar*)"yes") == 0 ) {
+						xmlChar* dipvalue_value = xmlGetProp(dipswitch_children, (const xmlChar*)"value");
+						if( dipvalue_value ) new_dip_info->defvalue = atoi((const char*)dipvalue_value);
+						xmlFree(dipvalue_value);
+					}
+					else
+					{
+						xmlChar* dipvalue_name = xmlGetProp(dipswitch_children, (const xmlChar*)"name");
+						xmlChar* dipvalue_value = xmlGetProp(dipswitch_children, (const xmlChar*)"value");
+
+						struct dipvalue_info* new_dipvalue = (struct dipvalue_info*)malloc(sizeof(struct dipvalue_info));
+						/* TODO: check allocation */
+						memset(new_dipvalue, 0x00, sizeof(struct dipvalue_info));
+
+						if( dipvalue_name ) new_dipvalue->name = dipvalue_name;
+						if( dipvalue_value ) new_dipvalue->value = atoi((const char*)dipvalue_value);
+						
+						if( new_dip_info->values == NULL )
+							new_dip_info->values = new_dipvalue;
+						
+						if( last_dipvalue )
+							last_dipvalue->next = new_dipvalue;
+						last_dipvalue = new_dipvalue;
+					}
+					
+					xmlFree(dipvalue_default);
+				}
+			}
+			
+			dipswitch_children = dipswitch_children->next;
+		}
+		
+		if( type == CFG_DIP ) {
+			if( (*new_driv_inf)->dipswitches == NULL)
+				(*new_driv_inf)->dipswitches = new_dip_info;
+		}
+		else if( type == CFG_CONF )
+		{
+			if( (*new_driv_inf)->configurations == NULL)
+				(*new_driv_inf)->configurations = new_dip_info;
+		}
+		
+		if( last_dip_info )
+			last_dip_info->next = new_dip_info;
+		last_dip_info = new_dip_info;
+	}
+}
+
 static void parse_listxml_element(const xmlNodePtr game_child, struct driver_info** new_driv_inf)
 {
 	/* "game" in MAME and "machine" in MESS */
@@ -1556,9 +1644,6 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 
 		(*new_driv_inf)->name = xmlGetProp(game_child, (const xmlChar*)"name");
 		(*new_driv_inf)->sourcefile = sourcefile;
-
-		struct dipswitch_info* last_dip_info = NULL;
-		struct dipswitch_info* last_conf_info = NULL;
 
 		xmlNodePtr game_children = game_child->children;
 
@@ -1612,129 +1697,11 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 				}
 			}
 			
-			if( config_use_dipswitches ) {
-				if( xmlStrcmp(game_children->name, (const xmlChar*)"dipswitch") == 0 ) {
-					xmlChar* dip_name = xmlGetProp(game_children, (const xmlChar*)"name");
-					xmlChar* dip_tag = xmlGetProp(game_children, (const xmlChar*)"tag");
-					xmlChar* dip_mask = xmlGetProp(game_children, (const xmlChar*)"mask");
+			if( config_use_dipswitches )
+				parse_listxml_element_cfg(game_children, new_driv_inf, CFG_DIP);
 
-					struct dipswitch_info* new_dip_info = (struct dipswitch_info*)malloc(sizeof(struct dipswitch_info));
-					/* TODO: check allocation */
-					memset(new_dip_info, 0x00, sizeof(struct dipswitch_info));
-					
-					if( dip_name ) new_dip_info->name = dip_name;
-					if( dip_tag ) new_dip_info->tag = dip_tag;
-					if( dip_mask ) new_dip_info->mask = atoi((const char*)dip_mask);
-
-					struct dipvalue_info* last_dipvalue = NULL;
-
-					xmlNodePtr dipswitch_children = game_children->children;					
-					while( dipswitch_children != NULL ) {
-						if( xmlStrcmp(dipswitch_children->name, (const xmlChar*)"dipvalue") == 0 ) {
-							xmlChar* dipvalue_default = xmlGetProp(dipswitch_children, (const xmlChar*)"default");
-							if( dipvalue_default ) {
-								if( xmlStrcmp(dipvalue_default, (const xmlChar*)"yes") == 0 ) {
-									xmlChar* dipvalue_value = xmlGetProp(dipswitch_children, (const xmlChar*)"value");
-									if( dipvalue_value ) new_dip_info->defvalue = atoi((const char*)dipvalue_value);
-									xmlFree(dipvalue_value);
-								}
-								else
-								{
-									xmlChar* dipvalue_name = xmlGetProp(dipswitch_children, (const xmlChar*)"name");
-									xmlChar* dipvalue_value = xmlGetProp(dipswitch_children, (const xmlChar*)"value");
-
-									struct dipvalue_info* new_dipvalue = (struct dipvalue_info*)malloc(sizeof(struct dipvalue_info));
-									/* TODO: check allocation */
-									memset(new_dipvalue, 0x00, sizeof(struct dipvalue_info));
-
-									if( dipvalue_name ) new_dipvalue->name = dipvalue_name;
-									if( dipvalue_value ) new_dipvalue->value = atoi((const char*)dipvalue_value);
-									
-									if( new_dip_info->values == NULL )
-										new_dip_info->values = new_dipvalue;
-									
-									if( last_dipvalue )
-										last_dipvalue->next = new_dipvalue;
-									last_dipvalue = new_dipvalue;
-								}
-								
-								xmlFree(dipvalue_default);
-							}
-						}
-						
-						dipswitch_children = dipswitch_children->next;
-					}
-					
-					if( (*new_driv_inf)->dipswitches == NULL)
-						(*new_driv_inf)->dipswitches = new_dip_info;
-					
-					if( last_dip_info )
-						last_dip_info->next = new_dip_info;
-					last_dip_info = new_dip_info;
-				}
-			}
-
-			if( config_use_configurations ) {
-				if( xmlStrcmp(game_children->name, (const xmlChar*)"configuration") == 0 ) {
-					xmlChar* conf_name = xmlGetProp(game_children, (const xmlChar*)"name");
-					xmlChar* conf_tag = xmlGetProp(game_children, (const xmlChar*)"tag");
-					xmlChar* conf_mask = xmlGetProp(game_children, (const xmlChar*)"mask");
-
-					struct dipswitch_info* new_conf_info = (struct dipswitch_info*)malloc(sizeof(struct dipswitch_info));
-					/* TODO: check allocation */
-					memset(new_conf_info, 0x00, sizeof(struct dipswitch_info));
-					
-					if( conf_name ) new_conf_info->name = conf_name;
-					if( conf_tag ) new_conf_info->tag = conf_tag;
-					if( conf_mask ) new_conf_info->mask = atoi((const char*)conf_mask);
-
-					struct dipvalue_info* last_confsetting = NULL;
-
-					xmlNodePtr configuration_children = game_children->children;					
-					while( configuration_children != NULL ) {
-						if( xmlStrcmp(configuration_children->name, (const xmlChar*)"confsetting") == 0 ) {
-							xmlChar* confsetting_default = xmlGetProp(configuration_children, (const xmlChar*)"default");
-							if( confsetting_default ) {
-								if( xmlStrcmp(confsetting_default, (const xmlChar*)"yes") == 0 ) {
-									xmlChar* confsetting_value = xmlGetProp(configuration_children, (const xmlChar*)"value");
-									if( confsetting_value ) new_conf_info->defvalue = atoi((const char*)confsetting_value);
-									xmlFree(confsetting_value);
-								}
-								else
-								{
-									xmlChar* confsetting_name = xmlGetProp(configuration_children, (const xmlChar*)"name");
-									xmlChar* confsetting_value = xmlGetProp(configuration_children, (const xmlChar*)"value");
-
-									struct dipvalue_info* new_confsetting = (struct dipvalue_info*)malloc(sizeof(struct dipvalue_info));
-									/* TODO: check allocation */
-									memset(new_confsetting, 0x00, sizeof(struct dipvalue_info));
-
-									if( confsetting_name ) new_confsetting->name = confsetting_name;
-									if( confsetting_value ) new_confsetting->value = atoi((const char*)confsetting_value);
-									
-									if( new_conf_info->values == NULL )
-										new_conf_info->values = new_confsetting;
-									
-									if( last_confsetting )
-										last_confsetting->next = new_confsetting;
-									last_confsetting = new_confsetting;
-								}
-								
-								xmlFree(confsetting_default);
-							}
-						}
-						
-						configuration_children = configuration_children->next;
-					}
-					
-					if( (*new_driv_inf)->configurations == NULL)
-						(*new_driv_inf)->configurations = new_conf_info;
-					
-					if( last_conf_info )
-						last_conf_info->next = new_conf_info;
-					last_conf_info = new_conf_info;
-				}
-			}
+			if( config_use_configurations )
+				parse_listxml_element_cfg(game_children, new_driv_inf, CFG_CONF);
 
 			if( (app_type == APP_MESS) ) {
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"device") == 0 ) {

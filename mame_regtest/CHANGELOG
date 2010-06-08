@@ -468,3 +468,5 @@
 	- do not process any entries when "xpath_expr" is invalid
 	- added a few more XPath error messages
 	- fixed memory leak in create_cfg() when creating a .cfg file
+	- merged redundant dipswitch/configuration parsing code into parse_listxml_element_cfg()
+	- added enum cfg_type for .cfg entry type parameter
