@@ -76,7 +76,7 @@ mame_regtest returncodes:
 #include "common.h"
 #include "config.h"
 
-#define VERSION "0.69"
+#define VERSION "0.70"
 
 struct dipvalue_info {
 	xmlChar* name;
