@@ -467,3 +467,4 @@
 	- fixed return value of create_cfg() in case of success
 	- do not process any entries when "xpath_expr" is invalid
 	- added a few more XPath error messages
+	- fixed memory leak in create_cfg() when creating a .cfg file

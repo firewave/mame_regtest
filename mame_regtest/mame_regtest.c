@@ -926,6 +926,7 @@ static int create_cfg(struct driver_entry* de, int type)
 	</mameconfig>
 	*/
 	
+	int res = 0;
 	struct dipswitch_info* inp_name = NULL;
 	struct dipvalue_info* inp_value = NULL;
 	const char* type_str = NULL;
@@ -942,7 +943,7 @@ static int create_cfg(struct driver_entry* de, int type)
 	}
 	
 	if( !inp_name || !inp_value )
-		return 0;
+		return res;
 	
 	char* cfgfile = NULL;
 	append_string(&cfgfile, dummy_root);
@@ -979,18 +980,23 @@ static int create_cfg(struct driver_entry* de, int type)
 		xmlNewProp(port_node, (const xmlChar*)"defvalue", (const xmlChar*)tmp);
 		itoa(inp_value->value, tmp, 10);
 		xmlNewProp(port_node, (const xmlChar*)"value", (const xmlChar*)tmp);
+		
+		res = 1;
 	}
 	else {
 		printf("unknown 'mameconfig' version\n");
-		return 0;
 	}
+
+	if( res == 1 )	
+		xmlSaveFormatFileEnc(cfgfile, cfg_doc, "UTF-8", 1);
 	
-	xmlSaveFormatFileEnc(cfgfile, cfg_doc, "UTF-8", 1);
+	xmlFreeDoc(cfg_doc);
+	cfg_doc = NULL;
 
 	free(cfgfile);
 	cfgfile = NULL;
 
-	return 1;
+	return res;
 }
 
 static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
