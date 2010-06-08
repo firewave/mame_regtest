@@ -460,3 +460,8 @@
 	- added support for configurations
 	- added hard-coded reporting of "called within reset scope by" for now
 	- fixed formating of output when no stderr exists
+
+0.70
+	- read "mameconfig" version from listxml when available
+	- report error in case of unsupported "mameconfig" version
+	- fixed return value of create_cfg() in case of success

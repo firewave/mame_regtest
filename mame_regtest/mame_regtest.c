@@ -980,19 +980,17 @@ static int create_cfg(struct driver_entry* de, int type)
 		itoa(inp_value->value, tmp, 10);
 		xmlNewProp(port_node, (const xmlChar*)"value", (const xmlChar*)tmp);
 	}
-	/*
 	else {
 		printf("unknown 'mameconfig' version\n");
-		return 1;
+		return 0;
 	}
-	*/
 	
 	xmlSaveFormatFileEnc(cfgfile, cfg_doc, "UTF-8", 1);
 
 	free(cfgfile);
 	cfgfile = NULL;
 
-	return 0;
+	return 1;
 }
 
 static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
@@ -1788,6 +1786,11 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 				if( app_ver )
 					printf("build: %s%s\n", app_ver, is_debug ? " (debug)" : "");
 
+				xmlChar* mameconfig_attr = xmlGetProp(root, (const xmlChar*)"mameconfig");
+				if( mameconfig_attr )
+					mameconfig_ver = atoi((const char*)mameconfig_attr);
+				xmlFree(mameconfig_attr);
+				mameconfig_attr = NULL;
 
 				if( config_xpath_expr && (strlen(config_xpath_expr) > 0) ) {
 					xpathCtx = xmlXPathNewContext(doc);
