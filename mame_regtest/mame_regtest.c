@@ -40,6 +40,7 @@ mame_regtest returncodes:
 #ifdef _MSC_VER
 #include <direct.h>
 #include <io.h>
+#include <process.h>
 #if _MSC_VER >= 1400
 #undef access
 #define access _access
@@ -57,6 +58,8 @@ mame_regtest returncodes:
 #define getcwd _getcwd
 #undef putenv
 #define putenv _putenv
+#undef getpid
+#define getpid _getpid
 #endif
 #define F_OK 00
 #endif
@@ -1912,11 +1915,8 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-#ifndef _MSC_VER
 	itoa(getpid(), pid_str, 10);
-#else
-	// TODO
-#endif
+
 	printf("\n");
 	printf("process: %s\n", pid_str);
 

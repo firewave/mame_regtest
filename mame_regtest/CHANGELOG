@@ -472,3 +472,4 @@
 	- added enum cfg_type for .cfg entry type parameter
 	- added option "use_softwarelist" to control usage of software lists
 	- renamed the output file postfix for device file entries from "dev" to "sfw" (software)
+	- made process ID code working with Visual Studio
