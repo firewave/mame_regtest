@@ -1355,7 +1355,7 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 						struct image_entry* images = NULL;
 						read_image_entries(device_node, &images);
 
-						snprintf(de->postfix, sizeof(de->postfix), "%sdev%05d", initial_postfix, j);
+						snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05d", initial_postfix, j);
 
 						de->images = images;
 
@@ -1507,11 +1507,10 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 		
 		if( config_use_softwarelist && config_hashpath_folder && actual_driv_inf->has_softlist ) {
 			char* driver_softlist = NULL;
-			char* mame_call = NULL;
-	
 			append_string(&driver_softlist, (const char*)actual_driv_inf->name);
 			append_string(&driver_softlist, "_listsoftware");
 					
+			char* mame_call = NULL;					
 			get_executable(&mame_call, NULL, driver_softlist);
 			append_string(&mame_call, " -hashpath ");
 			append_string(&mame_call, config_hashpath_folder);
