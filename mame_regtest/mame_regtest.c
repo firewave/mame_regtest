@@ -1155,36 +1155,35 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 				xmlFree(actual_driv_inf->devices[i]);
 			}
 		}
-		if( actual_driv_inf->dipswitches ) {
-			struct dipswitch_info* dipswitch = actual_driv_inf->dipswitches;
-			while( dipswitch != NULL ) {
-				struct dipvalue_info* dipvalue = dipswitch->values;
-				while( dipvalue != NULL ) {
-					struct dipvalue_info* next_dipvalue = dipvalue->next;
-					free(dipvalue);
-					dipvalue = next_dipvalue;
-				};
-				
-				struct dipswitch_info* next_dipswitch = dipswitch->next;
-				free(dipswitch);				
-				dipswitch = next_dipswitch;
+
+		struct dipswitch_info* dipswitch = actual_driv_inf->dipswitches;
+		while( dipswitch != NULL ) {
+			struct dipvalue_info* dipvalue = dipswitch->values;
+			while( dipvalue != NULL ) {
+				struct dipvalue_info* next_dipvalue = dipvalue->next;
+				free(dipvalue);
+				dipvalue = next_dipvalue;
 			};
-		}
-		if( actual_driv_inf->configurations ) {
-			struct dipswitch_info* configuration = actual_driv_inf->configurations;
-			while( configuration != NULL ) {
-				struct dipvalue_info* confsetting = configuration->values;
-				while( confsetting != NULL ) {
-					struct dipvalue_info* next_confsetting = confsetting->next;
-					free(confsetting);
-					confsetting = next_confsetting;
-				};
-				
-				struct dipswitch_info* next_configuration = configuration->next;
-				free(configuration);				
-				configuration = next_configuration;
+			
+			struct dipswitch_info* next_dipswitch = dipswitch->next;
+			free(dipswitch);				
+			dipswitch = next_dipswitch;
+		};
+
+		struct dipswitch_info* configuration = actual_driv_inf->configurations;
+		while( configuration != NULL ) {
+			struct dipvalue_info* confsetting = configuration->values;
+			while( confsetting != NULL ) {
+				struct dipvalue_info* next_confsetting = confsetting->next;
+				free(confsetting);
+				confsetting = next_confsetting;
 			};
-		}
+			
+			struct dipswitch_info* next_configuration = configuration->next;
+			free(configuration);				
+			configuration = next_configuration;
+		};
+
 		if( actual_driv_inf->next ) {
 			struct driver_info* tmp_driv_inf = actual_driv_inf;
 			actual_driv_inf = actual_driv_inf->next;
