@@ -113,6 +113,7 @@ struct driver_info {
 	int device_mandatory;
 	struct dipswitch_info* dipswitches;
 	struct dipswitch_info* configurations;
+	int has_softlist;
 	struct driver_info* next;
 };
 
@@ -214,6 +215,7 @@ static int config_write_wav = 0;
 static int config_use_dipswitches = 0;
 static int config_use_configurations = 0;
 static char* config_hashpath_folder = NULL;
+static int config_use_softwarelist = 0;
 
 struct config_entry mrt_config[] =
 {
@@ -258,6 +260,7 @@ struct config_entry mrt_config[] =
 	{ "use_dipswitches",		CFG_INT,		&config_use_dipswitches },
 	{ "use_configurations",		CFG_INT,		&config_use_configurations },
 	{ "hashpath",				CFG_STR_PTR,	&config_hashpath_folder },
+	{ "use_softwarelist",		CFG_INT,		&config_use_softwarelist },
 	{ NULL,						CFG_UNK,		NULL }
 };
 
@@ -1502,6 +1505,36 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				}
 			}
 		}
+		
+		if( config_use_softwarelist && config_hashpath_folder && actual_driv_inf->has_softlist ) {
+			char* driver_softlist = NULL;
+			char* mame_call = NULL;
+	
+			append_string(&driver_softlist, (const char*)actual_driv_inf->name);
+			append_string(&driver_softlist, "_listsoftware");
+					
+			get_executable(&mame_call, NULL, driver_softlist);
+			append_string(&mame_call, " -hashpath ");
+			append_string(&mame_call, config_hashpath_folder);
+			append_string(&mame_call, " ");
+			append_string(&mame_call, (const char*)actual_driv_inf->name);
+			append_string(&mame_call, " -listsoftware > ");
+			append_string(&mame_call, config_output_folder);
+			append_string(&mame_call, FILESLASH);
+			append_string(&mame_call, driver_softlist);
+			append_string(&mame_call, ".xml");
+	
+			if( config_verbose )
+				printf("%s\n", mame_call);
+	
+			system(mame_call);
+			
+			free(mame_call);
+			mame_call = NULL;
+	
+			free(driver_softlist);
+			driver_softlist = NULL;
+		}
 
 		if( actual_driv_inf->next )
 			actual_driv_inf = actual_driv_inf->next;
@@ -1723,6 +1756,9 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 						dev_childs = dev_childs->next;
 					}
 				}
+				
+				if( xmlStrcmp(game_children->name, (const xmlChar*)"softwarelist") == 0 )
+					(*new_driv_inf)->has_softlist = 1;
 			}
 
 			game_children = game_children->next;
@@ -2072,6 +2108,7 @@ int main(int argc, char *argv[])
 		printf("use_configurations: %d\n", config_use_configurations);
 		if( config_hashpath_folder && (strlen(config_hashpath_folder) > 0) )
 			printf("using hashpath folder: %s\n", config_hashpath_folder);
+		printf("use_softwarelist: %d\n", config_use_softwarelist);
 
 		printf("hack_ftr: %d\n", config_hack_ftr);
 		printf("hack_biospath: %d\n", config_hack_biospath);
