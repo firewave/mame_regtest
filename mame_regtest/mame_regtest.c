@@ -1379,56 +1379,9 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 		if( res == 0 )
 			return res;
 	}
-
-	if( config_use_devices && actual_driv_inf->devices ) {
-		char* device_file = NULL;
-		if( config_global_device_file && (strlen(config_global_device_file) > 0) )
-			append_string(&device_file, config_global_device_file);
-		else {
-			append_string(&device_file, "mrt_");
-			append_string(&device_file, (const char*)actual_driv_inf->name);
-			append_string(&device_file, ".xml");
-		}
-		if( access(device_file, F_OK) == 0 ) {
-			printf("found device file: %s\n", device_file);
-
-			xmlDocPtr device_doc = xmlReadFile(device_file, NULL, 0);
-			if( device_doc ) {
-				int j = 0;
-
-				char initial_postfix[1024];
-				snprintf(initial_postfix, sizeof(initial_postfix), "%s", de->postfix);
-
-				xmlNodePtr device_root = xmlDocGetRootElement(device_doc);
-				xmlNodePtr device_node = device_root->children;
-				while( device_node ) {
-					if( device_node->type == XML_ELEMENT_NODE ) {
-						struct image_entry* images = NULL;
-						read_image_entries(device_node, &images);
-
-						snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05d", initial_postfix, j);
-
-						de->images = images;
-
-						res = execute_mame2(de);
-
-						free_image_entries(images);
-						de->images = NULL;
-						++j;
-					}
-
-					device_node = device_node->next;
-				}
-
-				xmlFreeDoc(device_doc);
-				device_doc = NULL;
-			}
-		}
-
-		free(device_file);
-		device_file = NULL;
-	}
 	
+	int software_count = 0;
+
 	/* process softlist output */
 	if( config_use_softwarelist && config_hashpath_folder && actual_driv_inf->has_softlist ) {
 		char* driver_softlist_file = NULL;
@@ -1458,7 +1411,7 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 							struct image_entry* images = NULL;
 							read_softlist_entry(xpathObj->nodesetval->nodeTab[i], &images, actual_driv_inf);
 	
-							snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05d", initial_postfix, i);
+							snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05d", initial_postfix, software_count);
 	
 							de->images = images;
 	
@@ -1466,6 +1419,10 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 	
 							free_image_entries(images);
 							de->images = NULL;
+							
+							snprintf(de->postfix, sizeof(de->postfix), "%s", initial_postfix);
+							
+							software_count++;
 						}
 					}
 
@@ -1490,6 +1447,56 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 
 		free(driver_softlist_file);
 		driver_softlist_file = NULL;
+	}
+
+	if( config_use_devices && actual_driv_inf->devices ) {
+		char* device_file = NULL;
+		if( config_global_device_file && (strlen(config_global_device_file) > 0) )
+			append_string(&device_file, config_global_device_file);
+		else {
+			append_string(&device_file, "mrt_");
+			append_string(&device_file, (const char*)actual_driv_inf->name);
+			append_string(&device_file, ".xml");
+		}
+		if( access(device_file, F_OK) == 0 ) {
+			printf("found device file: %s\n", device_file);
+
+			xmlDocPtr device_doc = xmlReadFile(device_file, NULL, 0);
+			if( device_doc ) {
+				char initial_postfix[1024];
+				snprintf(initial_postfix, sizeof(initial_postfix), "%s", de->postfix);
+
+				xmlNodePtr device_root = xmlDocGetRootElement(device_doc);
+				xmlNodePtr device_node = device_root->children;
+				while( device_node ) {
+					if( device_node->type == XML_ELEMENT_NODE ) {
+						struct image_entry* images = NULL;
+						read_image_entries(device_node, &images);
+
+						snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05d", initial_postfix, software_count);
+
+						de->images = images;
+
+						res = execute_mame2(de);
+
+						free_image_entries(images);
+						de->images = NULL;
+						
+						snprintf(de->postfix, sizeof(de->postfix), "%s", initial_postfix);
+						
+						software_count++;
+					}
+
+					device_node = device_node->next;
+				}
+
+				xmlFreeDoc(device_doc);
+				device_doc = NULL;
+			}
+		}
+
+		free(device_file);
+		device_file = NULL;
 	}
 
 	return res;
