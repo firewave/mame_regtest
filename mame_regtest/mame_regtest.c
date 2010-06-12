@@ -81,6 +81,14 @@ mame_regtest returncodes:
 
 #define VERSION "0.70"
 
+struct device_info {
+	xmlChar* name;
+	xmlChar* briefname;	
+	xmlChar* interface;
+	int mandatory;
+	struct device_info* next;
+};
+
 enum cfg_type {
 	CFG_DIP 	= 1,
 	CFG_CONF 	= 2
@@ -111,8 +119,7 @@ struct driver_info {
 	int bios_count;
 	xmlChar* bioses[32];
 	int bios_default;
-	int device_count;
-	xmlChar* devices[32];
+	struct device_info* devices;
 	int device_mandatory;
 	struct dipswitch_info* dipswitches;
 	struct dipswitch_info* configurations;
@@ -678,7 +685,7 @@ static int read_image_entries(const xmlNodePtr node, struct image_entry** images
 		if( !image )
 			return 0;
 
-		memset(image, 0, sizeof(struct image_entry));
+		memset(image, 0x00, sizeof(struct image_entry));
 
 		image->device_type = attrs->name;
 		xmlNodePtr value = attrs->children;
@@ -1148,15 +1155,18 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 			xmlFree(actual_driv_inf->sourcefile);
 		if( actual_driv_inf->bios_count ) {
 			int i = 0;
-			for( ; i < actual_driv_inf->bios_count; ++i ) {
+			for( ; i < actual_driv_inf->bios_count; ++i )
 				xmlFree(actual_driv_inf->bioses[i]);
-			}
 		}
-		if( actual_driv_inf->device_count ) {
-			int i = 0;
-			for( ; i < actual_driv_inf->device_count; ++i ) {
-				xmlFree(actual_driv_inf->devices[i]);
-			}
+
+		struct device_info* devices = actual_driv_inf->devices;
+		while( devices != NULL ) {
+			struct device_info* next_device = devices->next;
+			xmlFree(devices->name);
+			xmlFree(devices->briefname);
+			xmlFree(devices->interface);
+			free(devices);
+			devices = next_device;
 		}
 
 		struct dipswitch_info* dipswitch = actual_driv_inf->dipswitches;
@@ -1332,7 +1342,7 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 			return res;
 	}
 
-	if( config_use_devices && actual_driv_inf->device_count ) {
+	if( config_use_devices && actual_driv_inf->devices ) {
 		char* device_file = NULL;
 		if( config_global_device_file && (strlen(config_global_device_file) > 0) )
 			append_string(&device_file, config_global_device_file);
@@ -1674,10 +1684,12 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 			printf("could not allocate driver_info\n");
 			return;
 		}
-		memset(*new_driv_inf, 0, sizeof(struct driver_info));
+		memset(*new_driv_inf, 0x00, sizeof(struct driver_info));
 
 		(*new_driv_inf)->name = xmlGetProp(game_child, (const xmlChar*)"name");
 		(*new_driv_inf)->sourcefile = sourcefile;
+		
+		struct device_info* last_dev_info = NULL;
 
 		xmlNodePtr game_children = game_child->children;
 
@@ -1739,23 +1751,42 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 
 			if( (app_type == APP_MESS) ) {
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"device") == 0 ) {
+					struct device_info* new_dev_info = (struct device_info*)malloc(sizeof(struct device_info));
+					/* TODO: check allocation */
+					memset(new_dev_info, 0x00, sizeof(struct device_info));
+
 					xmlChar* dev_man = xmlGetProp(game_children, (const xmlChar*)"mandatory");
 					if( dev_man ) {
 						(*new_driv_inf)->device_mandatory = 1;
+						new_dev_info->mandatory = 1;
 						xmlFree(dev_man);
 					}
+
+					xmlChar* dev_intf = xmlGetProp(game_children, (const xmlChar*)"interface");
+					if( dev_intf )
+						new_dev_info->interface = dev_intf;
 
 					xmlNodePtr dev_childs = game_children->children;
 					while( dev_childs != NULL ) {
 						if( xmlStrcmp(dev_childs->name, (const xmlChar*)"instance") == 0 ) {
+							xmlChar* dev_name = xmlGetProp(dev_childs, (const xmlChar*)"name");
+							if( dev_name )
+								new_dev_info->name = dev_name;
+
 							xmlChar* dev_brief = xmlGetProp(dev_childs, (const xmlChar*)"briefname");
-							if( dev_brief ) {
-								(*new_driv_inf)->devices[(*new_driv_inf)->device_count++] = dev_brief;
-							}
+							if( dev_brief )
+								new_dev_info->briefname = dev_brief;
 						}
 
 						dev_childs = dev_childs->next;
 					}
+					
+					if( (*new_driv_inf)->devices == NULL )
+						(*new_driv_inf)->devices = new_dev_info;
+					
+					if( last_dev_info )
+						last_dev_info->next = new_dev_info;
+					last_dev_info = new_dev_info;
 				}
 				
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"softwarelist") == 0 )
