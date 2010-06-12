@@ -130,6 +130,7 @@ struct driver_info {
 struct image_entry {
 	const xmlChar* device_type;
 	const xmlChar* device_file;
+	const xmlChar* device_interface;
 	struct image_entry* next;
 };
 
@@ -703,6 +704,43 @@ static int read_image_entries(const xmlNodePtr node, struct image_entry** images
 
 		attrs = attrs->next;
 	}
+	
+	return 1;
+}
+
+/* reads data from a "software" element node */
+static int read_softlist_entry(const xmlNodePtr node, struct image_entry** images, struct driver_info* driv_inf)
+{
+	*images = NULL;
+	
+	struct image_entry* image = (struct image_entry*)malloc(sizeof(struct image_entry));
+	if( !image )
+		return 0;
+	
+	memset(image, 0x00, sizeof(struct image_entry));
+	
+	image->device_file = xmlGetProp(node, (const xmlChar*)"name");
+	
+	xmlNodePtr soft_child = node->children;
+	while( soft_child ) {
+		if( soft_child->type == XML_ELEMENT_NODE ) {
+			if( xmlStrcmp(soft_child->name, (const xmlChar*)"part") == 0 )
+				image->device_interface = xmlGetProp(soft_child, (const xmlChar*)"interface");
+		}
+		
+		soft_child = soft_child->next;
+	}
+	
+	/* TODO: move this somewhere else? */
+	struct device_info* dev_info = driv_inf->devices;
+	while(dev_info) {
+		if( xmlStrcmp(dev_info->interface, image->device_interface) == 0 )
+			image->device_type = xmlStrdup(dev_info->briefname);
+			
+		dev_info = dev_info->next;
+	}
+	
+	*images = image;
 	
 	return 1;
 }
@@ -1390,6 +1428,69 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 		free(device_file);
 		device_file = NULL;
 	}
+	
+	/* process softlist output */
+	if( config_use_softwarelist && config_hashpath_folder && actual_driv_inf->has_softlist ) {
+		char* driver_softlist_file = NULL;
+		append_string(&driver_softlist_file, config_output_folder);
+		append_string(&driver_softlist_file, FILESLASH);
+		append_string(&driver_softlist_file, (const char*)actual_driv_inf->name);
+		append_string(&driver_softlist_file, "_listsoftware");
+		append_string(&driver_softlist_file, ".xml");
+	
+		/* process softlist entries */
+		xmlDocPtr soft_doc = xmlReadFile(driver_softlist_file, NULL, 0);
+		if( soft_doc ) {
+			xmlXPathContextPtr xpathCtx = xmlXPathNewContext(soft_doc);
+			if( xpathCtx ) {
+				xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression((const xmlChar*)"/softwarelists/softwarelist/software", xpathCtx);
+				if( xpathObj ) {
+					if( xpathObj->nodesetval )
+					{
+						printf("XPath found %d nodes (software list)\n", xpathObj->nodesetval->nodeNr);
+
+						char initial_postfix[1024];
+						snprintf(initial_postfix, sizeof(initial_postfix), "%s", de->postfix);
+
+						int i = 0;
+						for( ; i < xpathObj->nodesetval->nodeNr; ++i )
+						{
+							struct image_entry* images = NULL;
+							read_softlist_entry(xpathObj->nodesetval->nodeTab[i], &images, actual_driv_inf);
+	
+							snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05d", initial_postfix, i);
+	
+							de->images = images;
+	
+							res = execute_mame2(de);
+	
+							free_image_entries(images);
+							de->images = NULL;
+						}
+					}
+
+					xmlXPathFreeObject(xpathObj);
+				}
+				else {
+					printf("could not evaluate XPath expression\n");
+				}
+
+				xmlXPathFreeContext(xpathCtx);
+			}
+			else {
+				printf("could not create XPath context\n");
+			}
+			
+			xmlFreeDoc(soft_doc);
+			soft_doc = NULL;
+		}
+		else {
+			printf("could not read '%s'\n", driver_softlist_file);
+		}
+
+		free(driver_softlist_file);
+		driver_softlist_file = NULL;
+	}
 
 	return res;
 }
@@ -1408,6 +1509,36 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 		de.sourcefile = (const char*)actual_driv_inf->sourcefile;
 		de.autosave = actual_driv_inf->savestate;
 		de.device_mandatory = actual_driv_inf->device_mandatory;
+
+		/* create softlist output */
+		if( config_use_softwarelist && config_hashpath_folder && actual_driv_inf->has_softlist ) {
+			char* driver_softlist = NULL;
+			append_string(&driver_softlist, (const char*)actual_driv_inf->name);
+			append_string(&driver_softlist, "_listsoftware");
+					
+			char* mame_call = NULL;					
+			get_executable(&mame_call, NULL, driver_softlist);
+			append_string(&mame_call, " -hashpath ");
+			append_string(&mame_call, config_hashpath_folder);
+			append_string(&mame_call, " ");
+			append_string(&mame_call, (const char*)actual_driv_inf->name);
+			append_string(&mame_call, " -listsoftware > ");
+			append_string(&mame_call, config_output_folder);
+			append_string(&mame_call, FILESLASH);
+			append_string(&mame_call, driver_softlist);
+			append_string(&mame_call, ".xml");
+	
+			if( config_verbose )
+				printf("%s\n", mame_call);
+	
+			system(mame_call);
+			
+			free(mame_call);
+			mame_call = NULL;
+	
+			free(driver_softlist);
+			driver_softlist = NULL;
+		}
 
 		/* only run with the default options when no additional bioses or ramsizes are available to avoid duplicate runs */
 		if( actual_driv_inf->bios_count <= 1 &&
@@ -1518,35 +1649,6 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 			}
 		}
 		
-		if( config_use_softwarelist && config_hashpath_folder && actual_driv_inf->has_softlist ) {
-			char* driver_softlist = NULL;
-			append_string(&driver_softlist, (const char*)actual_driv_inf->name);
-			append_string(&driver_softlist, "_listsoftware");
-					
-			char* mame_call = NULL;					
-			get_executable(&mame_call, NULL, driver_softlist);
-			append_string(&mame_call, " -hashpath ");
-			append_string(&mame_call, config_hashpath_folder);
-			append_string(&mame_call, " ");
-			append_string(&mame_call, (const char*)actual_driv_inf->name);
-			append_string(&mame_call, " -listsoftware > ");
-			append_string(&mame_call, config_output_folder);
-			append_string(&mame_call, FILESLASH);
-			append_string(&mame_call, driver_softlist);
-			append_string(&mame_call, ".xml");
-	
-			if( config_verbose )
-				printf("%s\n", mame_call);
-	
-			system(mame_call);
-			
-			free(mame_call);
-			mame_call = NULL;
-	
-			free(driver_softlist);
-			driver_softlist = NULL;
-		}
-
 		if( actual_driv_inf->next )
 			actual_driv_inf = actual_driv_inf->next;
 		else
@@ -1836,13 +1938,13 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 						char* real_xpath_expr = NULL;
 						convert_xpath_expr(&real_xpath_expr);
 						
-						printf("using xpath expression: %s\n", real_xpath_expr);
+						printf("using XPath expression: %s\n", real_xpath_expr);
 
 						xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression((const xmlChar*)real_xpath_expr, xpathCtx);
 						if( xpathObj ) {
 							if( xpathObj->nodesetval )
 							{
-								printf("xpath found %d nodes\n", xpathObj->nodesetval->nodeNr);
+								printf("XPath found %d nodes\n", xpathObj->nodesetval->nodeNr);
 		
 								xmlBufferPtr xmlBuf = NULL;
 								if( config_print_xpath_results )
