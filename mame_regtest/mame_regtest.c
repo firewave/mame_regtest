@@ -1814,9 +1814,6 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 				printf("Unknown -listxml output\n");
 
 			if( app_type != APP_UNKNOWN ) {
-				xmlXPathContextPtr xpathCtx = NULL;
-				xmlXPathObjectPtr xpathObj = NULL;
-
 				xmlChar* debug_attr = xmlGetProp(root, (const xmlChar*)"debug");
 				if( xmlStrcmp(debug_attr, (const xmlChar*)"yes") == 0 )
 					is_debug = 1;
@@ -1834,14 +1831,14 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 				mameconfig_attr = NULL;
 
 				if( config_xpath_expr && (strlen(config_xpath_expr) > 0) ) {
-					xpathCtx = xmlXPathNewContext(doc);
+					xmlXPathContextPtr xpathCtx = xmlXPathNewContext(doc);
 					if( xpathCtx ) {
 						char* real_xpath_expr = NULL;
 						convert_xpath_expr(&real_xpath_expr);
 						
 						printf("using xpath expression: %s\n", real_xpath_expr);
 
-						xpathObj = xmlXPathEvalExpression((const xmlChar*)real_xpath_expr, xpathCtx);
+						xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression((const xmlChar*)real_xpath_expr, xpathCtx);
 						if( xpathObj ) {
 							if( xpathObj->nodesetval )
 							{
@@ -1849,7 +1846,7 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 		
 								xmlBufferPtr xmlBuf = NULL;
 								if( config_print_xpath_results )
-									xmlBuf = xmlBufferCreate();
+									xmlBuf = xmlBufferCreate(); /* TODO: check allocation */
 		
 								struct driver_info* last_driv_inf = NULL;
 		
@@ -1889,15 +1886,17 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 									xmlBuf = NULL;
 								}
 							}
+
+							xmlXPathFreeObject(xpathObj);
 						}
 						else {
 							printf("could not evaluate XPath expression\n");
-
-							xmlXPathFreeContext(xpathCtx);
 						}
 
 						free(real_xpath_expr);
 						real_xpath_expr = NULL;
+
+						xmlXPathFreeContext(xpathCtx);
 					}
 					else {
 						printf("could not create XPath context\n");
@@ -1923,11 +1922,6 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 						game_child = game_child->next;
 					}
 				}
-
-				if( xpathObj != NULL )
-					xmlXPathFreeObject(xpathObj);
-				if( xpathCtx != NULL )
-					xmlXPathFreeContext(xpathCtx);
 			}
 		}
 		xmlFreeDoc(doc);
