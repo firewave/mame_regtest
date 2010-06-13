@@ -22,7 +22,6 @@ mame_regtest
 		- store both output file states in case of autosave
 		- add macro to output files/folders for version/revision etc.
 		- test absolute paths in INI (debugfile / rompath)
-		- run test_createconfig in dummy_root to avoid usage of existing mame.ini
 		- use the following debugger commands
 			- gtime <milliseconds in hex>
 			- hardreset (causes endless restarts of MAME)
@@ -48,12 +47,10 @@ mame_regtest
 		- make it possible to set affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
 		- make dipswitches/configurations work with ramsizes and bioses
 		- add signal/abort handler and cleanup in it
-		- add support for the softlists
 		- do not check the default ramsize again in bios/ram combination runs
 		- take a look at messtest for "hardreset" tests and extended image testing
 		- "device_mandatory" doesn't specify which device is the mandatory one
 		- "start_at" sample actually starts after the specified set
-		- create script to automatically create release archive
 		- image testing
 			- attribute to disable an image entry in the XML
 			- add base folder for images in XML (could also be used for parsing a folder?)
@@ -63,6 +60,8 @@ mame_regtest
 				- use folder node in-between to be able to switch folders
 			- read images from folder with same name as device (look for XML first / specify folder in XML?)
 			- add option with folder for device XMLs?
+		- add XPath support for software lists
+		- rename device_type to something else - it's the briefname
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -84,6 +83,8 @@ mame_regtest
 		- change ram, bioses and devices from arrays to lists
 			- add sanity checks for maximum bios, ramsize and device count
 		- use different prefix for cfg_type enum / conflicts with config_entry
+		- run test_createconfig in dummy_root to avoid usage of existing mame.ini (and other other command-line option calls)
+		- warn if "use_softwarelist" is used with an empty "hashpath"
 
 	issues/bugs/errorhandling:
 		- avoid duplicated slashes
@@ -117,6 +118,7 @@ mame_regtest
 		- fix Fedora Core 10 compilation (MAX_PATH)
 		- make doesn't work when the additional files already exist and you compile by target (e.g. mame_regtest.exe)
 		- switch to binaries/includes from http://www.zlatkovic.com/pub/libxml/
+		- create working x64 version
 		
 	Visual Studio:
 		- add microsoft versions for the GCC specific code (FileFindFirst(), FileFindNext(), etc.)
@@ -174,6 +176,7 @@ mame_regtest
 			- allow multiple ones
 		- support multiple input folders
 			- support subfolders
+		- skip support files (*_listsoftware.xml)
 			
 	create_image_xml
 		- add more output to create_image_xml
