@@ -281,6 +281,34 @@ static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, uns
 static void cleanup_and_exit(int errcode, const char* errstr);
 static int get_MHDR_data(FILE* in_fd, unsigned int* MHDR_width, unsigned int* MHDR_height);
 
+/* result must be free'd with xmlXPathFreeNodeSet() */
+static xmlNodeSetPtr get_xpath_nodeset(xmlDocPtr doc, const xmlChar* xpath_expr)
+{
+	xmlNodeSetPtr nodeset = NULL;
+	
+	xmlXPathContextPtr xpathCtx = xmlXPathNewContext(doc);
+	if( xpathCtx ) {
+		xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(xpath_expr, xpathCtx);
+		if( xpathObj ) {
+			nodeset = xpathObj->nodesetval;
+
+			xpathObj->nodesetval = NULL;
+
+			xmlXPathFreeObject(xpathObj);
+		}
+		else {
+			printf("could not evaluate XPath expression\n");
+		}
+
+		xmlXPathFreeContext(xpathCtx);
+	}
+	else {
+		printf("could not create XPath context\n");
+	}
+	
+	return nodeset;
+}
+
 static void append_driver_info(char** str, struct driver_entry* de)
 {
 	append_string(str, de->name);
@@ -1394,48 +1422,34 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 		/* process softlist entries */
 		xmlDocPtr soft_doc = xmlReadFile(driver_softlist_file, NULL, 0);
 		if( soft_doc ) {
-			xmlXPathContextPtr xpathCtx = xmlXPathNewContext(soft_doc);
-			if( xpathCtx ) {
-				xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression((const xmlChar*)"/softwarelists/softwarelist/software", xpathCtx);
-				if( xpathObj ) {
-					if( xpathObj->nodesetval )
-					{
-						printf("XPath found %d nodes (software list)\n", xpathObj->nodesetval->nodeNr);
+			xmlNodeSetPtr soft_nodeset = get_xpath_nodeset(soft_doc, (const xmlChar*)"/softwarelists/softwarelist/software");
+			if( soft_nodeset )
+			{
+				char initial_postfix[1024];
+				snprintf(initial_postfix, sizeof(initial_postfix), "%s", de->postfix);
 
-						char initial_postfix[1024];
-						snprintf(initial_postfix, sizeof(initial_postfix), "%s", de->postfix);
+				int i = 0;
+				for( ; i < soft_nodeset->nodeNr; ++i )
+				{
+					struct image_entry* images = NULL;
+					read_softlist_entry(soft_nodeset->nodeTab[i], &images, actual_driv_inf);
 
-						int i = 0;
-						for( ; i < xpathObj->nodesetval->nodeNr; ++i )
-						{
-							struct image_entry* images = NULL;
-							read_softlist_entry(xpathObj->nodesetval->nodeTab[i], &images, actual_driv_inf);
-	
-							snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05d", initial_postfix, software_count);
-	
-							de->images = images;
-	
-							res = execute_mame2(de);
-	
-							free_image_entries(images);
-							de->images = NULL;
-							
-							snprintf(de->postfix, sizeof(de->postfix), "%s", initial_postfix);
-							
-							software_count++;
-						}
-					}
+					snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05d", initial_postfix, software_count);
 
-					xmlXPathFreeObject(xpathObj);
+					de->images = images;
+
+					res = execute_mame2(de);
+
+					free_image_entries(images);
+					de->images = NULL;
+					
+					snprintf(de->postfix, sizeof(de->postfix), "%s", initial_postfix);
+					
+					software_count++;
 				}
-				else {
-					printf("could not evaluate XPath expression\n");
-				}
-
-				xmlXPathFreeContext(xpathCtx);
-			}
-			else {
-				printf("could not create XPath context\n");
+				
+				xmlXPathFreeNodeSet(soft_nodeset);
+				soft_nodeset = NULL;
 			}
 			
 			xmlFreeDoc(soft_doc);
@@ -1940,76 +1954,64 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 				mameconfig_attr = NULL;
 
 				if( config_xpath_expr && (strlen(config_xpath_expr) > 0) ) {
-					xmlXPathContextPtr xpathCtx = xmlXPathNewContext(doc);
-					if( xpathCtx ) {
-						char* real_xpath_expr = NULL;
-						convert_xpath_expr(&real_xpath_expr);
-						
-						printf("using XPath expression: %s\n", real_xpath_expr);
+					char* real_xpath_expr = NULL;
+					convert_xpath_expr(&real_xpath_expr);
+					
+					printf("using XPath expression: %s\n", real_xpath_expr);
 
-						xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression((const xmlChar*)real_xpath_expr, xpathCtx);
-						if( xpathObj ) {
-							if( xpathObj->nodesetval )
-							{
-								printf("XPath found %d nodes\n", xpathObj->nodesetval->nodeNr);
-		
-								xmlBufferPtr xmlBuf = NULL;
-								if( config_print_xpath_results )
-									xmlBuf = xmlBufferCreate(); /* TODO: check allocation */
-		
-								struct driver_info* last_driv_inf = NULL;
-		
-								int i = 0;
-								for( ; i < xpathObj->nodesetval->nodeNr; ++i )
-								{
-									if( config_print_xpath_results ) {
-										xmlBufferAdd(xmlBuf, (const xmlChar*)"\t", 1);
-										xmlNodeDump(xmlBuf, doc, xpathObj->nodesetval->nodeTab[i], 0, 1);
-										xmlBufferAdd(xmlBuf, (const xmlChar*)"\n", 1);
-									}
-		
-									struct driver_info* new_driv_inf = NULL;
-		
-									parse_listxml_element(xpathObj->nodesetval->nodeTab[i], &new_driv_inf);
-		
-									if( new_driv_inf != NULL )
-									{
-										if( last_driv_inf )
-											last_driv_inf->next = new_driv_inf;
-										else
-											*driv_inf = new_driv_inf;
-											
-										last_driv_inf = new_driv_inf;
-									}
-								}
-		
-								if( config_print_xpath_results ) {
-									FILE *xpath_result_fd = mrt_fopen("xpath_results.xml", "w");
-									fprintf(xpath_result_fd, "<xpath_result>\n");
-									xmlBufferDump(xpath_result_fd, xmlBuf);
-									fprintf(xpath_result_fd, "</xpath_result>\n");
-									fclose(xpath_result_fd);
-									xpath_result_fd = NULL;
-		
-									xmlBufferFree(xmlBuf);
-									xmlBuf = NULL;
-								}
+					xmlNodeSetPtr nodeset = get_xpath_nodeset(doc, (const xmlChar*)real_xpath_expr);
+					if( nodeset )
+					{
+						printf("XPath found %d nodes\n", nodeset->nodeNr);
+
+						xmlBufferPtr xmlBuf = NULL;
+						if( config_print_xpath_results )
+							xmlBuf = xmlBufferCreate(); /* TODO: check allocation */
+
+						struct driver_info* last_driv_inf = NULL;
+
+						int i = 0;
+						for( ; i < nodeset->nodeNr; ++i )
+						{
+							if( config_print_xpath_results ) {
+								xmlBufferAdd(xmlBuf, (const xmlChar*)"\t", 1);
+								xmlNodeDump(xmlBuf, doc, nodeset->nodeTab[i], 0, 1);
+								xmlBufferAdd(xmlBuf, (const xmlChar*)"\n", 1);
 							}
 
-							xmlXPathFreeObject(xpathObj);
-						}
-						else {
-							printf("could not evaluate XPath expression\n");
+							struct driver_info* new_driv_inf = NULL;
+
+							parse_listxml_element(nodeset->nodeTab[i], &new_driv_inf);
+
+							if( new_driv_inf != NULL )
+							{
+								if( last_driv_inf )
+									last_driv_inf->next = new_driv_inf;
+								else
+									*driv_inf = new_driv_inf;
+									
+								last_driv_inf = new_driv_inf;
+							}							
 						}
 
-						free(real_xpath_expr);
-						real_xpath_expr = NULL;
+						if( config_print_xpath_results ) {
+							FILE *xpath_result_fd = mrt_fopen("xpath_results.xml", "w");
+							fprintf(xpath_result_fd, "<xpath_result>\n");
+							xmlBufferDump(xpath_result_fd, xmlBuf);
+							fprintf(xpath_result_fd, "</xpath_result>\n");
+							fclose(xpath_result_fd);
+							xpath_result_fd = NULL;
 
-						xmlXPathFreeContext(xpathCtx);
+							xmlBufferFree(xmlBuf);
+							xmlBuf = NULL;
+						}
+						
+						xmlXPathFreeNodeSet(nodeset);
+						nodeset = NULL;
 					}
-					else {
-						printf("could not create XPath context\n");
-					}
+
+					free(real_xpath_expr);
+					real_xpath_expr = NULL;
 				}
 				else {
 					xmlNodePtr game_child = root->children;
