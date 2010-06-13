@@ -108,7 +108,8 @@ mame_regtest
 			- add notes about dependencies between options in the documentation
 			- add note to "use_debug" about needing a build with USE_DEBUGGER=1 and about the version, that started to include the debugger in non-debug builds
 			- update building instructions in Wiki
-		- document upper limit of dipswitches/devices/etc. of 100000
+			- verify the version number for software lists
+		- document upper limit of dipswitches/devices/etc. of 100000		
 
 	compilation:
 		- fix compilation on systems, that already have a htonl() function
