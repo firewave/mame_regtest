@@ -473,3 +473,5 @@
 	- added option "use_softwarelist" to control usage of software lists
 	- renamed the output file postfix for device file entries from "dev" to "sfw" (software)
 	- made process ID code working with Visual Studio
+	- added warning when "use_softwarelist" is set, but "hashpath" isn't
+	- renamed device_type to device_briefname

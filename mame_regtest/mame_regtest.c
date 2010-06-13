@@ -128,7 +128,7 @@ struct driver_info {
 };
 
 struct image_entry {
-	const xmlChar* device_type;
+	const xmlChar* device_briefname;
 	const xmlChar* device_file;
 	const xmlChar* device_interface;
 	struct image_entry* next;
@@ -686,9 +686,9 @@ static void print_driver_info(struct driver_entry* de, FILE* print_fd)
 		fprintf(print_fd, " (configuration %s value %s)", de->configuration->name, de->confsetting->name);
 	struct image_entry* images = de->images;
 	while( images ) {
-		if( (images->device_type && xmlStrlen(images->device_type) > 0) &&
+		if( (images->device_briefname && xmlStrlen(images->device_briefname) > 0) &&
 			(images->device_file && xmlStrlen(images->device_file) > 0) ) {
-			fprintf(print_fd, " (%s %s)", images->device_type, images->device_file);
+			fprintf(print_fd, " (%s %s)", images->device_briefname, images->device_file);
 		}
 		images = images->next;
 	}
@@ -716,7 +716,7 @@ static int read_image_entries(const xmlNodePtr node, struct image_entry** images
 
 		memset(image, 0x00, sizeof(struct image_entry));
 
-		image->device_type = attrs->name;
+		image->device_briefname = attrs->name;
 		xmlNodePtr value = attrs->children;
 		if( value )
 			image->device_file = value->content;
@@ -763,7 +763,7 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 	struct device_info* dev_info = driv_inf->devices;
 	while(dev_info) {
 		if( xmlStrcmp(dev_info->interface, image->device_interface) == 0 )
-			image->device_type = xmlStrdup(dev_info->briefname);
+			image->device_briefname = xmlStrdup(dev_info->briefname);
 			
 		dev_info = dev_info->next;
 	}
@@ -1115,10 +1115,10 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 	}
 	struct image_entry* images = de->images;
 	while(images) {
-		if( (images->device_type && xmlStrlen(images->device_type) > 0) && 
+		if( (images->device_briefname && xmlStrlen(images->device_briefname) > 0) && 
 			(images->device_file && xmlStrlen(images->device_file) > 0) ) {
 			append_string(&sys, " -");
-			append_string(&sys, (const char*)images->device_type);
+			append_string(&sys, (const char*)images->device_briefname);
 			append_string(&sys, " ");
 			append_quoted_string(&sys,  (const char*)images->device_file);
 		}
@@ -1330,9 +1330,9 @@ static int execute_mame2(struct driver_entry* de)
 		
 		struct image_entry* images = de->images;
 		while(images) {
-			if( (images->device_type && xmlStrlen(images->device_type) > 0) &&
+			if( (images->device_briefname && xmlStrlen(images->device_briefname) > 0) &&
 				(images->device_file && xmlStrlen(images->device_file) > 0) ) {
-				xmlNewProp(devices_node, images->device_type, images->device_file);
+				xmlNewProp(devices_node, images->device_briefname, images->device_file);
 			}
 
 			images = images->next;
@@ -2261,6 +2261,9 @@ int main(int argc, char *argv[])
 		printf("'str' value has to be at least '2' when used with 'hack_ftr'\n");
 		cleanup_and_exit(1, "aborting");
 	}
+	
+	if( config_use_softwarelist && ((config_hashpath_folder == 0) || (strlen(config_hashpath_folder) == 0)) )
+		printf("'hashpath' is empty - no software lists available for testing\n");
 
 	if( config_clear_output_folder ) {
 		printf("clearing existing output folder\n");
