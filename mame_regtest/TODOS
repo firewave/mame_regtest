@@ -61,7 +61,6 @@ mame_regtest
 			- read images from folder with same name as device (look for XML first / specify folder in XML?)
 			- add option with folder for device XMLs?
 		- add XPath support for software lists
-		- rename device_type to something else - it's the briefname
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -84,7 +83,6 @@ mame_regtest
 			- add sanity checks for maximum bios, ramsize and device count
 		- use different prefix for cfg_type enum / conflicts with config_entry
 		- run test_createconfig in dummy_root to avoid usage of existing mame.ini (and other other command-line option calls)
-		- warn if "use_softwarelist" is used with an empty "hashpath"
 
 	issues/bugs/errorhandling:
 		- avoid duplicated slashes
