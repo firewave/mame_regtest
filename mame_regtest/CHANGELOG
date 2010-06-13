@@ -475,3 +475,5 @@
 	- made process ID code working with Visual Studio
 	- added warning when "use_softwarelist" is set, but "hashpath" isn't
 	- renamed device_type to device_briefname
+	
+0.71
