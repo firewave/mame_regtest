@@ -481,3 +481,4 @@
 	- fixed resource leak when parsing MNGs without MHDR (reported by cppcheck)
 	- replaced some unecessary strlen() calls reported by cppcheck
 	- added missing static to clear_directory_nosnap()
+	- simplified append_string()

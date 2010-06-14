@@ -45,17 +45,13 @@ int mrt_getch()
 void append_string(char** str, const char* str_to_append)
 {
 	size_t applen = strlen(str_to_append);
-	if( *str == NULL ) {
-		*str = (char*)malloc(applen+1);
-		memcpy(*str, str_to_append, applen);
-		(*str)[applen] = '\0';
-	}
-	else {
-		size_t length = strlen(*str);
-		*str = (char*)realloc(*str, length+applen+1);
-		memcpy(*str+length, str_to_append, applen);
-		(*str)[length+applen] = '\0';
-	}
+	size_t length = 0;
+	if( *str != NULL )
+		length = strlen(*str);
+
+	*str = (char*)realloc(*str, length+applen+1);
+	memcpy(*str+length, str_to_append, applen);
+	(*str)[length+applen] = '\0';
 }
 
 void append_quoted_string(char** str, const char* str_to_append)
