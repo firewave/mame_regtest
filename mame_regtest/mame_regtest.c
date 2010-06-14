@@ -419,6 +419,8 @@ static int parse_mng(const char* file, xmlNodePtr filenode)
 	int res = get_MHDR_data(mng_fd, &MHDR_width, &MHDR_height);
 	if( res == 0 ) {
 		printf("could not get MHDR data from '%s'\n", file);
+		fclose(mng_fd);
+		mng_fd = NULL;
 		return frame;
 	}
 
