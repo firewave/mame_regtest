@@ -588,13 +588,13 @@ static int create_dummy_root_ini()
 				fprintf(fp, "seconds_to_run     %s\n", config_str_str);
 			else
 				fprintf(fp, "frames_to_run      %s\n", config_str_str);
-			if( config_rompath_folder && (strlen(config_rompath_folder) > 0) ) {
+			if( config_rompath_folder && (*config_rompath_folder != 0) ) {
 				if( !config_hack_biospath )
 					fprintf(fp, "rompath            %s\n", config_rompath_folder); /* rompath for MAME/MESS */
 				else
 					fprintf(fp, "biospath           %s\n", config_rompath_folder); /* old biospath for MESS */
 			}
-			if( (app_type == APP_MESS) && config_hashpath_folder && (strlen(config_hashpath_folder) > 0) )
+			if( (app_type == APP_MESS) && config_hashpath_folder && (*config_hashpath_folder != 0) )
 				fprintf(fp, "hashpath            %s\n", config_hashpath_folder); /* hashpath for MESS */
 			fclose(fp);
 			res = 1;
@@ -1148,7 +1148,7 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 		append_driver_info(&sys, de);
 		append_string(&sys, ".wav");
 	}
-	if( config_additional_options && (strlen(config_additional_options) > 0) ) {
+	if( config_additional_options && (*config_additional_options != 0) ) {
 		append_string(&sys, " ");
 		append_string(&sys, config_additional_options);
 	}
@@ -1470,7 +1470,7 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 
 	if( config_use_devices && actual_driv_inf->devices ) {
 		char* device_file = NULL;
-		if( config_global_device_file && (strlen(config_global_device_file) > 0) )
+		if( config_global_device_file && (*config_global_device_file != 0) )
 			append_string(&device_file, config_global_device_file);
 		else {
 			append_string(&device_file, "mrt_");
@@ -1958,7 +1958,7 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 				xmlFree(mameconfig_attr);
 				mameconfig_attr = NULL;
 
-				if( config_xpath_expr && (strlen(config_xpath_expr) > 0) ) {
+				if( config_xpath_expr && (*config_xpath_expr != 0) ) {
 					char* real_xpath_expr = NULL;
 					convert_xpath_expr(&real_xpath_expr);
 					
@@ -2106,7 +2106,7 @@ int main(int argc, char *argv[])
 		config_mame_exe = tmp_mame_exe;
 	}
 
-	if( !config_mame_exe || (strlen(config_mame_exe) == 0) ) {
+	if( !config_mame_exe || (*config_mame_exe == 0) ) {
 		printf("'executable' is empty or missing\n");
 		cleanup_and_exit(1, "aborting");
 	}
@@ -2131,7 +2131,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if( strlen(config_output_folder) > 0 ) {
+	if( *config_output_folder != 0 ) {
 		if( config_verbose )
 			printf("using output folder: %s\n", config_output_folder);
 	}
@@ -2143,7 +2143,7 @@ int main(int argc, char *argv[])
 	if( config_verbose ) {
 		printf("str: %s\n", config_str_str);
 
-		if( config_gamelist_xml_file && (strlen(config_gamelist_xml_file) > 0) ) {
+		if( config_gamelist_xml_file && (*config_gamelist_xml_file != 0) ) {
 			printf("using custom list: %s\n", config_gamelist_xml_file);
 		}
 
@@ -2175,7 +2175,7 @@ int main(int argc, char *argv[])
 		cleanup_and_exit(1, "aborting");
 	}
 
-	if( strlen(temp_folder) > 0 ) {
+	if( *temp_folder != 0 ) {
 		if( config_verbose )
 			printf("using output folder: %s\n", temp_folder);
 		if( access(temp_folder, F_OK) != 0 ) {
@@ -2203,11 +2203,11 @@ int main(int argc, char *argv[])
 	if( config_use_valgrind )
 	{
 #if USE_VALGRIND
-		if( !config_valgrind_binary || (strlen(config_valgrind_binary) == 0) )
+		if( !config_valgrind_binary || (*config_valgrind_binary == 0) )
 			append_string(&config_valgrind_binary, "valgrind");
 		if( config_verbose )
 			printf("valgrind_binary: %s\n", config_valgrind_binary);
-		if( !config_valgrind_parameters || (strlen(config_valgrind_parameters) == 0) )
+		if( !config_valgrind_parameters || (*config_valgrind_parameters == 0) )
 			append_string(&config_valgrind_parameters, "--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --leak-resolution=med");
 		if( config_verbose )
 			printf("valgrind_parameters: %s\n", config_valgrind_parameters);
@@ -2217,7 +2217,7 @@ int main(int argc, char *argv[])
 	}
 
 	if( config_verbose ) {
-		if( config_rompath_folder && (strlen(config_rompath_folder) > 0) )
+		if( config_rompath_folder && (*config_rompath_folder != 0) )
 			printf("using rompath folder: %s\n", config_rompath_folder);
 
 		printf("bios: %d\n", config_use_bios);
@@ -2227,7 +2227,7 @@ int main(int argc, char *argv[])
 		printf("xpath_expr: %s\n", config_xpath_expr ? config_xpath_expr : "");
 		printf("use_devices: %d\n", config_use_devices);
 		printf("use_nonrunnable: %d\n", config_use_nonrunnable);
-		if( config_global_device_file && (strlen(config_global_device_file) > 0) )
+		if( config_global_device_file && (*config_global_device_file != 0) )
 			printf("using device_file: %s\n", config_global_device_file);
 		printf("use_isbios: %d\n", config_use_isbios);
 		printf("store_output: %d\n", config_store_output);
@@ -2245,7 +2245,7 @@ int main(int argc, char *argv[])
 		printf("write_wav: %d\n", config_write_wav);
 		printf("use_dipswitches: %d\n", config_use_dipswitches);
 		printf("use_configurations: %d\n", config_use_configurations);
-		if( config_hashpath_folder && (strlen(config_hashpath_folder) > 0) )
+		if( config_hashpath_folder && (*config_hashpath_folder != 0) )
 			printf("using hashpath folder: %s\n", config_hashpath_folder);
 		printf("use_softwarelist: %d\n", config_use_softwarelist);
 
@@ -2257,7 +2257,7 @@ int main(int argc, char *argv[])
 		printf("\n"); /* for output formating */
 	}
 
-	if( strlen(config_str_str) == 0 ) {
+	if( *config_str_str == 0 ) {
 		printf("'str' value cannot be empty\n");
 		cleanup_and_exit(1, "aborting");		
 	}
@@ -2267,7 +2267,7 @@ int main(int argc, char *argv[])
 		cleanup_and_exit(1, "aborting");
 	}
 	
-	if( config_use_softwarelist && ((config_hashpath_folder == 0) || (strlen(config_hashpath_folder) == 0)) )
+	if( config_use_softwarelist && (!config_hashpath_folder || (*config_hashpath_folder == 0)) )
 		printf("'hashpath' is empty - no software lists available for testing\n");
 
 	if( config_clear_output_folder ) {
@@ -2280,7 +2280,7 @@ int main(int argc, char *argv[])
 
 	printf("\n"); /* for output formating */
 
-	if( !config_gamelist_xml_file || (strlen(config_gamelist_xml_file) == 0) ) {
+	if( !config_gamelist_xml_file || (*config_gamelist_xml_file == 0) ) {
 		append_string(&config_gamelist_xml_file, listxml_output); 
 
 		printf("writing -listxml output\n");

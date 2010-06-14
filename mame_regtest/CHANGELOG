@@ -479,3 +479,4 @@
 0.71
 	- fixed compilation with USE_VALGRIND set to 1
 	- fixed resource leak when parsing MNGs without MHDR (reported by cppcheck)
+	- replaced some unecessary strlen() calls reported by cppcheck
