@@ -500,7 +500,7 @@ static void clear_callback_nosnap(struct parse_callback_data* pcd)
 	}
 }
 
-void clear_directory_nosnap(const char* dirname, int delete_root)
+static void clear_directory_nosnap(const char* dirname, int delete_root)
 {
 	parse_directory(dirname, 0, clear_callback_nosnap, (void*)&delete_root);
 
