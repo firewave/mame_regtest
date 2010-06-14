@@ -368,6 +368,12 @@ static const char* get_inifile()
 
 static void get_executable(char** sys, struct driver_entry* de, const char* callstr)
 {
+#if !USE_VALGRIND
+	/* shut up compiler */
+	(void)de;
+	(void)callstr;
+#endif
+	
 	if( config_use_valgrind ) {
 #if USE_VALGRIND
 		append_string(sys, config_valgrind_binary);
@@ -385,7 +391,7 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 		}
 		append_string(sys, ".valgrind_%p");
 		append_string(sys, " ");
-#else
+#endif
 	}
 	/*
 	else if( config_use_gdb && (!callstr || (strcmp(callstr, "listxml") != 0)) ) {
@@ -395,10 +401,7 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 		append_string(sys, " ");
 	}
 	*/
-	/* shut up compiler */
-	(void)de;
-	(void)callstr;
-#endif
+
 	append_quoted_string(sys, config_mame_exe);
 }
 

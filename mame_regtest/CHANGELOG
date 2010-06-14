@@ -477,3 +477,4 @@
 	- renamed device_type to device_briefname
 	
 0.71
+	- fixed compilation with USE_VALGRIND set to 1
