@@ -432,7 +432,7 @@ static int parse_mng(const char* file, xmlNodePtr filenode)
 		xmlNewProp(filenode, (const xmlChar*)"height", (const xmlChar*)tmp);
 	}
 
-	do {
+	for( ; ; ) {
 		res = internal_get_next_IDAT_data(mng_fd, &IDAT_size, &IDAT_crc);
 		if( res == 1 ) {
 			/* found IDAT chunk */
@@ -459,7 +459,7 @@ static int parse_mng(const char* file, xmlNodePtr filenode)
 			printf("unexpected error parsing MNG '%s'\n", file);
 			break;
 		}
-	} while( 1 );
+	}
 
 	fclose(mng_fd);
 	mng_fd = NULL;
@@ -874,7 +874,7 @@ static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, uns
 	unsigned int reversed_chunk_size = 0;
 	unsigned char chunk_name[4] = "";
 
-	do {
+	for( ; ; ) {
 		if( fread(&chunk_size, sizeof(unsigned int), 1, in_fd) != 1 ) {
 			printf("could not read chunk size\n");
 			return 0;
@@ -916,7 +916,7 @@ static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, uns
 
 		fseek(in_fd, reversed_chunk_size, SEEK_CUR); /* jump chunk */
 		fseek(in_fd, 4, SEEK_CUR); /* jump CRC */
-	} while(1);
+	}
 }
 
 static int get_png_data(const char* png_name, unsigned int *IHDR_width, unsigned int* IHDR_height, unsigned int *IDAT_size, unsigned int* IDAT_crc)
@@ -1219,7 +1219,7 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 		return;
 
 	struct driver_info* actual_driv_inf = driv_inf;
-	do {
+	for( ; ; ) {
 		if( actual_driv_inf->name )
 			xmlFree(actual_driv_inf->name);
 		if( actual_driv_inf->sourcefile )
@@ -1277,7 +1277,7 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 			free(actual_driv_inf);
 			break;
 		}
-	} while (1);
+	}
 }
 
 static int execute_mame2(struct driver_entry* de)
