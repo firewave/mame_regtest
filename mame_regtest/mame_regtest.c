@@ -79,7 +79,7 @@ mame_regtest returncodes:
 #include "common.h"
 #include "config.h"
 
-#define VERSION "0.71"
+#define VERSION "0.72"
 
 struct device_info {
 	xmlChar* name;

@@ -483,3 +483,5 @@
 	- added missing static to clear_directory_nosnap()
 	- simplified append_string()
 	- avoid Visual Studio warnings about constant expressions
+
+0.72
