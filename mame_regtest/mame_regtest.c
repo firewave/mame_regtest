@@ -1310,7 +1310,7 @@ static int execute_mame2(struct driver_entry* de)
 
 	xmlNewProp(output_node, (const xmlChar*)"name", (const xmlChar*)de->name);
 	xmlNewProp(output_node, (const xmlChar*)"sourcefile", (const xmlChar*)de->sourcefile);
-	if( de->autosave )
+	if( config_use_autosave && de->autosave )
 		xmlNewProp(output_node, (const xmlChar*)"autosave", (const xmlChar*)"yes");
 	if( de->bios && (strlen(de->bios) > 0) )
 		xmlNewProp(output_node, (const xmlChar*)"bios", (const xmlChar*)de->bios);

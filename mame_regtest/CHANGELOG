@@ -485,3 +485,4 @@
 	- avoid Visual Studio warnings about constant expressions
 
 0.72
+	- do not write "autosave" flag to output XML when "use_autosave" is not set to 1
