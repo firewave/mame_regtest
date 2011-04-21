@@ -62,6 +62,15 @@ mame_regtest
 			- add option with folder for device XMLs?
 		- add XPath support for software lists
 		- use DTD for softlists
+		- measure the real time necessary for the execution to detect slowdowns
+		- add support for disks in softlist
+		- delete all existing dummy_root and mrt_temp folders on start-up?
+		- add ---track-origins=yes to valgrind command-line
+		- all combinations
+			- call function with array
+			- process the first entry and call itself with a smaller array
+		- add detection of duplicated bios and ramsize entries
+		- no stack crawl since the .pdb is not in the searchpath?
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -122,7 +131,6 @@ mame_regtest
 		- create working x64 version
 		
 	Visual Studio:
-		- add microsoft versions for the GCC specific code (FileFindFirst(), FileFindNext(), etc.)
 		- move the Microsoft-specific defines into a seperate header
 		- get proper libxml2 DLL to get Visual Studio working
 		- specify different output/object folders for the different executables in Visual Studio 2010 project files
@@ -178,6 +186,8 @@ mame_regtest
 		- support multiple input folders
 			- support subfolders
 		- skip support files (*_listsoftware.xml)
+		- add summary at top of report (x errors / x crashes / x memory leaks / x clipping / x with mandatory devices / x aborted)
+		- change way errors are handled - use xpath with regex instead?
 			
 	create_image_xml
 		- add more output to create_image_xml
