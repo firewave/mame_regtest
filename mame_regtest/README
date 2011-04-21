@@ -8,6 +8,7 @@ http://www.breaken.de/mame_regtest (outdated)
 notes:
 	- you need libxml2-2.6.27 to compile this
 	- you need zlib 1.2.3 to compile this
+	- you need dirent API 1.11 to compile this: http://www.softagalleria.net/dirent.php
 	- if you are using a system with big-endian byte-order you have to comment the LITTLE_ENDIAN and uncomment the BIG_ENDIAN define
 	- XPath tutorial: http://www.zvon.org/xxl/XPathTutorial/General/examples.html
 

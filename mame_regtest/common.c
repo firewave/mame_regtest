@@ -6,6 +6,7 @@
 #ifndef _MSC_VER
 #include <dirent.h>
 #else
+#include "dirent.h"
 #include <direct.h>
 #include <io.h>
 #if _MSC_VER >= 1400
@@ -144,7 +145,6 @@ void parse_directory(const char* dirname,
 	if( access(dirname, F_OK) != 0 )
 		return;
 
-#ifndef _MSC_VER
 	DIR* d = opendir(dirname);
 	if( d ) {
 		struct parse_callback_data pcd;
@@ -200,12 +200,6 @@ void parse_directory(const char* dirname,
 	}
 	else
 		printf("parse_directory() - could not open '%s'\n", dirname);
-#else
-	(void)user_data;
-	(void)callback;
-	(void)recursive;
-	// TODO
-#endif
 }
 
 int is_absolute_path(const char* path)

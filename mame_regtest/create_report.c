@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef _MSC_VER
-#include <dirent.h>
-#else
+#ifdef _MSC_VER
 #include <io.h>
 #if _MSC_VER >= 1400
 #undef strdup
