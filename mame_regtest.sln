@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mame_regtest", "mame_regtest.vcxproj", "{09971EEE-02F4-4C27-85BB-5CC8E0761770}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "create_report", "create_report.vcxproj", "{F5226423-A01A-4B22-8590-7817A6902C7D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09971EEE-02F4-4C27-85BB-5CC8E0761770}.Debug|Win32.ActiveCfg = Debug|Win32
+		{09971EEE-02F4-4C27-85BB-5CC8E0761770}.Debug|Win32.Build.0 = Debug|Win32
+		{09971EEE-02F4-4C27-85BB-5CC8E0761770}.Release|Win32.ActiveCfg = Release|Win32
+		{09971EEE-02F4-4C27-85BB-5CC8E0761770}.Release|Win32.Build.0 = Release|Win32
+		{F5226423-A01A-4B22-8590-7817A6902C7D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F5226423-A01A-4B22-8590-7817A6902C7D}.Debug|Win32.Build.0 = Debug|Win32
+		{F5226423-A01A-4B22-8590-7817A6902C7D}.Release|Win32.ActiveCfg = Release|Win32
+		{F5226423-A01A-4B22-8590-7817A6902C7D}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
