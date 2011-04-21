@@ -1,34 +1,3 @@
-/*
-mame_regtest
-(c) Copyright 2005-2010 by Oliver Stoeneberg
-
-http://mess.redump.net/tools:mame_regtest
-http://mess.redump.net/tools:mame_regtest:config (documentation of the options in the XML)
-http://www.breaken.de/mame_regtest (outdated)
-
-notes:
-	- you need libxml2-2.6.27 to compile this
-	- you need zlib 1.2.3 to compile this
-	- if you are using a system with big-endian byte-order you have to comment the LITTLE_ENDIAN and uncomment the BIG_ENDIAN define
-	- XPath tutorial: http://www.zvon.org/xxl/XPathTutorial/General/examples.html
-
-MAME/MESS returncodes:
-          1 - terminated / ???
-          2 - missing roms
-          3 - assertion / fatalerror
-          4 - no image specified (MESS-only)
-          5 - no such game
-          6 - invalid config
-        128 - ???  
-        100 - exception
--1073741819 - exception (SDLMAME/SDLMESS)
-
-mame_regtest returncodes:
-	0 - OK
-	1 - error
-*/
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
