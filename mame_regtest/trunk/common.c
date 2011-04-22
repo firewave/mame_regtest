@@ -314,3 +314,17 @@ void free_array(char** arr)
 	}
 	free(arr);
 }
+
+char* get_directory(const char* filepath)
+{
+	char* result = NULL;
+	
+	const char* pos = strrchr(filepath, FILESLASH[0]);
+	if( pos ) {
+		int len = pos - filepath;
+		result = (char*)malloc(len);
+		strncpy(result, filepath, len);
+	}
+
+	return result;	
+}
