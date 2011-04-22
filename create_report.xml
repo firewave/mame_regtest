@@ -29,7 +29,7 @@
 		<option name='report_type' value='1'/>
 		<option name='xml_folder' value='d:\mame\mrt_output.129u3'/>
 		<option name='compare_folder' value='d:\mame\mrt_output.129u5'/>
-		<option name='output_file' value='d:\mrt_diff.txt'/>
+		<option name='output_folder' value='d:\mrt_diff'/>
 		<option name='dokuwiki_format' value='1'/>
 		<option name='group_data' value='1'/>
 	</comparison>
