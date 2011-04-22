@@ -174,8 +174,6 @@ mame_regtest
 		- add check for a specific string as option 
 			- replace "called within reset scope by" with it -> field="stderr" string="called within reset scope by"
 			- allow multiple ones
-		- support subfolders
-		- skip support files (*_listsoftware.xml)
 		- find out what the various negative erorcodes mean
 		- replace hard-coded format with templates
 		- use tables in comparison report?
