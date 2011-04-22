@@ -89,7 +89,7 @@ struct driver_info {
 	xmlChar* bioses[32];
 	int bios_default;
 	struct device_info* devices;
-	int device_mandatory;
+	xmlChar* device_mandatory;
 	struct dipswitch_info* dipswitches;
 	struct dipswitch_info* configurations;
 	int has_softlist;
@@ -111,7 +111,7 @@ struct driver_entry {
 	struct image_entry* images;
 	char postfix[1024];
 	int autosave;
-	int device_mandatory;
+	const char* device_mandatory;
 	struct dipswitch_info* dipswitch;
 	struct dipvalue_info* dipvalue;
 	struct dipswitch_info* configuration;
@@ -1198,6 +1198,8 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 			for( ; i < actual_driv_inf->bios_count; ++i )
 				xmlFree(actual_driv_inf->bioses[i]);
 		}
+		if( actual_driv_inf->device_mandatory )
+			xmlFree(actual_driv_inf->device_mandatory);
 
 		struct device_info* devices = actual_driv_inf->devices;
 		while( devices != NULL ) {
@@ -1297,7 +1299,7 @@ static int execute_mame2(struct driver_entry* de)
 		xmlNewProp(output_node, (const xmlChar*)"confsetting", (const xmlChar*)de->confsetting->name);
 	}
 	if( de->device_mandatory )
-		xmlNewProp(output_node, (const xmlChar*)"mandatory", (const xmlChar*)"yes");
+		xmlNewProp(output_node, (const xmlChar*)"mandatory", (const xmlChar*)de->device_mandatory);
 
 	if( de->images ) {
 		xmlNodePtr devices_node = xmlNewChild(output_node, NULL, (const xmlChar*)"devices", NULL);
@@ -1503,7 +1505,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 		de.name = (const char*)actual_driv_inf->name;
 		de.sourcefile = (const char*)actual_driv_inf->sourcefile;
 		de.autosave = actual_driv_inf->savestate;
-		de.device_mandatory = actual_driv_inf->device_mandatory;
+		de.device_mandatory = (const char*)actual_driv_inf->device_mandatory;
 
 		/* create softlist output */
 		if( config_use_softwarelist && config_hashpath_folder && actual_driv_inf->has_softlist ) {
@@ -1854,7 +1856,6 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 
 					xmlChar* dev_man = xmlGetProp(game_children, (const xmlChar*)"mandatory");
 					if( dev_man ) {
-						(*new_driv_inf)->device_mandatory = 1;
 						new_dev_info->mandatory = 1;
 						xmlFree(dev_man);
 					}
@@ -1871,8 +1872,11 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 								new_dev_info->name = dev_name;
 
 							xmlChar* dev_brief = xmlGetProp(dev_childs, (const xmlChar*)"briefname");
-							if( dev_brief )
+							if( dev_brief ) {
 								new_dev_info->briefname = dev_brief;
+								if( new_dev_info->mandatory )
+									(*new_driv_inf)->device_mandatory = xmlStrdup(dev_brief);
+							}
 						}
 
 						dev_childs = dev_childs->next;
