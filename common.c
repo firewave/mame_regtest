@@ -16,6 +16,8 @@
 #define rmdir _rmdir
 #undef mkdir
 #define mkdir _mkdir
+#undef strdup
+#define strdup _strdup
 #endif
 #define F_OK 00
 #endif
@@ -276,4 +278,39 @@ void calc_crc32(const char* file, unsigned int* crc)
 
 	fclose(fd);
 	fd = NULL;
+}
+
+char** split_string(const char* str, const char* delims)
+{
+	char** strings = NULL;
+	int i = 0;
+
+	char* cpy = strdup(str);
+	
+	char* pch = strtok(cpy, delims);
+	while(pch != NULL)
+	{
+		strings = (char**)realloc(strings, sizeof(char*) * (i+2));
+		strings[i] = strdup(pch);
+		pch = strtok(NULL, delims);
+		i++;
+	}
+
+	strings[i] = NULL;
+
+	free(cpy);
+
+	return strings;
+}
+
+void free_array(char** arr)
+{
+	int i;
+	for(i=0;;++i)
+	{
+		if(arr[i] == NULL)
+			break;
+		free(arr[i]);
+	}
+	free(arr);
 }

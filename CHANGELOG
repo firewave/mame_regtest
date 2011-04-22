@@ -491,6 +491,8 @@
 	- seperated project output folders in Visual Studio
 	- also compile mame_regtest Release as C++
 	- avoid warning about unreachable code with Visual Studio Release build
+	- added split_string() to common.c/.h
+	- added free_array() to common.c/.h
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
