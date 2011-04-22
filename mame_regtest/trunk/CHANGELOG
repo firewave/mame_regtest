@@ -493,6 +493,9 @@
 	- avoid warning about unreachable code with Visual Studio Release build
 	- added split_string() to common.c/.h
 	- added free_array() to common.c/.h
+	- updated default "valgrind_parameters"
+		- removed "--leak-resolution=med" since the valgrind default is now "high"
+		- added "--track-origins=yes"
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set

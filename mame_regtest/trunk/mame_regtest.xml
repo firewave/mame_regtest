@@ -55,7 +55,7 @@
 		<!-- valgrind options -->
 		<option name='use_valgrind' value='0'/>
 		<option name='valgrind_binary' value='valgrind'/>
-		<option name='valgrind_parameters' value='--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --leak-resolution=med'/>
+		<option name='valgrind_parameters' value='--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --track-origins=yes'/>
 
 		<!-- additional options -->
 		<option name='test_createconfig' value='1'/>
