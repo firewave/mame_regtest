@@ -498,6 +498,7 @@
 		- added "--track-origins=yes"
 	- added "pngcmp" for PNG comparison
 	- fixed "start_at" example in default configuration
+	- added get_directory() to common.c/.h
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set

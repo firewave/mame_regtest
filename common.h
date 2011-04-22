@@ -88,4 +88,7 @@ char** split_string(const char* str, const char* delims);
 
 void free_array(char** arr);
 
+/* you have to free the result */
+char* get_directory(const char* filepath);
+
 #endif
