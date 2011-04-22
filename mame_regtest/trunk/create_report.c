@@ -173,6 +173,38 @@ struct config_entry report_config[] =
 	{ NULL, 				CFG_UNK, 		NULL }
 };
 
+struct report_summary
+{
+	int executed;
+	int errors;
+	int memleaks;
+	int crashed;
+	int clipped;
+	int mandatory;
+	int aborted;
+	int missing;
+	int unknown;
+};
+
+static void summary_incr(struct report_summary* summary, const xmlChar* exitcode_key)
+{
+	if( xmlStrcmp(exitcode_key, (const xmlChar*)"0") == 0 )
+		return;
+
+	if( xmlStrcmp(exitcode_key, (const xmlChar*)"1") == 0 )
+		summary->aborted++;
+	else if( xmlStrcmp(exitcode_key, (const xmlChar*)"2") == 0 )
+		summary->missing++;
+	else if( xmlStrcmp(exitcode_key, (const xmlChar*)"3") == 0 )
+		summary->errors++;
+	else if( xmlStrcmp(exitcode_key, (const xmlChar*)"4") == 0 )
+		summary->mandatory++;
+	else if( xmlStrcmp(exitcode_key, (const xmlChar*)"100") == 0 || xmlStrcmp(exitcode_key, (const xmlChar*)"-1073740771") == 0 || xmlStrcmp(exitcode_key, (const xmlChar*)"-1073741819") == 0 || xmlStrcmp(exitcode_key, (const xmlChar*)"-2147483645") == 0 )
+		summary->crashed++;
+	else
+		summary->unknown++;
+}
+
 struct report_cb_data
 {
 	FILE* report_fd;
@@ -184,6 +216,7 @@ struct report_cb_data
 	int report_type;
 	const char* compare_folder;
 	int print_stdout;
+	struct report_summary summary;
 };
 
 /* TODO - handle multiple occurances */
@@ -233,7 +266,7 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 	attr1 = NULL; \
 }
 
-static int create_report_from_filename(const char *const filename, const struct report_cb_data *const r_cb_data, int write_src_header)
+static int create_report_from_filename(const char *const filename, struct report_cb_data* r_cb_data, int write_src_header)
 {
 	int data_written = 0;
 	
@@ -261,6 +294,8 @@ static int create_report_from_filename(const char *const filename, const struct 
 				while( output_childs ) {
 					if( output_childs->type == XML_ELEMENT_NODE ) {
 						if( xmlStrcmp(output_childs->name, (const xmlChar*)"result") == 0 ) {
+							r_cb_data->summary.executed++;
+
 							xmlChar* exitcode_key = xmlGetProp(output_childs, (const xmlChar*)"exitcode");		
 							xmlChar* stderr_key = xmlGetProp(output_childs, (const xmlChar*)"stderr");
 							xmlChar* stdout_key = xmlGetProp(output_childs, (const xmlChar*)"stdout");
@@ -272,6 +307,12 @@ static int create_report_from_filename(const char *const filename, const struct 
 							/* TODO: replace with option */
 							int reset_scope_found = stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"called within reset scope by");
 							
+							summary_incr(&r_cb_data->summary, exitcode_key);
+							if(memleak_found)
+								r_cb_data->summary.memleaks++;
+							if(clipped_found)
+								r_cb_data->summary.clipped++;
+
 							int report_error = (error_found && !(r_cb_data->ignore_exitcode_4 && error4_found));
 							int report_memleak = (memleak_found && r_cb_data->show_memleaks);
 							int report_stdout = (r_cb_data->print_stdout && stdout_key && xmlStrlen(stdout_key) > 0);
@@ -479,9 +520,11 @@ static void create_report()
 	r_cb_data.report_type = config_report_type;
 	r_cb_data.compare_folder = config_compare_folder;
 	r_cb_data.print_stdout = config_print_stdout;
+	memset(&r_cb_data.summary, 0x00, sizeof(struct report_summary));
 
 	if( config_group_data ) {
 		struct group_data* gd = NULL;
+		printf("getting group data...\n");
 		get_group_data(config_xml_folder, &gd);
 	
 		printf("creating report...\n");
@@ -489,8 +532,22 @@ static void create_report()
 
 		free_group_data(gd);
 	}
-	else
+	else {
+		printf("creating report...\n");
 		parse_directory(config_xml_folder, 0, create_report_cb, (void*)&r_cb_data);
+	}
+
+	if( config_dokuwiki_format ) {
+		fprintf(report_fd, "===== Summary =====\n");
+		fprintf(report_fd, "%d executed\n", r_cb_data.summary.executed);
+		fprintf(report_fd, "%d crashes\n", r_cb_data.summary.crashed);
+		fprintf(report_fd, "%d errors\n", r_cb_data.summary.errors);
+		fprintf(report_fd, "%d missing roms\n", r_cb_data.summary.missing);
+		fprintf(report_fd, "%d with memory leaks\n", r_cb_data.summary.memleaks);
+		fprintf(report_fd, "%d with clipping\n", r_cb_data.summary.clipped);
+		fprintf(report_fd, "%d with mandatory devices\n", r_cb_data.summary.mandatory);
+		fprintf(report_fd, "%d unknown\n", r_cb_data.summary.unknown);
+	}
 
 	fclose(report_fd);
 	report_fd = NULL;
