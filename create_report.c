@@ -275,22 +275,22 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 			\
 			fprintf(r_cb_data->report_fd, "<p>\n"); \
 			PRINT_INFO \
-			fprintf(r_cb_data->report_fd, "<br>\n"); \
+			fprintf(r_cb_data->report_fd, "<br/>\n"); \
 			\
 			xmlFree(name); \
 			name = NULL; \
 			xmlFree(srcfile); \
 			srcfile = NULL; \
 		} \
-		fprintf(r_cb_data->report_fd, "'%s' differs<br>\n", attr_name);\
+		fprintf(r_cb_data->report_fd, "'%s' differs<br/>\n", attr_name);\
 		\
 		xmlChar* tmp = xmlEncodeEntitiesReentrant(doc_old, attr1); \
-		fprintf(r_cb_data->report_fd, "old: %s<br>\n", tmp); \
+		fprintf(r_cb_data->report_fd, "old: %s<br/>\n", tmp); \
 		xmlFree(tmp); \
 		tmp = NULL; \
 		\
 		tmp = xmlEncodeEntitiesReentrant(doc, attr2); \
-		fprintf(r_cb_data->report_fd, "new: %s<br>\n", tmp); \
+		fprintf(r_cb_data->report_fd, "new: %s<br/>\n", tmp); \
 		xmlFree(tmp); \
 		tmp = NULL; \
 	} \
@@ -524,7 +524,7 @@ static int create_report_from_filename(const char *const filename, struct report
 					// TODO: add all information about execution to report
 					int pngcmp_res = system(pngcmp_cmd);
 					if( pngcmp_res == 1 )
-						fprintf(r_cb_data->report_fd, "<img src=\"%s\">\n", outpath);
+						fprintf(r_cb_data->report_fd, "<img src=\"%s\" alt=\"%s\"/>\n", outpath, entry_name);
 					
 					free(pngcmp_cmd);
 					pngcmp_cmd = NULL;
@@ -632,7 +632,13 @@ static void create_report()
 		free(outputfile);
 		outputfile = NULL;
 		
-		fprintf(report_fd, "<html>\n<body>\n");
+		fprintf(report_fd, "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
+		fprintf(report_fd, "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n");
+		fprintf(report_fd, "<head>\n");
+		fprintf(report_fd, "<title>mame_regtest comparison report</title>\n");
+		fprintf(report_fd, "<meta http-equiv=\"Content-type\" content=\"text/html;charset=UTF-8\"/>\n");
+		fprintf(report_fd, "</head>\n");
+		fprintf(report_fd, "<body>\n");
 	}
 		
 	r_cb_data.report_fd = report_fd;
