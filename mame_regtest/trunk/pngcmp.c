@@ -78,7 +78,6 @@ int main(int argc, char *argv[])
 	outfilename = astring_dupc(argv[3]);
 	
 	int png_res = generate_png_diff(imgfilename1, imgfilename2, outfilename);
-	printf("%d\n", png_res);
 
 	astring_free(outfilename);
 	astring_free(imgfilename2);
