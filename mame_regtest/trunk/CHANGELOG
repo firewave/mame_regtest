@@ -488,7 +488,7 @@
 	- do not write "autosave" flag to output XML when "use_autosave" is not set to 1
 	- moved info from mame_regtest.c to README
 	- enabled parse_directory() for Visual Studio 2010 by using dirent API
-	- seperated project output folders in Visual Studio
+	- separated project output folders in Visual Studio
 	- also compile mame_regtest Release as C++
 	- avoid warning about unreachable code with Visual Studio Release build
 	- added split_string() to common.c/.h
@@ -496,3 +496,4 @@
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
+	- added support for multiple input folders (separated by ';')
