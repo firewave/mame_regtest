@@ -488,3 +488,5 @@
 	- do not write "autosave" flag to output XML when "use_autosave" is not set to 1
 	- moved info from mame_regtest.c to README
 	- enabled parse_directory() for Visual Studio 2010 by using dirent API
+	- seperated project output folders in Visual Studio
+	- also compile mame_regtest Release as C++
