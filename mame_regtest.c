@@ -93,6 +93,7 @@ struct driver_info {
 	struct dipswitch_info* dipswitches;
 	struct dipswitch_info* configurations;
 	int has_softlist;
+	xmlChar* softwarelist;
 	struct driver_info* next;
 };
 
@@ -196,6 +197,7 @@ static int config_use_dipswitches = 0;
 static int config_use_configurations = 0;
 static char* config_hashpath_folder = NULL;
 static int config_use_softwarelist = 0;
+static int config_hack_softwarelist = 0;
 
 struct config_entry mrt_config[] =
 {
@@ -241,6 +243,7 @@ struct config_entry mrt_config[] =
 	{ "use_configurations",		CFG_INT,		&config_use_configurations },
 	{ "hashpath",				CFG_STR_PTR,	&config_hashpath_folder },
 	{ "use_softwarelist",		CFG_INT,		&config_use_softwarelist },
+	{ "hack_softwarelist",		CFG_INT,		&config_hack_softwarelist },
 	{ NULL,						CFG_UNK,		NULL }
 };
 
@@ -1200,7 +1203,9 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 		}
 		if( actual_driv_inf->device_mandatory )
 			xmlFree(actual_driv_inf->device_mandatory);
-
+		if( actual_driv_inf->softwarelist )
+			xmlFree(actual_driv_inf->softwarelist);
+		
 		struct device_info* devices = actual_driv_inf->devices;
 		while( devices != NULL ) {
 			struct device_info* next_device = devices->next;
@@ -1398,7 +1403,11 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 		/* process softlist entries */
 		xmlDocPtr soft_doc = xmlReadFile(driver_softlist_file, NULL, 0);
 		if( soft_doc ) {
-			xmlNodeSetPtr soft_nodeset = get_xpath_nodeset(soft_doc, (const xmlChar*)"/softwarelists/softwarelist/software");
+			xmlNodeSetPtr soft_nodeset = NULL;
+			if( config_hack_softwarelist )
+				soft_nodeset = get_xpath_nodeset(soft_doc, (const xmlChar*)"/softwarelist/software");
+			else
+				soft_nodeset = get_xpath_nodeset(soft_doc, (const xmlChar*)"/softwarelists/softwarelist/software");
 			if( soft_nodeset )
 			{
 				char initial_postfix[1024];
@@ -1512,26 +1521,48 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 			char* driver_softlist = NULL;
 			append_string(&driver_softlist, (const char*)actual_driv_inf->name);
 			append_string(&driver_softlist, "_listsoftware");
-					
-			char* mame_call = NULL;					
-			get_executable(&mame_call, NULL, driver_softlist);
-			append_string(&mame_call, " -hashpath ");
-			append_string(&mame_call, config_hashpath_folder);
-			append_string(&mame_call, " ");
-			append_string(&mame_call, (const char*)actual_driv_inf->name);
-			append_string(&mame_call, " -listsoftware > ");
-			append_string(&mame_call, config_output_folder);
-			append_string(&mame_call, FILESLASH);
-			append_string(&mame_call, driver_softlist);
-			append_string(&mame_call, ".xml");
-	
-			if( config_verbose )
-				printf("%s\n", mame_call);
-	
-			system(mame_call);
 			
-			free(mame_call);
-			mame_call = NULL;
+			if( config_hack_softwarelist ) {
+				char* softlist = NULL;
+				append_string(&softlist, config_hashpath_folder);
+				append_string(&softlist, FILESLASH);
+				append_string(&softlist, (const char*)actual_driv_inf->softwarelist);
+				append_string(&softlist, ".xml");
+				
+				char* driver_softlist_path = NULL;
+				append_string(&driver_softlist_path, config_output_folder);
+				append_string(&driver_softlist_path, FILESLASH);
+				append_string(&driver_softlist_path, driver_softlist);
+				append_string(&driver_softlist_path, ".xml");
+				
+				copy_file(softlist, driver_softlist_path);
+				
+				free(driver_softlist_path);
+				driver_softlist_path = NULL;				
+				free(softlist);
+				softlist = NULL;
+			}
+			else {
+				char* mame_call = NULL;					
+				get_executable(&mame_call, NULL, driver_softlist);
+				append_string(&mame_call, " -hashpath ");
+				append_string(&mame_call, config_hashpath_folder);
+				append_string(&mame_call, " ");
+				append_string(&mame_call, (const char*)actual_driv_inf->name);
+				append_string(&mame_call, " -listsoftware > ");
+				append_string(&mame_call, config_output_folder);
+				append_string(&mame_call, FILESLASH);
+				append_string(&mame_call, driver_softlist);
+				append_string(&mame_call, ".xml");
+		
+				if( config_verbose )
+					printf("%s\n", mame_call);
+		
+				system(mame_call);
+				
+				free(mame_call);
+				mame_call = NULL;
+			}
 	
 			free(driver_softlist);
 			driver_softlist = NULL;
@@ -1890,8 +1921,10 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					last_dev_info = new_dev_info;
 				}
 				
-				if( xmlStrcmp(game_children->name, (const xmlChar*)"softwarelist") == 0 )
+				if( xmlStrcmp(game_children->name, (const xmlChar*)"softwarelist") == 0 ) {
 					(*new_driv_inf)->has_softlist = 1;
+					(*new_driv_inf)->softwarelist = xmlGetProp(game_children, (const xmlChar*)"name");
+				}
 			}
 
 			game_children = game_children->next;
@@ -2226,6 +2259,7 @@ int main(int argc, char *argv[])
 		printf("hack_biospath: %d\n", config_hack_biospath);
 		printf("hack_mngwrite: %d\n", config_hack_mngwrite);
 		printf("hack_pinmame: %d\n", config_hack_pinmame);
+		printf("hack_softwarelist: %d\n", config_hack_softwarelist);
 
 		printf("\n"); /* for output formating */
 	}
