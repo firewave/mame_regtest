@@ -235,29 +235,38 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 }
 
 /* TODO: implement dokuwiki format */
-#define COMPARE_ATTRIBUTE(xpath_expr, attr_name) \
+#define COMPARE_ATTRIBUTE(xpath_expr, attr_name, differs) \
 { \
 	xmlChar* attr1 = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)xpath_expr, (const xmlChar*)attr_name); \
 	xmlChar* attr2 = get_attribute_by_xpath(xpathCtx2, (const xmlChar*)xpath_expr, (const xmlChar*)attr_name); \
 	\
 	if( xmlStrcmp(attr1, attr2) != 0 ) \
 	{ \
+		differs = 1; \
 		if( write_set_data ) \
 		{ \
 			write_set_data = 0; \
 			xmlChar* name = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)"/output", (const xmlChar*)"name"); \
 			xmlChar* srcfile = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)"/output", (const xmlChar*)"sourcefile"); \
 			\
-			fprintf(r_cb_data->report_fd, "%s: %s\n", srcfile, name); \
+			fprintf(r_cb_data->report_fd, "<p>%s: %s<br>\n", srcfile, name); \
 			\
 			xmlFree(name); \
 			name = NULL; \
 			xmlFree(srcfile); \
 			srcfile = NULL; \
 		} \
-		fprintf(r_cb_data->report_fd, "'%s' differs\n", attr_name);\
-		fprintf(r_cb_data->report_fd, "\told: %s\n", attr1); \
-		fprintf(r_cb_data->report_fd, "\tnew: %s\n", attr2); \
+		fprintf(r_cb_data->report_fd, "'%s' differs<br>\n", attr_name);\
+		\
+		xmlChar* tmp = xmlEncodeEntitiesReentrant(doc1, attr1); \
+		fprintf(r_cb_data->report_fd, "old: %s<br>\n", tmp); \
+		xmlFree(tmp); \
+		tmp = NULL; \
+		\
+		tmp = xmlEncodeEntitiesReentrant(doc2, attr2); \
+		fprintf(r_cb_data->report_fd, "new: %s<br>\n", tmp); \
+		xmlFree(tmp); \
+		tmp = NULL; \
 	} \
 	\
 	xmlFree(attr2); \
@@ -270,7 +279,7 @@ static int create_report_from_filename(const char *const filename, struct report
 {
 	int data_written = 0;
 	
-	switch( r_cb_data->report_type)
+	switch( r_cb_data->report_type )
 	{
 		default:
 		case 0:
@@ -435,22 +444,89 @@ static int create_report_from_filename(const char *const filename, struct report
 		case 1:
 		{
 			char* entry_name = get_filename(filename);
-			char* tmp_path = NULL;
-			append_string(&tmp_path, r_cb_data->compare_folder);
-			append_string(&tmp_path, FILESLASH);
-			append_string(&tmp_path, entry_name);
-			if( access(tmp_path, F_OK) == 0 ) {
+			char* entry_directory = get_directory(filename);
+			char* old_path = NULL;
+			append_string(&old_path, r_cb_data->compare_folder);
+			append_string(&old_path, FILESLASH);
+			append_string(&old_path, entry_name);
+			if( access(old_path, F_OK) == 0 ) {
 				int write_set_data = 1;
+				int dummy = 0;
+				int png_differs = 0;
 
-				xmlDocPtr doc1 = xmlReadFile(filename, NULL, 0);
-				xmlDocPtr doc2 = xmlReadFile(tmp_path, NULL, 0);
+				xmlDocPtr doc1 = xmlReadFile(old_path, NULL, 0);
+				xmlDocPtr doc2 = xmlReadFile(filename, NULL, 0);
 
 				xmlXPathContextPtr xpathCtx1 = xmlXPathNewContext(doc1);
 				xmlXPathContextPtr xpathCtx2 = xmlXPathNewContext(doc2);
 
-				COMPARE_ATTRIBUTE("/output/result", "exitcode")
-				COMPARE_ATTRIBUTE("/output/result", "stderr")
-				COMPARE_ATTRIBUTE("/output/result/dir[@name='snap']//file", "png_crc")
+				COMPARE_ATTRIBUTE("/output/result", "exitcode", dummy)
+				COMPARE_ATTRIBUTE("/output/result", "stderr", dummy)
+				COMPARE_ATTRIBUTE("/output/result/dir[@name='snap']//file", "png_crc", png_differs)
+				
+				if( png_differs ) {
+					xmlChar* name = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)"/output", (const xmlChar*)"name");
+					xmlChar* srcfile = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)"/output", (const xmlChar*)"sourcefile");
+					
+					char* png_path = NULL;
+					append_string(&png_path, FILESLASH);
+					append_string(&png_path, (const char*)name);
+					append_string(&png_path, FILESLASH);
+					append_string(&png_path, "snap");
+					append_string(&png_path, FILESLASH);
+					append_string(&png_path, (const char*)name);
+					append_string(&png_path, FILESLASH);
+					append_string(&png_path, "final.png");
+					
+					char* path1 = NULL;
+					append_string(&path1, r_cb_data->compare_folder);
+					append_string(&path1, png_path);					
+
+					char* path2 = NULL;
+					append_string(&path2, entry_directory);
+					append_string(&path2, png_path);
+					
+					// TODO: need output path for diff
+					// TODO: use basename instead of entry_name
+					char* outpath = NULL;
+					append_string(&outpath, "D:\\mame_regtest\\_diff_test\\");
+					append_string(&outpath, entry_name);
+					append_string(&outpath, "_diff.png");
+					
+					// TODO: switch the paths for now since somehow pngcmp prints the old one on the right
+					char* pngcmp_cmd = NULL;
+					append_string(&pngcmp_cmd, "pngcmp");
+					append_string(&pngcmp_cmd, " ");
+					//append_string(&pngcmp_cmd, path1);
+					append_string(&pngcmp_cmd, path2);
+					append_string(&pngcmp_cmd, " ");
+					//append_string(&pngcmp_cmd, path2);
+					append_string(&pngcmp_cmd, path1);
+					append_string(&pngcmp_cmd, " ");
+					append_string(&pngcmp_cmd, outpath);
+					
+					// TODO: add all information about execution to report
+					int pngcmp_res = system(pngcmp_cmd);
+					if( pngcmp_res == 1 )
+						fprintf(r_cb_data->report_fd, "<img src=\"%s\">\n", outpath);
+					
+					free(pngcmp_cmd);
+					pngcmp_cmd = NULL;
+					free(outpath);
+					outpath = NULL;
+					free(path2);
+					path2 = NULL;
+					free(path1);
+					path1 = NULL;
+					free(png_path);
+					png_path = NULL;
+					
+					xmlFree(srcfile);
+					srcfile = NULL;
+					
+					xmlFree(name);
+					name = NULL;
+				}
 
 				if( xpathCtx2 )
 					xmlXPathFreeContext(xpathCtx2);
@@ -461,12 +537,17 @@ static int create_report_from_filename(const char *const filename, struct report
 				doc2 = NULL;
 				xmlFreeDoc(doc1);
 				doc1 = NULL;
+				
+				if( write_set_data == 0 )
+					fprintf(r_cb_data->report_fd, "</p>\n");
 			}
 			else {
-				fprintf(r_cb_data->report_fd, "%s - missing\n", entry_name);
+				fprintf(r_cb_data->report_fd, "<p>%s - new</p>\n", entry_name);
 			}
-			free(tmp_path);
-			tmp_path = NULL;
+			free(old_path);
+			old_path = NULL;
+			free(entry_directory);
+			entry_directory = NULL;
 			free(entry_name);
 			entry_name = NULL;
 		}
@@ -522,6 +603,9 @@ static void create_report()
 	r_cb_data.print_stdout = config_print_stdout;
 	memset(&r_cb_data.summary, 0x00, sizeof(struct report_summary));
 
+	if( config_report_type == 1 )
+		fprintf(report_fd, "<html>\n<body>\n");
+	
 	char** folders = split_string(config_xml_folder, ";");
 	int i;
 
@@ -544,7 +628,7 @@ static void create_report()
 
 	free_array(folders);
 
-	if( config_dokuwiki_format ) {
+	if( config_dokuwiki_format && config_report_type == 0 ) {
 		fprintf(report_fd, "===== Summary =====\n");
 		fprintf(report_fd, "  * %d executed\n", r_cb_data.summary.executed);
 		fprintf(report_fd, "  * %d crashed\n", r_cb_data.summary.crashed);
@@ -555,6 +639,9 @@ static void create_report()
 		fprintf(report_fd, "  * %d with mandatory devices\n", r_cb_data.summary.mandatory);
 		fprintf(report_fd, "  * %d unknown\n", r_cb_data.summary.unknown);
 	}
+	
+	if( config_report_type == 1 )
+		fprintf(report_fd, "</body>\n</html>\n");
 
 	fclose(report_fd);
 	report_fd = NULL;

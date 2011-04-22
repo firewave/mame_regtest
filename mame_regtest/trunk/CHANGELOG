@@ -503,3 +503,4 @@
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
 	- added support for multiple input folders (separated by ';')
+	- updated comparison report to invoke pngcmp and output in HTML
