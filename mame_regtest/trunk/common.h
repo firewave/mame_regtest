@@ -83,4 +83,9 @@ void clear_directory(const char* dirname, int delete_root);
 
 void calc_crc32(const char* file, unsigned int* crc);
 
+/* you have to free the result with free_array() */
+char** split_string(const char* str, const char* delims);
+
+void free_array(char** arr);
+
 #endif
