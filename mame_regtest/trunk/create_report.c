@@ -156,6 +156,7 @@ static int config_group_data = 0;
 static int config_report_type = 0; /* 0 = result report - 1 = comparison report */
 static char* config_compare_folder = NULL;
 static int config_print_stdout = 0;
+static char* config_output_folder = NULL;
 
 struct config_entry report_config[] =
 {
@@ -170,6 +171,7 @@ struct config_entry report_config[] =
 	{ "report_type",		CFG_INT,		&config_report_type },
 	{ "compare_folder",		CFG_STR_PTR,	&config_compare_folder }, /* comparison report specific */
 	{ "print_stdout", 		CFG_INT, 		&config_print_stdout },
+	{ "output_folder", 		CFG_STR_PTR, 		&config_output_folder }, /* comparison report specific */
 	{ NULL, 				CFG_UNK, 		NULL }
 };
 
@@ -217,6 +219,7 @@ struct report_cb_data
 	const char* compare_folder;
 	int print_stdout;
 	struct report_summary summary;
+	const char* output_folder;
 };
 
 /* TODO - handle multiple occurances */
@@ -234,7 +237,28 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 	return attr_value;
 }
 
-/* TODO: implement dokuwiki format */
+#define PRINT_INFO \
+	fprintf(r_cb_data->report_fd, "%s: %s", sourcefile_key, name_key); \
+	if( bios_key ) \
+		fprintf(r_cb_data->report_fd, " (bios %s)", bios_key); \
+	if( ramsize_key ) \
+		fprintf(r_cb_data->report_fd, " (ramsize %s)", ramsize_key); \
+	if( dipswitch_key && dipvalue_key ) \
+		fprintf(r_cb_data->report_fd, " (dipswitch %s value %s)", dipswitch_key, dipvalue_key); \
+	if( configuration_key && confsetting_key ) \
+		fprintf(r_cb_data->report_fd, " (configuration %s value %s)", configuration_key, confsetting_key); \
+	if( devices_node ) \
+	{ \
+		xmlAttrPtr dev_attrs = devices_node->properties; \
+		while( dev_attrs ) { \
+			fprintf(r_cb_data->report_fd, " (%s %s)", dev_attrs->name, dev_attrs->children->content); \
+			 \
+			dev_attrs = dev_attrs->next; \
+		} \
+	} \
+	if( autosave_key ) \
+		fprintf(r_cb_data->report_fd, " (autosave)"); \
+
 #define COMPARE_ATTRIBUTE(xpath_expr, attr_name, differs) \
 { \
 	xmlChar* attr1 = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)xpath_expr, (const xmlChar*)attr_name); \
@@ -249,7 +273,9 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 			xmlChar* name = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)"/output", (const xmlChar*)"name"); \
 			xmlChar* srcfile = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)"/output", (const xmlChar*)"sourcefile"); \
 			\
-			fprintf(r_cb_data->report_fd, "<p>%s: %s<br>\n", srcfile, name); \
+			fprintf(r_cb_data->report_fd, "<p>\n"); \
+			PRINT_INFO \
+			fprintf(r_cb_data->report_fd, "<br>\n"); \
 			\
 			xmlFree(name); \
 			name = NULL; \
@@ -258,12 +284,12 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 		} \
 		fprintf(r_cb_data->report_fd, "'%s' differs<br>\n", attr_name);\
 		\
-		xmlChar* tmp = xmlEncodeEntitiesReentrant(doc1, attr1); \
+		xmlChar* tmp = xmlEncodeEntitiesReentrant(doc_old, attr1); \
 		fprintf(r_cb_data->report_fd, "old: %s<br>\n", tmp); \
 		xmlFree(tmp); \
 		tmp = NULL; \
 		\
-		tmp = xmlEncodeEntitiesReentrant(doc2, attr2); \
+		tmp = xmlEncodeEntitiesReentrant(doc, attr2); \
 		fprintf(r_cb_data->report_fd, "new: %s<br>\n", tmp); \
 		xmlFree(tmp); \
 		tmp = NULL; \
@@ -274,6 +300,37 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 	xmlFree(attr1); \
 	attr1 = NULL; \
 }
+
+#define PREPARE_KEYS(output_node) \
+	xmlChar* name_key = xmlGetProp(output_node, (const xmlChar*)"name"); \
+	xmlChar* sourcefile_key = xmlGetProp(output_node, (const xmlChar*)"sourcefile"); \
+	xmlChar* bios_key = xmlGetProp(output_node, (const xmlChar*)"bios"); \
+	xmlChar* ramsize_key = xmlGetProp(output_node, (const xmlChar*)"ramsize"); \
+	xmlChar* autosave_key = xmlGetProp(output_node, (const xmlChar*)"autosave"); \
+	xmlChar* dipswitch_key = xmlGetProp(output_node, (const xmlChar*)"dipswitch"); \
+	xmlChar* dipvalue_key = xmlGetProp(output_node, (const xmlChar*)"dipvalue"); \
+	xmlChar* configuration_key = xmlGetProp(output_node, (const xmlChar*)"configuration"); \
+	xmlChar* confsetting_key = xmlGetProp(output_node, (const xmlChar*)"confsetting");
+	
+#define FREE_KEYS \
+	xmlFree(confsetting_key); \
+	confsetting_key = NULL; \
+	xmlFree(configuration_key); \
+	configuration_key = NULL; \
+	xmlFree(dipvalue_key); \
+	dipvalue_key = NULL; \
+	xmlFree(dipswitch_key); \
+	dipswitch_key = NULL; \
+	xmlFree(autosave_key); \
+	autosave_key = NULL; \
+	xmlFree(ramsize_key); \
+	ramsize_key = NULL; \
+	xmlFree(bios_key); \
+	bios_key = NULL; \
+	xmlFree(sourcefile_key); \
+	sourcefile_key = NULL; \
+	xmlFree(name_key); \
+	name_key = NULL;
 
 static int create_report_from_filename(const char *const filename, struct report_cb_data* r_cb_data, int write_src_header)
 {
@@ -286,17 +343,8 @@ static int create_report_from_filename(const char *const filename, struct report
 		{
 			xmlDocPtr doc = xmlReadFile(filename, "UTF-8", 0);
 			if( doc ) {
-				xmlNodePtr output_node = doc->children;
-			
-				xmlChar* name_key = xmlGetProp(output_node, (const xmlChar*)"name");
-				xmlChar* sourcefile_key = xmlGetProp(output_node, (const xmlChar*)"sourcefile");
-				xmlChar* bios_key = xmlGetProp(output_node, (const xmlChar*)"bios");
-				xmlChar* ramsize_key = xmlGetProp(output_node, (const xmlChar*)"ramsize");
-				xmlChar* autosave_key = xmlGetProp(output_node, (const xmlChar*)"autosave");
-				xmlChar* dipswitch_key = xmlGetProp(output_node, (const xmlChar*)"dipswitch");
-				xmlChar* dipvalue_key = xmlGetProp(output_node, (const xmlChar*)"dipvalue");
-				xmlChar* configuration_key = xmlGetProp(output_node, (const xmlChar*)"configuration");
-				xmlChar* confsetting_key = xmlGetProp(output_node, (const xmlChar*)"confsetting");
+				xmlNodePtr output_node = doc->children;				
+				PREPARE_KEYS(output_node)
 			
 				xmlNodePtr output_childs = output_node->children;
 				xmlNodePtr devices_node = NULL;
@@ -368,26 +416,7 @@ static int create_report_from_filename(const char *const filename, struct report
 								}
 								else
 								{
-									fprintf(r_cb_data->report_fd, "%s: %s", sourcefile_key, name_key);
-									if( bios_key )
-										fprintf(r_cb_data->report_fd, " (bios %s)", bios_key);
-									if( ramsize_key )
-										fprintf(r_cb_data->report_fd, " (ramsize %s)", ramsize_key);
-									if( dipswitch_key && dipvalue_key )
-										fprintf(r_cb_data->report_fd, " (dipswitch %s value %s)", dipswitch_key, dipvalue_key);
-									if( configuration_key && confsetting_key )
-										fprintf(r_cb_data->report_fd, " (configuration %s value %s)", configuration_key, confsetting_key);
-									if( devices_node )
-									{
-										xmlAttrPtr dev_attrs = devices_node->properties;
-										while( dev_attrs ) {
-											fprintf(r_cb_data->report_fd, " (%s %s)", dev_attrs->name, dev_attrs->children->content);
-			
-											dev_attrs = dev_attrs->next;
-										}
-									}
-									if( autosave_key )
-										fprintf(r_cb_data->report_fd, " (autosave)");
+									PRINT_INFO
 									fprintf(r_cb_data->report_fd, " (%s)\n", exitcode_key);
 		
 									if( (report_error || report_stdout || report_clipped) && stdout_key && xmlStrlen(stdout_key) > 0 )
@@ -415,25 +444,8 @@ static int create_report_from_filename(const char *const filename, struct report
 					}
 					output_childs = output_childs->next;
 				}
-
-				xmlFree(confsetting_key);
-				confsetting_key = NULL;
-				xmlFree(configuration_key);
-				configuration_key = NULL;			
-				xmlFree(dipvalue_key);
-				dipvalue_key = NULL;
-				xmlFree(dipswitch_key);
-				dipswitch_key = NULL;
-				xmlFree(autosave_key);
-				autosave_key = NULL;
-				xmlFree(ramsize_key);
-				ramsize_key = NULL;
-				xmlFree(bios_key);
-				bios_key = NULL;
-				xmlFree(sourcefile_key);
-				sourcefile_key = NULL;
-				xmlFree(name_key);
-				name_key = NULL;
+				
+				FREE_KEYS
 		
 				xmlFreeDoc(doc);
 				doc = NULL;
@@ -454,11 +466,15 @@ static int create_report_from_filename(const char *const filename, struct report
 				int dummy = 0;
 				int png_differs = 0;
 
-				xmlDocPtr doc1 = xmlReadFile(old_path, NULL, 0);
-				xmlDocPtr doc2 = xmlReadFile(filename, NULL, 0);
+				xmlDocPtr doc_old = xmlReadFile(old_path, NULL, 0);
+				xmlDocPtr doc = xmlReadFile(filename, NULL, 0);
 
-				xmlXPathContextPtr xpathCtx1 = xmlXPathNewContext(doc1);
-				xmlXPathContextPtr xpathCtx2 = xmlXPathNewContext(doc2);
+				xmlXPathContextPtr xpathCtx1 = xmlXPathNewContext(doc_old);
+				xmlXPathContextPtr xpathCtx2 = xmlXPathNewContext(doc);
+				
+				xmlNodePtr output_node = doc->children;
+				xmlNodePtr devices_node = NULL; // TODO
+				PREPARE_KEYS(output_node)
 
 				COMPARE_ATTRIBUTE("/output/result", "exitcode", dummy)
 				COMPARE_ATTRIBUTE("/output/result", "stderr", dummy)
@@ -486,10 +502,10 @@ static int create_report_from_filename(const char *const filename, struct report
 					append_string(&path2, entry_directory);
 					append_string(&path2, png_path);
 					
-					// TODO: need output path for diff
 					// TODO: use basename instead of entry_name
 					char* outpath = NULL;
-					append_string(&outpath, "D:\\mame_regtest\\_diff_test\\");
+					append_string(&outpath, config_output_folder);
+					append_string(&outpath, FILESLASH);
 					append_string(&outpath, entry_name);
 					append_string(&outpath, "_diff.png");
 					
@@ -527,16 +543,18 @@ static int create_report_from_filename(const char *const filename, struct report
 					xmlFree(name);
 					name = NULL;
 				}
+				
+				FREE_KEYS
 
 				if( xpathCtx2 )
 					xmlXPathFreeContext(xpathCtx2);
 				if( xpathCtx1 )
 					xmlXPathFreeContext(xpathCtx1);
 
-				xmlFreeDoc(doc2);
-				doc2 = NULL;
-				xmlFreeDoc(doc1);
-				doc1 = NULL;
+				xmlFreeDoc(doc);
+				doc = NULL;
+				xmlFreeDoc(doc_old);
+				doc = NULL;
 				
 				if( write_set_data == 0 )
 					fprintf(r_cb_data->report_fd, "</p>\n");
@@ -589,10 +607,9 @@ static void create_report_cb(struct parse_callback_data* pcd)
 
 static void create_report()
 {
-	FILE* report_fd = fopen(config_output_file, "wb");
+	FILE* report_fd = NULL;
 
 	struct report_cb_data r_cb_data;
-	r_cb_data.report_fd = report_fd;
 	r_cb_data.print_stderr = config_print_stderr;
 	r_cb_data.dokuwiki_format = config_dokuwiki_format;
 	r_cb_data.ignore_exitcode_4 = config_ignore_exitcode_4;
@@ -601,10 +618,24 @@ static void create_report()
 	r_cb_data.report_type = config_report_type;
 	r_cb_data.compare_folder = config_compare_folder;
 	r_cb_data.print_stdout = config_print_stdout;
+	r_cb_data.output_folder = config_output_folder;
 	memset(&r_cb_data.summary, 0x00, sizeof(struct report_summary));
 
-	if( config_report_type == 1 )
+	if( config_report_type == 0 )
+		report_fd = fopen(config_output_file, "wb");
+	else if( config_report_type == 1 ) {
+		char* outputfile = NULL;
+		append_string(&outputfile, config_output_folder);
+		append_string(&outputfile, FILESLASH);
+		append_string(&outputfile, "mrt_diff.html");
+		report_fd = fopen(outputfile, "wb");
+		free(outputfile);
+		outputfile = NULL;
+		
 		fprintf(report_fd, "<html>\n<body>\n");
+	}
+		
+	r_cb_data.report_fd = report_fd;
 	
 	char** folders = split_string(config_xml_folder, ";");
 	int i;
