@@ -500,6 +500,7 @@
 	- fixed "start_at" example in default configuration
 	- added get_directory() to common.c/.h
 	- changed "device_mandatory" from integer to string
+	- added option "hack_softwarelist" to work around broken -listsoftware
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
