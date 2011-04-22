@@ -21,7 +21,7 @@
 		
 		<!-- xpath_expr examples -->
 		<!-- 'start_at' equivalent
-			<option name='xpath_expr' value='DRIVER_ROOT[@name="game"]/following-sibling::*'/>
+			<option name='xpath_expr' value='DRIVER_ROOT[@name="game"] | DRIVER_ROOT[@name="game"]/following-sibling::*'/>
 		-->
 		<!-- 'sourcefile' equivalent
 			<option name='xpath_expr' value='DRIVER_ROOT[@sourcefile="driver.c"]'/>

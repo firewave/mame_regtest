@@ -497,6 +497,7 @@
 		- removed "--leak-resolution=med" since the valgrind default is now "high"
 		- added "--track-origins=yes"
 	- added "pngcmp" for PNG comparison
+	- fixed "start_at" example in default configuration
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
