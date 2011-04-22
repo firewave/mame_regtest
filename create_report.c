@@ -546,14 +546,14 @@ static void create_report()
 
 	if( config_dokuwiki_format ) {
 		fprintf(report_fd, "===== Summary =====\n");
-		fprintf(report_fd, "%d executed\n", r_cb_data.summary.executed);
-		fprintf(report_fd, "%d crashes\n", r_cb_data.summary.crashed);
-		fprintf(report_fd, "%d errors\n", r_cb_data.summary.errors);
-		fprintf(report_fd, "%d missing roms\n", r_cb_data.summary.missing);
-		fprintf(report_fd, "%d with memory leaks\n", r_cb_data.summary.memleaks);
-		fprintf(report_fd, "%d with clipping\n", r_cb_data.summary.clipped);
-		fprintf(report_fd, "%d with mandatory devices\n", r_cb_data.summary.mandatory);
-		fprintf(report_fd, "%d unknown\n", r_cb_data.summary.unknown);
+		fprintf(report_fd, "  * %d executed\n", r_cb_data.summary.executed);
+		fprintf(report_fd, "  * %d crashes\n", r_cb_data.summary.crashed);
+		fprintf(report_fd, "  * %d errors\n", r_cb_data.summary.errors);
+		fprintf(report_fd, "  * %d missing roms\n", r_cb_data.summary.missing);
+		fprintf(report_fd, "  * %d with memory leaks\n", r_cb_data.summary.memleaks);
+		fprintf(report_fd, "  * %d with clipping\n", r_cb_data.summary.clipped);
+		fprintf(report_fd, "  * %d with mandatory devices\n", r_cb_data.summary.mandatory);
+		fprintf(report_fd, "  * %d unknown\n", r_cb_data.summary.unknown);
 	}
 
 	fclose(report_fd);
