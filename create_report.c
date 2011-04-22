@@ -522,10 +522,14 @@ static void create_report()
 	r_cb_data.print_stdout = config_print_stdout;
 	memset(&r_cb_data.summary, 0x00, sizeof(struct report_summary));
 
+	char** folders = split_string(config_xml_folder, ";");
+	int i;
+
 	if( config_group_data ) {
 		struct group_data* gd = NULL;
 		printf("getting group data...\n");
-		get_group_data(config_xml_folder, &gd);
+		for(i = 0; folders[i] != NULL; ++i)
+			get_group_data(folders[i], &gd);
 	
 		printf("creating report...\n");
 		create_report_from_group_data(gd, &r_cb_data);
@@ -534,8 +538,11 @@ static void create_report()
 	}
 	else {
 		printf("creating report...\n");
-		parse_directory(config_xml_folder, 0, create_report_cb, (void*)&r_cb_data);
+		for(i = 0; folders[i] != NULL; ++i)
+			parse_directory(folders[i], 0, create_report_cb, (void*)&r_cb_data);
 	}
+
+	free_array(folders);
 
 	if( config_dokuwiki_format ) {
 		fprintf(report_fd, "===== Summary =====\n");

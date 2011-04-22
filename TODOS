@@ -71,6 +71,8 @@ mame_regtest
 			- process the first entry and call itself with a smaller array
 		- add detection of duplicated bios and ramsize entries
 		- no stack crawl since the .pdb is not in the searchpath?
+		- try to create append_to_array() based on split_string()
+		- add option to suppress driver call without images when using softlists
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -183,10 +185,8 @@ mame_regtest
 		- add check for a specific string as option 
 			- replace "called within reset scope by" with it -> field="stderr" string="called within reset scope by"
 			- allow multiple ones
-		- support multiple input folders
-			- support subfolders
+		- support subfolders
 		- skip support files (*_listsoftware.xml)
-		- change way errors are handled - use xpath with regex instead?
 		- find out what the various negative erorcodes mean
 			
 	create_image_xml
