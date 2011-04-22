@@ -523,8 +523,12 @@ static int create_report_from_filename(const char *const filename, struct report
 					
 					// TODO: add all information about execution to report
 					int pngcmp_res = system(pngcmp_cmd);
-					if( pngcmp_res == 1 )
-						fprintf(r_cb_data->report_fd, "<img src=\"%s\" alt=\"%s\"/>\n", outpath, entry_name);
+					if( pngcmp_res == 1 ) {
+						char* outfile = get_filename(outpath);
+						fprintf(r_cb_data->report_fd, "<img src=\"%s\" alt=\"%s\"/>\n", outfile, outfile);
+						free(outfile);
+						outfile = NULL;
+					}
 					
 					free(pngcmp_cmd);
 					pngcmp_cmd = NULL;
