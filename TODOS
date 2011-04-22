@@ -65,14 +65,13 @@ mame_regtest
 		- measure the real time necessary for the execution to detect slowdowns
 		- add support for disks in softlist
 		- delete all existing dummy_root and mrt_temp folders on start-up?
-		- add ---track-origins=yes to valgrind command-line
 		- all combinations
 			- call function with array
 			- process the first entry and call itself with a smaller array
 		- add detection of duplicated bios and ramsize entries
 		- no stack crawl since the .pdb is not in the searchpath?
 		- try to create append_to_array() based on split_string()
-		- add option to suppress driver call without images when using softlists
+		- add option to suppress default driver call when using softlists
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -135,12 +134,7 @@ mame_regtest
 	Visual Studio:
 		- move the Microsoft-specific defines into a seperate header
 		- get proper libxml2 DLL to get Visual Studio working
-		- specify different output/object folders for the different executables in Visual Studio 2010 project files
 		
-	local SVN
-		- tag releases in the future
-		- add trunk/tags/branches structure
-
 	create_report:
 		- write comparison tool
 			- parse dir A and check dir B for missing file
@@ -165,7 +159,7 @@ mame_regtest
 			- add option for main HTML report folder
 			- make HTML report work in Mozilla ( use /ref and /new links)
 		- extract differing frames (also for HTML report)
-		- show PNG differences (use Aaron's code)
+		- show PNG differences (use pngcmp)
 		- color codes based on exitcodes
 		- expose the data (collect the necessary XMLs and add them to a subfolder?)
 		- wiki syntax
@@ -188,9 +182,15 @@ mame_regtest
 		- support subfolders
 		- skip support files (*_listsoftware.xml)
 		- find out what the various negative erorcodes mean
+		- replace hard-coded format with templates
 			
 	create_image_xml
 		- add more output to create_image_xml
+		
+	pngcmp:
+		- analyze where the most time is spent
+		- try to optimize it, but comparing and writing in the same loop and just don't write the final bitmap when they differ
+		- package optimized mingw binary instead of Visual Studio one
 
 	Known Issues:
 		- not everything is properly encoded by xmlEncodeEntitiesReentrant()
