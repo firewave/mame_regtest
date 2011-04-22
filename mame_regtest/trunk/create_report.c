@@ -49,7 +49,7 @@ struct build_group_cb_data
 static void build_group_cb(struct parse_callback_data* pcd)
 {
 	if( pcd->type == ENTRY_FILE ) {
-		if( strstr(pcd->entry_name, ".xml") && strstr(pcd->entry_name, "listxml.xml") == NULL )
+		if( strstr(pcd->entry_name, ".xml") && strstr(pcd->entry_name, "listxml.xml") == NULL && strstr(pcd->entry_name, "_listsoftware.xml") == NULL )
 		{
 			printf("%s\n", pcd->entry_name);
 			xmlDocPtr doc = xmlReadFile(pcd->fullname, "UTF-8", 0);
