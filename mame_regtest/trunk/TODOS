@@ -8,7 +8,6 @@ mame_regtest
 		- add "hang"/deadlock detection (-watchdog / usable from 0.136)
 		- mark the different autosave calls (load / save)
 		- multipass XPath (e.g. first select m6502 cpus and then all with autosave from those nodes)
-		- add more input paths to configuration (like artwork and samples)
 		- multithreading mode
 		- configuration rewrite
 			- empty options will not properly overwrite/reset existing options to default values
@@ -26,7 +25,7 @@ mame_regtest
 			- gtime <milliseconds in hex>
 			- hardreset (causes endless restarts of MAME)
 			- snap
-		- add option to use a specific debugscript?
+		- add option to override debugscript
 		- use more command-line options
 			- -verify*
 			- -list*
@@ -34,7 +33,7 @@ mame_regtest
 			- call -validate?
 		- add soft/hardreset tests after each call like "autosave" test?
 			- how will it work with -autosave?
-		- add clean/merged configuration to output data
+		- add clean/merged mame_regtest configuration to output data
 		- make it possible to use multiple configurations
 			- config_object {
 				void* xml;
@@ -45,12 +44,9 @@ mame_regtest
 		- add option to run MAME in gdb (gdb --batch --eval-command=run --args)
 			- disallow usage of gdb and valgrind at the same time
 		- make it possible to set affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
-		- make dipswitches/configurations work with ramsizes and bioses
 		- add signal/abort handler and cleanup in it
 		- do not check the default ramsize again in bios/ram combination runs
 		- take a look at messtest for "hardreset" tests and extended image testing
-		- "device_mandatory" doesn't specify which device is the mandatory one
-		- "start_at" sample actually starts after the specified set
 		- image testing
 			- attribute to disable an image entry in the XML
 			- add base folder for images in XML (could also be used for parsing a folder?)
@@ -65,13 +61,12 @@ mame_regtest
 		- measure the real time necessary for the execution to detect slowdowns
 		- add support for disks in softlist
 		- delete all existing dummy_root and mrt_temp folders on start-up?
-		- all combinations
+		- all bios/ramsize/configuration/dipswitch combinations
 			- call function with array
 			- process the first entry and call itself with a smaller array
 		- add detection of duplicated bios and ramsize entries
-		- no stack crawl since the .pdb is not in the searchpath?
 		- try to create append_to_array() based on split_string()
-		- add option to suppress default driver call when using softlists
+		- add option to only check software, that is supported
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -183,12 +178,17 @@ mame_regtest
 		- skip support files (*_listsoftware.xml)
 		- find out what the various negative erorcodes mean
 		- replace hard-coded format with templates
+		- use tables in comparison report?
+		- create output_folder
+			- same behavior as mame_regtest output folder
+		- convert \n to <br> in stdout and stderr output
+		- how to support multiples paths for comparison reports?
 			
 	create_image_xml
 		- add more output to create_image_xml
 		
 	pngcmp:
-		- analyze where the most time is spent
+		- how to speed up writing of diff?
 		- try to optimize it, but comparing and writing in the same loop and just don't write the final bitmap when they differ
 		- package optimized mingw binary instead of Visual Studio one
 
@@ -197,11 +197,6 @@ mame_regtest
 		- using autosave will overwrite the initial valgrind log-file for the driver (well..not really, it adds the pid - still you want to differ them easily)
 
 	Test TODOs:
-		- test release and debug builds of MAME and MESS
-		- test 32-bit compile on 64-bit OS (windows and linux)
-		- test 64-bit compile
-		- test with SDLMAME/SDLMESS
-		- test on PPC
 		- create testset with images for each device in each driver
 		- split up MAME test into #-z
 
