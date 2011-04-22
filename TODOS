@@ -186,8 +186,8 @@ mame_regtest
 		- support multiple input folders
 			- support subfolders
 		- skip support files (*_listsoftware.xml)
-		- add summary at top of report (x errors / x crashes / x memory leaks / x clipping / x with mandatory devices / x aborted)
 		- change way errors are handled - use xpath with regex instead?
+		- find out what the various negative erorcodes mean
 			
 	create_image_xml
 		- add more output to create_image_xml
