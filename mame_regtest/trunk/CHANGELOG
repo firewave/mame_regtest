@@ -508,3 +508,4 @@
 	- updated comparison report to invoke pngcmp and output in HTML
 	- added option "output_folder" for comparison reports
 	- skip *_listsoftware.xml files
+	- added option "recursive"

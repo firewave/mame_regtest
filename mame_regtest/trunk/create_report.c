@@ -112,12 +112,12 @@ static void build_group_cb(struct parse_callback_data* pcd)
 	}	
 }
 
-static void get_group_data(const char* dirname, struct group_data** gd)
+static void get_group_data(const char* dirname, int recursive, struct group_data** gd)
 {	
 	struct build_group_cb_data bg_cb_data;
 	bg_cb_data.gd_list = gd;
 
-	parse_directory(dirname, 0, build_group_cb, (void*)&bg_cb_data);	
+	parse_directory(dirname, recursive, build_group_cb, (void*)&bg_cb_data);	
 }
 
 static void free_group_data(struct group_data* gd)
@@ -157,6 +157,7 @@ static int config_report_type = 0; /* 0 = result report - 1 = comparison report 
 static char* config_compare_folder = NULL;
 static int config_print_stdout = 0;
 static char* config_output_folder = NULL;
+static int config_recursive = 0;
 
 struct config_entry report_config[] =
 {
@@ -171,7 +172,8 @@ struct config_entry report_config[] =
 	{ "report_type",		CFG_INT,		&config_report_type },
 	{ "compare_folder",		CFG_STR_PTR,	&config_compare_folder }, /* comparison report specific */
 	{ "print_stdout", 		CFG_INT, 		&config_print_stdout },
-	{ "output_folder", 		CFG_STR_PTR, 		&config_output_folder }, /* comparison report specific */
+	{ "output_folder", 		CFG_STR_PTR, 	&config_output_folder }, /* comparison report specific */
+	{ "recursive", 			CFG_INT, 		&config_recursive },
 	{ NULL, 				CFG_UNK, 		NULL }
 };
 
@@ -220,6 +222,7 @@ struct report_cb_data
 	int print_stdout;
 	struct report_summary summary;
 	const char* output_folder;
+	int recursive;
 };
 
 /* TODO - handle multiple occurances */
@@ -623,6 +626,7 @@ static void create_report()
 	r_cb_data.compare_folder = config_compare_folder;
 	r_cb_data.print_stdout = config_print_stdout;
 	r_cb_data.output_folder = config_output_folder;
+	r_cb_data.recursive = config_recursive;
 	memset(&r_cb_data.summary, 0x00, sizeof(struct report_summary));
 
 	if( config_report_type == 0 )
@@ -654,7 +658,7 @@ static void create_report()
 		struct group_data* gd = NULL;
 		printf("getting group data...\n");
 		for(i = 0; folders[i] != NULL; ++i)
-			get_group_data(folders[i], &gd);
+			get_group_data(folders[i], config_recursive, &gd);
 	
 		printf("creating report...\n");
 		create_report_from_group_data(gd, &r_cb_data);
@@ -664,7 +668,7 @@ static void create_report()
 	else {
 		printf("creating report...\n");
 		for(i = 0; folders[i] != NULL; ++i)
-			parse_directory(folders[i], 0, create_report_cb, (void*)&r_cb_data);
+			parse_directory(folders[i], config_recursive, create_report_cb, (void*)&r_cb_data);
 	}
 
 	free_array(folders);
