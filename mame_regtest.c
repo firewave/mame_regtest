@@ -2348,5 +2348,7 @@ int main(int argc, char *argv[])
 	cleanup_driver_info_list(driv_inf);
 
 	cleanup_and_exit(0, "finished");
+#ifndef _MSC_VER
 	return 0; /* to shut up compiler */
+#endif
 }
