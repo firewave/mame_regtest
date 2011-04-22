@@ -3,6 +3,7 @@
 	<report_10>
 		<option name='report_type' value='0'/>
 		<option name='xml_folder' value='d:\mess\mrt_output'/>
+		<option name='recursive' value='0'/>
 		<option name='output_file' value='d:\report_10.txt'/>
 		<option name='print_stderr' value='1'/>
 		<option name='dokuwiki_format' value='1'/>
