@@ -681,7 +681,7 @@ static void create_report()
 		fprintf(report_fd, "  * %d with missing roms\n", r_cb_data.summary.missing);
 		fprintf(report_fd, "  * %d with memory leaks\n", r_cb_data.summary.memleaks);
 		fprintf(report_fd, "  * %d with clipping\n", r_cb_data.summary.clipped);
-		fprintf(report_fd, "  * %d with mandatory devices\n", r_cb_data.summary.mandatory);
+		fprintf(report_fd, "  * %d with missing mandatory devices\n", r_cb_data.summary.mandatory);
 		fprintf(report_fd, "  * %d unknown\n", r_cb_data.summary.unknown);
 	}
 	
