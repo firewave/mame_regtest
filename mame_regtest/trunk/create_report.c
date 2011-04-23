@@ -203,7 +203,7 @@ static void summary_incr(struct report_summary* summary, const xmlChar* exitcode
 		summary->errors++;
 	else if( xmlStrcmp(exitcode_key, (const xmlChar*)"4") == 0 )
 		summary->mandatory++;
-	else if( xmlStrcmp(exitcode_key, (const xmlChar*)"100") == 0 || xmlStrcmp(exitcode_key, (const xmlChar*)"-1073740771") == 0 || xmlStrcmp(exitcode_key, (const xmlChar*)"-1073741819") == 0 || xmlStrcmp(exitcode_key, (const xmlChar*)"-2147483645") == 0 )
+	else if( xmlStrcmp(exitcode_key, (const xmlChar*)"100") == 0 || xmlStrcmp(exitcode_key, (const xmlChar*)"-1073740771") == 0 || xmlStrcmp(exitcode_key, (const xmlChar*)"-1073740940") == 0 || xmlStrcmp(exitcode_key, (const xmlChar*)"-1073741819") == 0 || xmlStrcmp(exitcode_key, (const xmlChar*)"-2147483645") == 0 )
 		summary->crashed++;
 	else
 		summary->unknown++;
