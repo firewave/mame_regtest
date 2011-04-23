@@ -739,8 +739,10 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 	/* TODO: move this somewhere else? */
 	struct device_info* dev_info = driv_inf->devices;
 	while(dev_info) {
-		if( xmlStrcmp(dev_info->interface, image->device_interface) == 0 )
+		if( xmlStrcmp(dev_info->interface, image->device_interface) == 0 ) {
 			image->device_briefname = xmlStrdup(dev_info->briefname);
+			break;
+		}
 			
 		dev_info = dev_info->next;
 	}
