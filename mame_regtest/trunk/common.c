@@ -328,3 +328,24 @@ char* get_directory(const char* filepath)
 
 	return result;	
 }
+
+void replace_string(const char* input, char** output, const char* old_str, const char* new_str)
+{	
+	char* str_copy = strdup(input);
+	char* pos = strstr(str_copy, old_str);
+	while( pos != NULL )
+	{
+		pos = pos + strlen(old_str);
+		char* pos1 = strstr(pos, old_str);
+		if( pos1 != NULL )
+			*pos1 = 0;
+		
+		append_string(output, new_str);
+		append_string(output, pos);
+		
+		pos = pos1;
+	}
+	
+	free(str_copy);
+	str_copy = NULL;
+}
