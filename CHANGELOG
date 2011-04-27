@@ -505,6 +505,7 @@
 	- fixed memory leaks when using softwarelists
 	- fixed driver being executed multiple times without a device when the softwarelist entries don't match any interface
 	- use first matching interface when using softwarelists
+	- add command-line to output XML
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set

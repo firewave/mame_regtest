@@ -1077,7 +1077,7 @@ static int create_cfg(struct driver_entry* de, int type)
 	return res;
 }
 
-static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
+static int execute_mame(struct driver_entry* de, xmlNodePtr* result, char** cmd_out)
 {
 	print_driver_info(de, stdout);
 	if( config_use_autosave && de->autosave )
@@ -1159,6 +1159,9 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 
 	if( config_verbose )
 		printf("system call: %s\n", sys);
+		
+	if( cmd_out )
+		*cmd_out = sys;
 
 	/* TODO: errorhandling */
 	mrt_mkdir(dummy_root);
@@ -1168,7 +1171,8 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 	int sys_res = system(sys);
 	ch_res = chdir(current_path);
 	
-	free(sys);
+	if( !cmd_out )
+		free(sys);
 	sys = NULL;
 
 	if( result ) {
@@ -1337,7 +1341,14 @@ static int execute_mame2(struct driver_entry* de)
 		}
 	}
 
-	res = execute_mame(de, &result1);
+	char* cmd = NULL;
+	res = execute_mame(de, &result1, &cmd);
+	
+	if( cmd ) {
+		xmlNewProp(output_node, (const xmlChar*)"cmd", (const xmlChar*)cmd);
+		free(cmd);
+		cmd = NULL;
+	}
 
 	if( result1 ) {
 		xmlAddChild(output_node, result1);
@@ -1345,7 +1356,7 @@ static int execute_mame2(struct driver_entry* de)
 	}
 
 	if( res == 1 && config_use_autosave && de->autosave ) {
-		res = execute_mame(de, &result2);
+		res = execute_mame(de, &result2, NULL);
 
 		if( result2 ) {
 			xmlAddChild(output_node, result2);
