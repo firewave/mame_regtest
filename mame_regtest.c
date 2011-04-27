@@ -121,7 +121,6 @@ struct driver_entry {
 
 static int app_type = 0;
 static int is_debug = 0;
-static const int xpath_placeholder_size = 11;
 
 static xmlChar* app_ver = NULL;
 static char* debugscript_file = NULL;
@@ -581,31 +580,6 @@ static int create_dummy_root_ini()
 		printf("could not create '%s'\n", dummy_ini_folder);
 
 	return res;
-}
-
-static void convert_xpath_expr(char** real_xpath_expr)
-{	
-	char* xpath_copy = strdup(config_xpath_expr);
-	char* pos = strstr(xpath_copy, xpath_placeholder);
-	while( pos != NULL )
-	{
-		pos = pos + xpath_placeholder_size;
-		char* pos1 = strstr(pos, xpath_placeholder);
-		if( pos1 != NULL )
-			*pos1 = 0;
-		
-		if( app_type == APP_MAME )
-			append_string(real_xpath_expr, "/mame/game");
-		else if( app_type == APP_MESS )
-			append_string(real_xpath_expr, "/mess/machine");
-			
-		append_string(real_xpath_expr, pos);
-		
-		pos = pos1;
-	}
-	
-	free(xpath_copy);
-	xpath_copy = NULL;
 }
 
 static void cleanup_and_exit(int errcode, const char* errstr)
@@ -1995,8 +1969,11 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 
 				if( config_xpath_expr && (*config_xpath_expr != 0) ) {
 					char* real_xpath_expr = NULL;
-					convert_xpath_expr(&real_xpath_expr);
-					
+					if( app_type == APP_MAME )
+						replace_string(config_xpath_expr, &real_xpath_expr, xpath_placeholder, "/mame/game");
+					else if( app_type == APP_MESS )
+						replace_string(config_xpath_expr, &real_xpath_expr, xpath_placeholder, "/mess/machine");
+				
 					printf("using XPath expression: %s\n", real_xpath_expr);
 
 					xmlNodeSetPtr nodeset = get_xpath_nodeset(doc, (const xmlChar*)real_xpath_expr);

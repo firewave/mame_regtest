@@ -91,4 +91,6 @@ void free_array(char** arr);
 /* you have to free the result */
 char* get_directory(const char* filepath);
 
+void replace_string(const char* input, char** output, const char* old_str, const char* new_str);
+
 #endif

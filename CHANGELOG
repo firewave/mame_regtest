@@ -506,6 +506,8 @@
 	- fixed driver being executed multiple times without a device when the softwarelist entries don't match any interface
 	- use first matching interface when using softwarelists
 	- add command-line to output XML
+	- added replace_string() to common.c/.h
+	- replaced convert_xpath_expr() with replace_string() and got rid of xpath_placeholder_size
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
