@@ -57,7 +57,9 @@ mame_regtest
 			- read images from folder with same name as device (look for XML first / specify folder in XML?)
 			- add option with folder for device XMLs?
 		- add XPath support for software lists
-		- use DTD for softlists
+			- add option to only check software, that is supported
+			- use DTD for softlists
+				- how to load software.dtd? must be in same path as executable
 		- measure the real time necessary for the execution to detect slowdowns
 		- add support for disks in softlist
 		- delete all existing dummy_root and mrt_temp folders on start-up?
@@ -66,7 +68,10 @@ mame_regtest
 			- process the first entry and call itself with a smaller array
 		- add detection of duplicated bios and ramsize entries
 		- try to create append_to_array() based on split_string()
-		- add option to only check software, that is supported
+		- output the software list only once and only when used
+			- check for existing files
+		- handle multiple software lists in hack
+		- log info about softwarelist entries without matching interface
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
