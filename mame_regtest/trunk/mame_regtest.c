@@ -98,9 +98,9 @@ struct driver_info {
 };
 
 struct image_entry {
-	const xmlChar* device_briefname;
-	const xmlChar* device_file;
-	const xmlChar* device_interface;
+	xmlChar* device_briefname;
+	xmlChar* device_file;
+	xmlChar* device_interface;
 	struct image_entry* next;
 };
 
@@ -671,12 +671,20 @@ static void print_driver_info(struct driver_entry* de, FILE* print_fd)
 	}
 }
 
+static void free_image_entry(struct image_entry* image)
+{
+	xmlFree(image->device_briefname);
+	xmlFree(image->device_file);
+	xmlFree(image->device_interface);
+	free(image);
+}
+
 static void free_image_entries(struct image_entry* images)
 {
 	while( images ) {
 		struct image_entry* temp = images;
 		images = images->next;
-		free(temp);
+		free_image_entry(temp);
 	}
 }
 
@@ -693,10 +701,10 @@ static int read_image_entries(const xmlNodePtr node, struct image_entry** images
 
 		memset(image, 0x00, sizeof(struct image_entry));
 
-		image->device_briefname = attrs->name;
+		image->device_briefname = xmlStrdup(attrs->name);
 		xmlNodePtr value = attrs->children;
 		if( value )
-			image->device_file = value->content;
+			image->device_file = xmlStrdup(value->content);
 		else
 			image->device_file = NULL;
 
@@ -729,8 +737,10 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 	xmlNodePtr soft_child = node->children;
 	while( soft_child ) {
 		if( soft_child->type == XML_ELEMENT_NODE ) {
-			if( xmlStrcmp(soft_child->name, (const xmlChar*)"part") == 0 )
+			if( xmlStrcmp(soft_child->name, (const xmlChar*)"part") == 0 ) {
 				image->device_interface = xmlGetProp(soft_child, (const xmlChar*)"interface");
+				break;
+			}
 		}
 		
 		soft_child = soft_child->next;
@@ -745,6 +755,11 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 		}
 			
 		dev_info = dev_info->next;
+	}
+	
+	if( !image->device_briefname ) {
+		free_image_entry(image);
+		return 0;
 	}
 	
 	*images = image;
@@ -1099,7 +1114,7 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result)
 			append_string(&sys, " -");
 			append_string(&sys, (const char*)images->device_briefname);
 			append_string(&sys, " ");
-			append_quoted_string(&sys,  (const char*)images->device_file);
+			append_quoted_string(&sys, (const char*)images->device_file);
 		}
 		
 		images = images->next;
@@ -1419,7 +1434,8 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 				for( ; i < soft_nodeset->nodeNr; ++i )
 				{
 					struct image_entry* images = NULL;
-					read_softlist_entry(soft_nodeset->nodeTab[i], &images, actual_driv_inf);
+					if( read_softlist_entry(soft_nodeset->nodeTab[i], &images, actual_driv_inf) == 0 )
+						continue;
 
 					snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05d", initial_postfix, software_count);
 
