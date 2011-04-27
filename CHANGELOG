@@ -502,6 +502,9 @@
 	- changed "device_mandatory" from integer to string
 	- added option "hack_softwarelist" to work around broken -listsoftware
 	- use the first matching interface when using softwarelists
+	- fixed memory leaks when using softwarelists
+	- fixed driver being executed multiple times without a device when the softwarelist entries don't match any interface
+	- use first matching interface when using softwarelists
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
