@@ -508,6 +508,7 @@
 	- add command-line to output XML
 	- added replace_string() to common.c/.h
 	- replaced convert_xpath_expr() with replace_string() and got rid of xpath_placeholder_size
+	- added allocation logging in LOG_ALLOC define
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
