@@ -1882,7 +1882,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 			if( config_use_configurations )
 				parse_listxml_element_cfg(game_children, new_driv_inf, CFG_CONF);
 
-			if( (app_type == APP_MESS) ) {
+			if( app_type == APP_MESS ) {
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"device") == 0 ) {
 					struct device_info* new_dev_info = (struct device_info*)malloc(sizeof(struct device_info));
 					/* TODO: check allocation */
