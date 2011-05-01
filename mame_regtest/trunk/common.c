@@ -1,8 +1,50 @@
+#ifdef LOG_ALLOC
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+int m = 0;
+
+void* mrt_malloc(size_t size)
+{
+	void* ptr = malloc(size);
+	printf("%d - malloc - %d - %p\n", ++m, size, ptr);
+	return ptr;
+}
+
+char* mrt_strdup(const char* str)
+{
+	char* ptr = strdup(str);
+	printf("%d - strdup - %p\n", ++m, ptr);
+	return ptr;
+}
+
+void* mrt_realloc(void* ptr, size_t size)
+{
+	void* ptr2 = realloc(ptr, size);
+	printf("%d - realloc - %p - %d - %p\n", (ptr == NULL) ? ++m : -1, ptr, size, ptr2);
+	return ptr2;
+}
+
+void mrt_free(void *ptr)
+{
+	printf("%d - free - %p\n", --m, ptr);
+	free(ptr);
+}
+
+#include "common.h"
+
+#else
+
 #include "common.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#endif
+
 #ifndef _MSC_VER
 #include <dirent.h>
 #else

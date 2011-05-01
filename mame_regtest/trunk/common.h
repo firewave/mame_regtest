@@ -1,6 +1,20 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
+#ifdef LOG_ALLOC
+
+void* mrt_malloc(size_t size);
+char* mrt_strdup(const char* str);
+void* mrt_realloc(void* ptr, size_t size);
+void mrt_free(void *ptr);
+
+#define malloc(size) mrt_malloc(size)
+#define strdup(str) mrt_strdup(str)
+#define realloc(ptr, size) mrt_realloc(ptr, size)
+#define free(ptr) mrt_free(ptr)
+
+#endif
+
 #include <sys/stat.h>
 
 /* getch */
