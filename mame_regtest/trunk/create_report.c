@@ -260,8 +260,8 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 		} \
 	} \
 	if( autosave_key ) \
-		fprintf(r_cb_data->report_fd, " (autosave)"); \
-
+		fprintf(r_cb_data->report_fd, " (autosave)");
+		
 #define COMPARE_ATTRIBUTE(xpath_expr, attr_name, differs) \
 { \
 	xmlChar* attr1 = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)xpath_expr, (const xmlChar*)attr_name); \
@@ -313,9 +313,12 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 	xmlChar* dipswitch_key = xmlGetProp(output_node, (const xmlChar*)"dipswitch"); \
 	xmlChar* dipvalue_key = xmlGetProp(output_node, (const xmlChar*)"dipvalue"); \
 	xmlChar* configuration_key = xmlGetProp(output_node, (const xmlChar*)"configuration"); \
-	xmlChar* confsetting_key = xmlGetProp(output_node, (const xmlChar*)"confsetting");
+	xmlChar* confsetting_key = xmlGetProp(output_node, (const xmlChar*)"confsetting"); \
+	xmlChar* cmd_key = xmlGetProp(output_node, (const xmlChar*)"cmd"); \
 	
 #define FREE_KEYS \
+	xmlFree(cmd_key); \
+	cmd_key = NULL; \
 	xmlFree(confsetting_key); \
 	confsetting_key = NULL; \
 	xmlFree(configuration_key); \
@@ -415,6 +418,9 @@ static int create_report_from_filename(const char *const filename, struct report
 									if( (report_error || report_memleak || report_stderr || reset_scope_found) && stderr_key && xmlStrlen(stderr_key) > 0 )
 										fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n", stderr_key);
 									
+									if( cmd_key )
+										fprintf(r_cb_data->report_fd, "  * Command-Line: <code>%s</code>\n", cmd_key);
+									
 									fprintf(r_cb_data->report_fd, "\n");
 								}
 								else
@@ -427,6 +433,9 @@ static int create_report_from_filename(const char *const filename, struct report
 			
 									if( (report_error || report_memleak || report_stderr) && stderr_key && xmlStrlen(stderr_key) > 0 )
 										fprintf(r_cb_data->report_fd, "%s\n", stderr_key);
+										
+									if( cmd_key )
+										fprintf(r_cb_data->report_fd, "%s\n", cmd_key);
 								}
 			
 								data_written = 1;
@@ -629,8 +638,11 @@ static void create_report()
 	r_cb_data.recursive = config_recursive;
 	memset(&r_cb_data.summary, 0x00, sizeof(struct report_summary));
 
-	if( config_report_type == 0 )
+	if( config_report_type == 0 ) {
 		report_fd = fopen(config_output_file, "wb");
+		if( config_dokuwiki_format )
+			fprintf(report_fd, "====== mame_regtest result ======\n");
+	}
 	else if( config_report_type == 1 ) {
 		char* outputfile = NULL;
 		append_string(&outputfile, config_output_folder);

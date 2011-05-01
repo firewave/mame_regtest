@@ -516,3 +516,5 @@
 	- added option "output_folder" for comparison reports
 	- skip *_listsoftware.xml files
 	- added option "recursive"
+	- added header to docuwiki format
+	- added command-line to docuwiki format
