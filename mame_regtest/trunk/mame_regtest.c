@@ -1698,9 +1698,8 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 	} while(res == 1);
 }
 
-static void parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_info** new_driv_inf, int type)
+static void parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_info** new_driv_inf, struct dipswitch_info** last_dip_info, int type)
 {
-	struct dipswitch_info* last_dip_info = NULL;
 	const xmlChar* cfg_xml_type_1 = NULL;
 	const xmlChar* cfg_xml_type_2 = NULL;
 	
@@ -1717,7 +1716,7 @@ static void parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_in
 		xmlChar* dip_name = xmlGetProp(game_children, (const xmlChar*)"name");
 		xmlChar* dip_tag = xmlGetProp(game_children, (const xmlChar*)"tag");
 		xmlChar* dip_mask = xmlGetProp(game_children, (const xmlChar*)"mask");
-
+		
 		struct dipswitch_info* new_dip_info = (struct dipswitch_info*)malloc(sizeof(struct dipswitch_info));
 		/* TODO: check allocation */
 		memset(new_dip_info, 0x00, sizeof(struct dipswitch_info));
@@ -1775,9 +1774,9 @@ static void parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_in
 				(*new_driv_inf)->configurations = new_dip_info;
 		}
 		
-		if( last_dip_info )
-			last_dip_info->next = new_dip_info;
-		last_dip_info = new_dip_info;
+		if( *last_dip_info )
+			(*last_dip_info)->next = new_dip_info;
+		*last_dip_info = new_dip_info;
 	}
 }
 
@@ -1834,6 +1833,8 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 		(*new_driv_inf)->sourcefile = sourcefile;
 		
 		struct device_info* last_dev_info = NULL;
+		struct dipswitch_info* last_dip_info = NULL;
+		struct dipswitch_info* last_cfg_info = NULL;
 
 		xmlNodePtr game_children = game_child->children;
 
@@ -1888,10 +1889,10 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 			}
 			
 			if( config_use_dipswitches )
-				parse_listxml_element_cfg(game_children, new_driv_inf, CFG_DIP);
+				parse_listxml_element_cfg(game_children, new_driv_inf, &last_dip_info, CFG_DIP);
 
 			if( config_use_configurations )
-				parse_listxml_element_cfg(game_children, new_driv_inf, CFG_CONF);
+				parse_listxml_element_cfg(game_children, new_driv_inf, &last_cfg_info, CFG_CONF);
 
 			if( app_type == APP_MESS ) {
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"device") == 0 ) {
