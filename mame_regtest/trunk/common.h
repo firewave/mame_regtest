@@ -13,6 +13,18 @@ void mrt_free(void *ptr);
 #define realloc(ptr, size) mrt_realloc(ptr, size)
 #define free(ptr) mrt_free(ptr)
 
+void print_leaked_pointers();
+
+/*
+mrt_xmlNewDoc();
+mrt_xmlReadFile();
+mrt_xmlFreeDoc();
+
+#define xmlNewDoc mrt_xmlNewDoc
+#define xmlReadFile mrt_xmlReadFile
+#define xmlFreeDoc mrt_xmlFreeDoc
+*/
+
 #endif
 
 #include <sys/stat.h>

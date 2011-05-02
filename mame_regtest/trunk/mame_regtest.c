@@ -619,6 +619,10 @@ static void cleanup_and_exit(int errcode, const char* errstr)
 	
 	free(dummy_root);
 	dummy_root = NULL;
+	
+#ifdef LOG_ALLOC
+	print_leaked_pointers();
+#endif
 
 	printf("%s\n", errstr);
 	exit(errcode);
