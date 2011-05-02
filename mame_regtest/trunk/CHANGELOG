@@ -509,6 +509,7 @@
 	- added replace_string() to common.c/.h
 	- replaced convert_xpath_expr() with replace_string() and got rid of xpath_placeholder_size
 	- added allocation logging in LOG_ALLOC define
+	- small cleanup to config_read_option_str_ptr()
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
