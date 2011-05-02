@@ -72,6 +72,10 @@ mame_regtest
 			- check for existing files
 		- handle multiple software lists in hack
 		- log info about softwarelist entries without matching interface
+		- how to specify a specific device in softwarelist tests?
+		- document all the exitcodes in README
+		- store merged configuration in results folder
+		- store the INI from the dummy path used for the runs
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -94,6 +98,9 @@ mame_regtest
 			- add sanity checks for maximum bios, ramsize and device count
 		- use different prefix for cfg_type enum / conflicts with config_entry
 		- run test_createconfig in dummy_root to avoid usage of existing mame.ini (and other other command-line option calls)
+		- add support for libxml2 function to LOG_ALLOC
+			- xmlNewDoc/xmlReadFile <-> xmlFreeDoc
+			- xmlGetProp/xmlStrdup <-> xmlFree
 
 	issues/bugs/errorhandling:
 		- avoid duplicated slashes
@@ -186,6 +193,9 @@ mame_regtest
 			- same behavior as mame_regtest output folder
 		- convert \n to <br> in stdout and stderr output
 		- how to support multiples paths for comparison reports?
+		- try to detect new/missing sets in comparison seperately
+		- note differences about bios or ramsize etc. in results
+		- when merged configuration exists in results folder add information to report
 			
 	create_image_xml
 		- add more output to create_image_xml
