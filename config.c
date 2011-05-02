@@ -21,6 +21,8 @@
 /* libxml2 */
 #include "libxml/parser.h"
 
+#include "common.h"
+
 static xmlDocPtr global_config_doc = NULL;
 static xmlNodePtr global_config_root = NULL;
 
@@ -104,10 +106,9 @@ static void config_read_option_str_ptr(const xmlNodePtr config_node, const char*
 {
 	xmlChar* opt = NULL;
 	if( config_read_option(config_node, opt_name, &opt) ) {
-		char** tmp = (char**)value;
-		if( *tmp )
-			free(*tmp);
-		*tmp = strdup((const char*)opt);
+		if( *value )
+			free(*value);
+		*value = strdup((const char*)opt);
 		xmlFree(opt);
 		opt = NULL;
 	}
