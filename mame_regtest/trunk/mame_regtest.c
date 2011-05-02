@@ -134,6 +134,7 @@ static char* dummy_root = NULL;
 static char* pause_file = NULL;
 static char pid_str[10] = "";
 static int mameconfig_ver = 10;
+struct driver_info* global_driv_inf = NULL;
 
 /* constant string variables */
 static const char* const xpath_placeholder = "DRIVER_ROOT";
@@ -251,6 +252,7 @@ static void open_mng_and_skip_sig(const char* mng_name, FILE** mng_fd);
 static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void cleanup_and_exit(int errcode, const char* errstr);
 static int get_MHDR_data(FILE* in_fd, unsigned int* MHDR_width, unsigned int* MHDR_height);
+static void cleanup_driver_info_list(struct driver_info* driv_inf);
 
 /* result must be free'd with xmlXPathFreeNodeSet() */
 static xmlNodeSetPtr get_xpath_nodeset(xmlDocPtr doc, const xmlChar* xpath_expr)
@@ -584,6 +586,11 @@ static int create_dummy_root_ini()
 
 static void cleanup_and_exit(int errcode, const char* errstr)
 {
+	if( global_driv_inf ) {
+		cleanup_driver_info_list(global_driv_inf);
+		global_driv_inf = NULL;
+	}
+
 	if( debugscript_file ) {
 		free(debugscript_file);
 		debugscript_file = NULL;
@@ -2331,11 +2338,9 @@ int main(int argc, char *argv[])
 		mame_call = NULL;
 	}
 
-	struct driver_info* driv_inf = NULL;
-
 	printf("\n"); /* for output formating */
 	printf("parsing -listxml output\n")	;
-	parse_listxml(config_gamelist_xml_file, &driv_inf);
+	parse_listxml(config_gamelist_xml_file, &global_driv_inf);
 
 	printf("\n"); /* for output formating */
 
@@ -2354,7 +2359,7 @@ int main(int argc, char *argv[])
 		mame_call = NULL;
 	}
 
-	if( driv_inf == NULL )
+	if( global_driv_inf == NULL )
 		cleanup_and_exit(0, "finished");
 
 	printf("clearing existing dummy directory\n");
@@ -2391,9 +2396,8 @@ int main(int argc, char *argv[])
 	putenv(osdprocessors_tmp);
 
 	printf("\n");
-	process_driver_info_list(driv_inf);	
+	process_driver_info_list(global_driv_inf);	
 	printf("\n"); /* for output formating */
-	cleanup_driver_info_list(driv_inf);
 
 	cleanup_and_exit(0, "finished");
 #ifndef _MSC_VER
