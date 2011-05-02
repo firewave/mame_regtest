@@ -510,6 +510,8 @@
 	- replaced convert_xpath_expr() with replace_string() and got rid of xpath_placeholder_size
 	- added allocation logging in LOG_ALLOC define
 	- small cleanup to config_read_option_str_ptr()
+	- renamed made "driv_inf" from main() global and renamed to "global_driv_inf"
+	- moved cleanup_driver_info_list() call to cleanup_and_exit() to avoid leaks in case of premature exit
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
