@@ -9,10 +9,11 @@ ZLIB_INC = -I./zlib/include
 LIBS = ./libxml2/libxml2.lib ./zlib/lib/zdll.lib
 
 WARNINGS = -Wall -Wextra -Wformat=2 -Wshadow -Wcast-qual -Wwrite-strings
-#CFLAGS += -Wunreachable-code
+#WARNINGS += -Wunreachable-code
 
 #CFLAGS = -g $(WARNINGS)
 CFLAGS = -O3 -s $(WARNINGS)
+#CFLAGS += -DLOG_ALLOC
 
 all: mame_regtest$(BIN_EXT) create_image_xml$(BIN_EXT) create_report$(BIN_EXT)
 
