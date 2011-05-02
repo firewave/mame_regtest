@@ -4,33 +4,106 @@
 #include <stdio.h>
 #include <string.h>
 
-int m = 0;
+static void* m_arr2[100000];
+static int m_entries = 100000;
+
+static void init_pointer_array()
+{
+	static int m_arr_init = 0;
+	if( m_arr_init == 0 ) {
+		printf("initializaing array\n");
+		memset(m_arr2, 0x00, sizeof(m_arr2));
+		m_arr_init = 1;
+	}
+}
+
+void print_leaked_pointers()
+{
+	printf("leaked pointers:\n");
+	int i = 0;
+	for( ; i < m_entries; ++i )
+	{
+		if( m_arr2[i] != NULL )
+			printf("%p\n", m_arr2[i]);
+	}
+}
+
+static void add_pointer(void* ptr)
+{
+	int i = 0;
+	for( ; i < m_entries; ++i )
+	{
+		if( m_arr2[i] == NULL )
+		{
+			m_arr2[i] = ptr;
+			break;
+		}
+	}
+}
+
+static void replace_pointer(void* old_ptr, void* new_ptr)
+{
+	if( old_ptr == NULL ) {
+		add_pointer(new_ptr);
+		return;
+	}
+
+	int i = 0;
+	for( ; i < m_entries; ++i )
+	{
+		if( m_arr2[i] == old_ptr )
+		{
+			m_arr2[i] = new_ptr;
+			break;
+		}
+	}
+}
+
+static void remove_pointer(void* ptr)
+{
+	replace_pointer(ptr, NULL);
+}
+
+static int m = 0;
 
 void* mrt_malloc(size_t size)
 {
+	init_pointer_array();
+
 	void* ptr = malloc(size);
 	printf("%d - malloc - %d - %p\n", ++m, size, ptr);
+	add_pointer(ptr);
 	return ptr;
 }
 
 char* mrt_strdup(const char* str)
 {
+	init_pointer_array();
+
 	char* ptr = strdup(str);
 	printf("%d - strdup - %p\n", ++m, ptr);
+	add_pointer(ptr);
 	return ptr;
 }
 
 void* mrt_realloc(void* ptr, size_t size)
 {
+	init_pointer_array();
+
 	void* ptr2 = realloc(ptr, size);
 	printf("%d - realloc - %p - %d - %p\n", (ptr == NULL) ? ++m : -1, ptr, size, ptr2);
+	replace_pointer(ptr, ptr2);
 	return ptr2;
 }
 
 void mrt_free(void *ptr)
 {
-	printf("%d - free - %p\n", --m, ptr);
-	free(ptr);
+	if( ptr != NULL )
+	{
+		printf("%d - free - %p\n", --m, ptr);
+		free(ptr);
+		remove_pointer(ptr);
+	}
 }
 
 #include "common.h"

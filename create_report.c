@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef __GNUC__
+#include <unistd.h>
+#endif
+
 #ifdef _MSC_VER
 #include <io.h>
 #if _MSC_VER >= 1400
@@ -727,6 +732,10 @@ int main(int argc, char *argv[])
 	create_report();
 	
 	config_free(report_config);
+	
+#ifdef LOG_ALLOC
+	print_leaked_pointers();
+#endif
 	
 	return 0;
 }
