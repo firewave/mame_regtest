@@ -1848,6 +1848,9 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 		(*new_driv_inf)->name = xmlGetProp(game_child, (const xmlChar*)"name");
 		(*new_driv_inf)->sourcefile = sourcefile;
 		
+		if( config_verbose )
+			printf("parsing '%s'\n", (*new_driv_inf)->name);
+		
 		struct device_info* last_dev_info = NULL;
 		struct dipswitch_info* last_dip_info = NULL;
 		struct dipswitch_info* last_cfg_info = NULL;
