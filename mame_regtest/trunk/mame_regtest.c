@@ -1949,6 +1949,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 								if( new_dev_info->mandatory )
 									(*new_driv_inf)->device_mandatory = xmlStrdup(dev_brief);
 							}
+							break;
 						}
 
 						dev_childs = dev_childs->next;
@@ -1963,10 +1964,13 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					
 					goto next;
 				}
-				
+				/* TODO: add support for multiple softwarelists */
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"softwarelist") == 0 ) {
-					(*new_driv_inf)->has_softlist = 1;
-					(*new_driv_inf)->softwarelist = xmlGetProp(game_children, (const xmlChar*)"name");
+					/* TODO: hack to avoid memory leaks */
+					if( (*new_driv_inf)->has_softlist == 0 ) {
+						(*new_driv_inf)->has_softlist = 1;
+						(*new_driv_inf)->softwarelist = xmlGetProp(game_children, (const xmlChar*)"name");
+					}
 					
 					goto next;
 				}
