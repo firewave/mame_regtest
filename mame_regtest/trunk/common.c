@@ -106,6 +106,69 @@ void mrt_free(void *ptr)
 	}
 }
 
+/* libxml2 */
+#include "libxml/parser.h"
+
+xmlDocPtr mrt_xmlNewDoc(const xmlChar* version)
+{
+	init_pointer_array();
+	
+	xmlDocPtr ptr = xmlNewDoc(version);
+	printf("%d - xmlNewDoc - %p\n", ++m, ptr);
+	add_pointer(ptr);
+	return ptr;
+}
+
+xmlDocPtr mrt_xmlReadFile(const char* URL, const char* encoding, int options)
+{
+	init_pointer_array();
+	
+	xmlDocPtr ptr = xmlReadFile(URL, encoding, options);
+	printf("%d - xmlReadFile - %p\n", ++m, ptr);
+	add_pointer(ptr);
+	return ptr;
+}
+
+void mrt_xmlFreeDoc(xmlDocPtr ptr)
+{
+	if( ptr != NULL )
+	{
+		printf("%d - xmlFreeDoc - %p\n", --m, ptr);
+		xmlFreeDoc(ptr);
+		remove_pointer(ptr);
+	}
+}
+
+xmlChar* mrt_xmlGetProp(xmlNodePtr node, const xmlChar* name)
+{
+	init_pointer_array();
+	
+	xmlChar* ptr = xmlGetProp(node, name);
+	printf("%d - xmlGetProp - %p\n", ++m, ptr);
+	add_pointer(ptr);
+	return ptr;
+}
+
+xmlChar* mrt_xmlStrdup(const xmlChar* cur)
+{
+	init_pointer_array();
+	
+	xmlChar* ptr = xmlStrdup(cur);
+	printf("%d - xmlStrdup - %p\n", ++m, ptr);
+	add_pointer(ptr);
+	return ptr;
+}
+
+void mrt_xmlFree(void* ptr)
+{
+	if( ptr != NULL )
+	{
+		printf("%d - xmlFree - %p\n", --m, ptr);
+		xmlFree(ptr);
+		remove_pointer(ptr);
+	}
+}
+
 #include "common.h"
 
 #else

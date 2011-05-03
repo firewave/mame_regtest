@@ -76,6 +76,7 @@ mame_regtest
 		- document all the exitcodes in README
 		- store merged configuration in results folder
 		- store the INI from the dummy path used for the runs
+		- do runs with -log enabled and add reports, that parse for like "unmapped writes" and stuff
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -98,9 +99,6 @@ mame_regtest
 			- add sanity checks for maximum bios, ramsize and device count
 		- use different prefix for cfg_type enum / conflicts with config_entry
 		- run test_createconfig in dummy_root to avoid usage of existing mame.ini (and other other command-line option calls)
-		- add support for libxml2 function to LOG_ALLOC
-			- xmlNewDoc/xmlReadFile <-> xmlFreeDoc
-			- xmlGetProp/xmlStrdup <-> xmlFree
 
 	issues/bugs/errorhandling:
 		- avoid duplicated slashes

@@ -13,17 +13,23 @@ void mrt_free(void *ptr);
 #define realloc(ptr, size) mrt_realloc(ptr, size)
 #define free(ptr) mrt_free(ptr)
 
-void print_leaked_pointers();
-
-/*
-mrt_xmlNewDoc();
-mrt_xmlReadFile();
-mrt_xmlFreeDoc();
+xmlDocPtr mrt_xmlNewDoc(const xmlChar* version);
+xmlDocPtr mrt_xmlReadFile(const char* URL, const char* encoding, int options);
+void mrt_xmlFreeDoc(xmlDocPtr ptr);
 
 #define xmlNewDoc mrt_xmlNewDoc
 #define xmlReadFile mrt_xmlReadFile
 #define xmlFreeDoc mrt_xmlFreeDoc
-*/
+
+xmlChar* mrt_xmlGetProp(xmlNodePtr node, const xmlChar* name);
+xmlChar* mrt_xmlStrdup(const xmlChar* cur);
+void mrt_xmlFree(void* ptr);
+
+#define xmlGetProp mrt_xmlGetProp
+#define xmlStrdup mrt_xmlStrdup
+#define xmlFree mrt_xmlFree
+
+void print_leaked_pointers();
 
 #endif
 
