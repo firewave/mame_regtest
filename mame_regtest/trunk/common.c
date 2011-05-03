@@ -39,6 +39,9 @@ static void add_pointer(void* ptr)
 			break;
 		}
 	}
+	
+	if( i == m_entries )
+		printf("pointer array too small\n");
 }
 
 static void replace_pointer(void* old_ptr, void* new_ptr)
@@ -57,6 +60,9 @@ static void replace_pointer(void* old_ptr, void* new_ptr)
 			break;
 		}
 	}
+	
+	if( i == m_entries )
+		printf("pointer not found in array\n");
 }
 
 static void remove_pointer(void* ptr)
