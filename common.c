@@ -30,6 +30,9 @@ void print_leaked_pointers()
 
 static void add_pointer(void* ptr)
 {
+	if( ptr == NULL )
+		return;
+
 	int i = 0;
 	for( ; i < m_entries; ++i )
 	{
@@ -150,7 +153,7 @@ xmlChar* mrt_xmlGetProp(xmlNodePtr node, const xmlChar* name)
 	init_pointer_array();
 	
 	xmlChar* ptr = xmlGetProp(node, name);
-	printf("%d - xmlGetProp - %p\n", ++m, ptr);
+	printf("%d - xmlGetProp - %p\n", (ptr != NULL) ? ++m : -1, ptr);
 	add_pointer(ptr);
 	return ptr;
 }
