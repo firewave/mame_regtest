@@ -77,6 +77,9 @@ mame_regtest
 		- store merged configuration in results folder
 		- store the INI from the dummy path used for the runs
 		- do runs with -log enabled and add reports, that parse for like "unmapped writes" and stuff
+		- avoid duplicated cleanup code for dips and configurations
+		- use macros FREE(), XMLFREE() etc. which includes the setting to NULL
+		- add options to makefile for DEBUG and LOG_ALLOC
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
