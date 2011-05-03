@@ -1704,7 +1704,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 	} while(res == 1);
 }
 
-static void parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_info** new_driv_inf, struct dipswitch_info** last_dip_info, int type)
+static int parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_info** new_driv_inf, struct dipswitch_info** last_dip_info, int type)
 {
 	const xmlChar* cfg_xml_type_1 = NULL;
 	const xmlChar* cfg_xml_type_2 = NULL;
@@ -1789,7 +1789,11 @@ static void parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_in
 		
 		xmlFree(dip_mask);
 		dip_mask = NULL;
+		
+		return 1;
 	}
+	
+	return 0;
 }
 
 static void parse_listxml_element(const xmlNodePtr game_child, struct driver_info** new_driv_inf)
@@ -1867,6 +1871,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 						(*new_driv_inf)->savestate = 0;
 					xmlFree(game_status);
 				}
+				goto next;
 			}
 
 			if( (app_type == APP_MESS) && config_use_ramsize ) {
@@ -1882,6 +1887,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 							(*new_driv_inf)->ram_default = (*new_driv_inf)->ram_count;
 						xmlFree(ram_default);
 					}
+					goto next;
 				}
 			}
 
@@ -1897,14 +1903,19 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 							(*new_driv_inf)->bios_default = (*new_driv_inf)->bios_count;
 						xmlFree(bios_default);
 					}
+					goto next;
 				}
 			}
 			
-			if( config_use_dipswitches )
-				parse_listxml_element_cfg(game_children, new_driv_inf, &last_dip_info, CFG_DIP);
+			if( config_use_dipswitches ) {
+				if( parse_listxml_element_cfg(game_children, new_driv_inf, &last_dip_info, CFG_DIP) == 1 )
+					goto next;
+			}
 
-			if( config_use_configurations )
-				parse_listxml_element_cfg(game_children, new_driv_inf, &last_cfg_info, CFG_CONF);
+			if( config_use_configurations ) {
+				if( parse_listxml_element_cfg(game_children, new_driv_inf, &last_cfg_info, CFG_CONF) == 1 )
+					goto next;
+			}
 
 			if( app_type == APP_MESS ) {
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"device") == 0 ) {
@@ -1946,15 +1957,20 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					if( last_dev_info )
 						last_dev_info->next = new_dev_info;
 					last_dev_info = new_dev_info;
+					
+					goto next;
 				}
 				
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"softwarelist") == 0 ) {
 					(*new_driv_inf)->has_softlist = 1;
 					(*new_driv_inf)->softwarelist = xmlGetProp(game_children, (const xmlChar*)"name");
+					
+					goto next;
 				}
 			}
 
-			game_children = game_children->next;
+			next:
+				game_children = game_children->next;
 		}
 	}
 }

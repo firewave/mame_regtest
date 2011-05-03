@@ -514,6 +514,8 @@
 	- moved cleanup_driver_info_list() call to cleanup_and_exit() to avoid leaks in case of premature exit
 	- fixed parsing of dipswitches and configurations - only the first one was tested and the others were leaked
 	- fixed memory leaks with dipswitches and configurations
+	- parse_listxml_element_cfg() now returns if it found the entry in the XML
+	- sped up parse_listxml_element() a bit
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
