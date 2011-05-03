@@ -1224,8 +1224,11 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 
 		struct dipswitch_info* dipswitch = actual_driv_inf->dipswitches;
 		while( dipswitch != NULL ) {
+			xmlFree(dipswitch->name);
+			xmlFree(dipswitch->tag);
 			struct dipvalue_info* dipvalue = dipswitch->values;
 			while( dipvalue != NULL ) {
+				xmlFree(dipvalue->name);
 				struct dipvalue_info* next_dipvalue = dipvalue->next;
 				free(dipvalue);
 				dipvalue = next_dipvalue;
@@ -1238,8 +1241,11 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 
 		struct dipswitch_info* configuration = actual_driv_inf->configurations;
 		while( configuration != NULL ) {
+			xmlFree(configuration->name);
+			xmlFree(configuration->tag);
 			struct dipvalue_info* confsetting = configuration->values;
 			while( confsetting != NULL ) {
+				xmlFree(confsetting->name);
 				struct dipvalue_info* next_confsetting = confsetting->next;
 				free(confsetting);
 				confsetting = next_confsetting;
@@ -1755,6 +1761,9 @@ static void parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_in
 						if( last_dipvalue )
 							last_dipvalue->next = new_dipvalue;
 						last_dipvalue = new_dipvalue;
+						
+						xmlFree(dipvalue_value);
+						dipvalue_value = NULL;
 					}
 					
 					xmlFree(dipvalue_default);
@@ -1777,6 +1786,9 @@ static void parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_in
 		if( *last_dip_info )
 			(*last_dip_info)->next = new_dip_info;
 		*last_dip_info = new_dip_info;
+		
+		xmlFree(dip_mask);
+		dip_mask = NULL;
 	}
 }
 
