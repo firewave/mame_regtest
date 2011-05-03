@@ -165,6 +165,16 @@ xmlChar* mrt_xmlStrdup(const xmlChar* cur)
 	return ptr;
 }
 
+xmlChar* mrt_xmlNodeGetContent(xmlNodePtr cur)
+{
+	init_pointer_array();
+	
+	xmlChar* ptr = xmlNodeGetContent(cur);
+	printf("%d - xmlNodeGetContent - %p\n", ++m, ptr);
+	add_pointer(ptr);
+	return ptr;
+}
+
 void mrt_xmlFree(void* ptr)
 {
 	if( ptr != NULL )
