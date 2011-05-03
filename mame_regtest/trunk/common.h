@@ -23,10 +23,12 @@ void mrt_xmlFreeDoc(xmlDocPtr ptr);
 
 xmlChar* mrt_xmlGetProp(xmlNodePtr node, const xmlChar* name);
 xmlChar* mrt_xmlStrdup(const xmlChar* cur);
+xmlChar* mrt_xmlNodeGetContent(xmlNodePtr cur);
 void mrt_xmlFree(void* ptr);
 
 #define xmlGetProp mrt_xmlGetProp
 #define xmlStrdup mrt_xmlStrdup
+#define xmlNodeGetContent mrt_xmlNodeGetContent
 #define xmlFree mrt_xmlFree
 
 void print_leaked_pointers();
