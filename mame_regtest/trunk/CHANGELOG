@@ -517,6 +517,7 @@
 	- parse_listxml_element_cfg() now returns if it found the entry in the XML
 	- sped up parse_listxml_element() a bit
 	- log name of driver, that is being parsed when "verbose" is set to 1
+	- added append_string_n() to common.c/.h
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set

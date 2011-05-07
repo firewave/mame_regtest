@@ -75,6 +75,7 @@ int mrt_getch();
 
 /* you have to free the pointer you append the string to */
 void append_string(char** str, const char* str_to_append);
+void append_string_n(char** str, const char* str_to_append, size_t applen);
 void append_quoted_string(char** str, const char* str_to_append);
 
 /* you have to free the content */
