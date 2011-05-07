@@ -242,9 +242,8 @@ int mrt_getch()
 }
 #endif
 
-void append_string(char** str, const char* str_to_append)
+void append_string_n(char** str, const char* str_to_append, size_t applen)
 {
-	size_t applen = strlen(str_to_append);
 	size_t length = 0;
 	if( *str != NULL )
 		length = strlen(*str);
@@ -252,6 +251,12 @@ void append_string(char** str, const char* str_to_append)
 	*str = (char*)realloc(*str, length+applen+1);
 	memcpy(*str+length, str_to_append, applen);
 	(*str)[length+applen] = '\0';
+}
+
+void append_string(char** str, const char* str_to_append)
+{
+	size_t applen = strlen(str_to_append);
+	append_string_n(str, str_to_append, applen);
 }
 
 void append_quoted_string(char** str, const char* str_to_append)
