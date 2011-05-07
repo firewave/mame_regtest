@@ -651,6 +651,14 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 		exitcode = nExitCode;
 	}
 
+	CloseHandle(hProcess);
+
+	if( stderr_str )
+		close(err_pipe[0]);
+
+	if( stdout_str )
+		close(out_pipe[0]);
+
 	return exitcode;
 }
 
