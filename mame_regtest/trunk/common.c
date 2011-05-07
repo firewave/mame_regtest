@@ -200,6 +200,11 @@ void mrt_xmlFree(void* ptr)
 
 #endif
 
+#ifdef __MINGW32__
+#undef htonl
+#include <windows.h>
+#endif
+
 #ifndef _MSC_VER
 #include <dirent.h>
 #else
@@ -217,6 +222,23 @@ void mrt_xmlFree(void* ptr)
 #define strdup _strdup
 #endif
 #define F_OK 00
+#endif
+
+#if defined(_MSC_VER) || defined(__MINGW32__)
+#include <fcntl.h>
+#include <process.h>
+#undef pipe
+#define pipe _pipe
+#undef dup
+#define dup _dup
+#undef dup2
+#define dup2 _dup2
+#undef close
+#define close _close
+#undef spawnvp
+#define spawnvp _spawnvp
+#undef read
+#define read _read
 #endif
 
 #ifndef WIN32
@@ -551,3 +573,84 @@ void replace_string(const char* input, char** output, const char* old_str, const
 	free(str_copy);
 	str_copy = NULL;
 }
+
+int mrt_system(const char* command, char** stdout_str, char** stderr_str)
+{
+	int exitcode = -1;
+	HANDLE hProcess;
+	char szBuffer[512];
+
+	int out;
+	int out_pipe[2];
+	int err;
+	int err_pipe[2];
+	
+	if( stdout_str ) {
+		if( pipe(out_pipe, 512, _O_NOINHERIT | O_BINARY ) == -1 )
+			return exitcode;
+
+		out = dup(_fileno(stdout));
+
+		if( dup2(out_pipe[1], _fileno(stdout)) != 0 )
+			return exitcode;
+
+		close(out_pipe[1]);
+	}
+
+	if( stderr_str ) { 
+		if( pipe(err_pipe, 512, _O_NOINHERIT | O_BINARY ) == -1 )
+			return exitcode;
+
+		err = dup(_fileno(stderr));
+
+		if( dup2(err_pipe[1], _fileno(stderr)) != 0 )
+			return exitcode;
+
+		close(err_pipe[1]);
+	}
+
+	char** argv = split_string(command, " ");
+
+	hProcess = (HANDLE)spawnvp(P_NOWAIT, argv[0], (const char* const*)argv);
+	
+	if( stderr_str ) {
+		if( dup2(err, _fileno(stderr)) != 0 )
+			return exitcode;
+
+		close(err);
+	}
+
+	if( stdout_str ) {
+		if( dup2(out, _fileno(stdout)) != 0 )
+			return exitcode;
+
+		close(out);
+	}
+
+	if(hProcess)
+	{
+		int nExitCode = STILL_ACTIVE;
+		while( nExitCode == STILL_ACTIVE )
+		{
+			if( stdout_str ) {
+				int nOutRead = read(out_pipe[0], szBuffer, 512);
+				if( nOutRead )
+					append_string_n(stdout_str, szBuffer, nOutRead);
+			}
+
+			if( stderr_str ) {
+				int nErrRead = read(err_pipe[0], szBuffer, 512);
+				if( nErrRead )
+					append_string_n(stderr_str, szBuffer, nErrRead);
+			}
+
+			if(!GetExitCodeProcess(hProcess,(unsigned long*)&nExitCode))
+				return exitcode;
+		}
+
+		exitcode = nExitCode;
+	}
+
+	return exitcode;
+}
+
