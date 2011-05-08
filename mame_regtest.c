@@ -48,6 +48,10 @@
 #include "common.h"
 #include "config.h"
 
+#ifdef _MSC_VER
+#define USE_MRT_SYSTEM
+#endif
+
 #define VERSION "0.72"
 
 struct device_info {
@@ -126,8 +130,10 @@ static xmlChar* app_ver = NULL;
 static char* debugscript_file = NULL;
 static char* listxml_output = NULL;
 static char* temp_folder = NULL;
+#ifndef USE_MRT_SYSTEM
 static char* stdout_temp_file = NULL;
 static char* stderr_temp_file = NULL;
+#endif
 static char* dummy_ini_folder = NULL;
 static char current_path[_MAX_PATH] = "";
 static char* dummy_root = NULL;
@@ -602,18 +608,20 @@ static void cleanup_and_exit(int errcode, const char* errstr)
 	}
 	config_free(mrt_config);
 
-	if( stderr_temp_file ) {
-		free(stderr_temp_file);
-		stderr_temp_file = NULL;
-	}
 	if( dummy_ini_folder ) {
 		free(dummy_ini_folder);
 		dummy_ini_folder = NULL;
+	}
+#ifndef USE_MRT_SYSTEM
+	if( stderr_temp_file ) {
+		free(stderr_temp_file);
+		stderr_temp_file = NULL;
 	}
 	if( stdout_temp_file ) {
 		free(stdout_temp_file);
 		stdout_temp_file = NULL;
 	}
+#endif
 	
 	clear_directory(temp_folder, 1);
 	free(temp_folder);
@@ -1133,12 +1141,14 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result, char** cmd_
 		append_string(&sys, " -skip_gameinfo");
 	}
 
+#ifndef USE_MRT_SYSTEM
 	append_string(&sys, " > ");
 	append_quoted_string(&sys, stdout_temp_file);
 
 	append_string(&sys, " 2> ");
 	append_quoted_string(&sys, stderr_temp_file);
-
+#endif
+	
 	/* the whole command-line has to be quoted - end */
 	append_string(&sys, " \"");
 
@@ -1153,7 +1163,13 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result, char** cmd_
 	create_cfg(de, 1);
 	create_cfg(de, 2);
 	int ch_res = chdir(dummy_root);
+#ifndef USE_MRT_SYSTEM
 	int sys_res = system(sys);
+#else
+	char* stdout_str = NULL;
+	char* stderr_str = NULL;
+	int sys_res = mrt_system(sys, &stdout_str, &stderr_str);
+#endif
 	ch_res = chdir(current_path);
 	
 	if( !cmd_out )
@@ -1165,16 +1181,25 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result, char** cmd_
 		char tmp[128];
 		snprintf(tmp, sizeof(tmp), "%d", sys_res);
 		xmlNewProp(*result, (const xmlChar*)"exitcode", (const xmlChar*)tmp);
-		char* content = NULL;
-		if( read_file(stdout_temp_file, &content) == 0 ) {
-			xmlNewProp(*result, (const xmlChar*)"stdout", (const xmlChar*)content);
-			free(content);
-			content = NULL;
+#ifndef USE_MRT_SYSTEM
+		char* stdout_str = NULL;
+		if( read_file(stdout_temp_file, &stdout_str) == 0 ) {
+#else
+		if( stdout_str ) {
+#endif
+			xmlNewProp(*result, (const xmlChar*)"stdout", (const xmlChar*)stdout_str);
+			free(stdout_str);
+			stdout_str = NULL;
 		}
-		if( read_file(stderr_temp_file, &content) == 0 ) {
-			xmlNewProp(*result, (const xmlChar*)"stderr", (const xmlChar*)content);
-			free(content);
-			content = NULL;
+#ifndef USE_MRT_SYSTEM
+		char* stderr_str = NULL;
+		if( read_file(stderr_temp_file, &stderr_str) == 0 ) {
+#else
+		if( stderr_str ) {
+#endif
+			xmlNewProp(*result, (const xmlChar*)"stderr", (const xmlChar*)stderr_str);
+			free(stderr_str);
+			stderr_str = NULL;
 		}
 	}
 
@@ -2243,6 +2268,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
+#ifndef USE_MRT_SYSTEM
 	append_string(&stdout_temp_file, temp_folder);
 	append_string(&stdout_temp_file, FILESLASH);
 	append_string(&stdout_temp_file, "tmp_stdout");
@@ -2250,6 +2276,7 @@ int main(int argc, char *argv[])
 	append_string(&stderr_temp_file, temp_folder);
 	append_string(&stderr_temp_file, FILESLASH);
 	append_string(&stderr_temp_file, "tmp_stderr");
+#endif
 
 	append_string(&dummy_ini_folder, temp_folder);
 	append_string(&dummy_ini_folder, FILESLASH);
