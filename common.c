@@ -239,6 +239,8 @@ void mrt_xmlFree(void* ptr)
 #define spawnvp _spawnvp
 #undef read
 #define read _read
+#undef fileno
+#define fileno _fileno
 #endif
 
 #ifndef WIN32
@@ -590,9 +592,9 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 		if( pipe(out_pipe, 512, _O_NOINHERIT | O_BINARY ) == -1 )
 			return exitcode;
 
-		out = dup(_fileno(stdout));
+		out = dup(fileno(stdout));
 
-		if( dup2(out_pipe[1], _fileno(stdout)) != 0 )
+		if( dup2(out_pipe[1], fileno(stdout)) != 0 )
 			return exitcode;
 
 		close(out_pipe[1]);
@@ -602,9 +604,9 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 		if( pipe(err_pipe, 512, _O_NOINHERIT | O_BINARY ) == -1 )
 			return exitcode;
 
-		err = dup(_fileno(stderr));
+		err = dup(fileno(stderr));
 
-		if( dup2(err_pipe[1], _fileno(stderr)) != 0 )
+		if( dup2(err_pipe[1], fileno(stderr)) != 0 )
 			return exitcode;
 
 		close(err_pipe[1]);
@@ -615,14 +617,14 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 	hProcess = (HANDLE)spawnvp(P_NOWAIT, argv[0], (const char* const*)argv);
 	
 	if( stderr_str ) {
-		if( dup2(err, _fileno(stderr)) != 0 )
+		if( dup2(err, fileno(stderr)) != 0 )
 			return exitcode;
 
 		close(err);
 	}
 
 	if( stdout_str ) {
-		if( dup2(out, _fileno(stdout)) != 0 )
+		if( dup2(out, fileno(stdout)) != 0 )
 			return exitcode;
 
 		close(out);
