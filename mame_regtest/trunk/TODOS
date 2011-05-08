@@ -80,6 +80,30 @@ mame_regtest
 		- avoid duplicated cleanup code for dips and configurations
 		- use macros FREE(), XMLFREE() etc. which includes the setting to NULL
 		- add options to makefile for DEBUG and LOG_ALLOC
+		- make pointer array dynamic
+		- test again with LOG_ALLOC and *all* features enabled
+		- prepare softwarelists before processing the data and store the path in the driver_info
+			- add append flag to copy_file()
+		- run without XML creation
+		- add option "devicefile_dir" to load the mrt_*.xml from
+			- allow image paths to be absolute or relative to the current folder (no ..)
+		- change the imagexml format to include driver subnoes, so you don't need one for each driver
+			- additional format? different filename than the others?
+		- add function to config.c/.h to store configuration as XML
+		- use special prefix for non-output XMLs like config, softwarelists, etc. (maybe '_'?)
+		- add support for multiple configurations
+			- mame_regtest <config1> <config2>
+			- change configuration to store the values in the big array and not external variables
+			- get rid of test-specific static variables
+		- when output directory already exists shown in gdb:
+			warning: Invalid parameter passed to C runtime function.
+		- port mrt_system() to non-windows systems
+		- mrt_system() doesn't work on MinGW
+		- SetNamedPipeHandleState
+			- PIPE_NOWAIT
+		- compilwer warnings in optimized build:
+			common.c:598: warning: 'out' may be used uninitialized in this function
+			common.c:600: warning: 'err' may be used uninitialized in this function
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -136,12 +160,10 @@ mame_regtest
 		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER? LSB_FIRST?)
 		- fix Fedora Core 10 compilation (MAX_PATH)
 		- make doesn't work when the additional files already exist and you compile by target (e.g. mame_regtest.exe)
-		- switch to binaries/includes from http://www.zlatkovic.com/pub/libxml/
 		- create working x64 version
 		
 	Visual Studio:
 		- move the Microsoft-specific defines into a seperate header
-		- get proper libxml2 DLL to get Visual Studio working
 		
 	create_report:
 		- write comparison tool
@@ -197,6 +219,8 @@ mame_regtest
 		- try to detect new/missing sets in comparison seperately
 		- note differences about bios or ramsize etc. in results
 		- when merged configuration exists in results folder add information to report
+		- comparison doesn't crate output folder - doesn't complain when it's missing either
+		- add optional to list OPTIONAL warnings
 			
 	create_image_xml
 		- add more output to create_image_xml
