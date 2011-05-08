@@ -529,6 +529,7 @@
 		- Visual Studio builds finally work
 	- handle dirname == NULL in parse_directory() and clear_directory()
 	- enabled "Smaller Type Check" in Visual Studio projects
+	- added command_to_argv() to common.c
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
