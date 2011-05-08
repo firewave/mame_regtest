@@ -595,6 +595,69 @@ void replace_string(const char* input, char** output, const char* old_str, const
 }
 
 #if defined (_MSC_VER) || defined (__MINGW32__)
+/* you need to free the result with free_array() */
+static char** command_to_argv(const char* command)
+{
+	char** argv = NULL;
+	int argc = 0;
+
+	char** parts = split_string(command, " ");
+
+	int in_quote = 0;
+	char* temp = NULL;
+	int i = 0;
+	for( ; parts[i] != NULL; ++i)
+	{
+		if( in_quote )
+		{
+			size_t len = strlen(parts[i]);
+			if( parts[i][len-1] == '"' )
+			{
+				append_string_n(&temp, parts[i], len-1);
+				in_quote = 0;
+				argv = (char**)realloc(argv, sizeof(char*) * (argc+2));
+				argv[argc] = strdup(temp);
+				free(temp);
+				temp = NULL;
+				argc++;
+			}
+		}
+		else {
+			if( parts[i][0] == '"' )
+			{
+				in_quote = 1;
+				size_t len = strlen(parts[i]);
+				if( parts[i][len-1] == '"' )
+				{
+					argv = (char**)realloc(argv, sizeof(char*) * (argc+2));
+					append_string_n(&temp, parts[i]+1, len-2);
+					argv[argc] = strdup(temp);
+					free(temp);
+					temp = NULL;
+					argc++;
+					in_quote = 0;
+				}
+				else
+				{
+					append_string_n(&temp, parts[i]+1, len-1);
+				}
+			}
+			else
+			{
+				argv = (char**)realloc(argv, sizeof(char*) * (argc+2));
+				argv[argc] = strdup(parts[i]);
+				argc++;
+			}
+		}
+	}
+
+	free_array(parts);
+
+	argv[argc] = NULL;
+
+	return argv;
+}
+
 int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 {
 	int exitcode = -1;
@@ -630,20 +693,26 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 		close(err_pipe[1]);
 	}
 
-	char** argv = split_string(command, " ");
+	char** argv = command_to_argv(command);
 
 	hProcess = (HANDLE)spawnvp(P_NOWAIT, argv[0], (const char* const*)argv);
 	
 	if( stderr_str ) {
 		if( dup2(err, fileno(stderr)) != 0 )
+		{
+			free_array(argv);
 			return exitcode;
+		}
 
 		close(err);
 	}
 
 	if( stdout_str ) {
 		if( dup2(out, fileno(stdout)) != 0 )
+		{
+			free_array(argv);
 			return exitcode;
+		}
 
 		close(out);
 	}
@@ -666,13 +735,18 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 			}
 
 			if(!GetExitCodeProcess(hProcess,(unsigned long*)&nExitCode))
+			{
+				free_array(argv);
 				return exitcode;
+			}
 		}
 
 		exitcode = nExitCode;
 	}
 
 	CloseHandle(hProcess);
+	
+	free_array(argv);
 
 	if( stderr_str )
 		close(err_pipe[0]);
