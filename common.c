@@ -574,6 +574,7 @@ void replace_string(const char* input, char** output, const char* old_str, const
 	str_copy = NULL;
 }
 
+#if defined (_MSC_VER) || defined (__MINGW32__)
 int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 {
 	int exitcode = -1;
@@ -661,4 +662,4 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 
 	return exitcode;
 }
-
+#endif

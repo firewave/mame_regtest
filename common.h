@@ -128,6 +128,8 @@ char* get_directory(const char* filepath);
 
 void replace_string(const char* input, char** output, const char* old_str, const char* new_str);
 
+#if defined (_MSC_VER) || defined (__MINGW32__)
 int mrt_system(const char* command, char** stdout_str, char** stderr_str);
+#endif
 
 #endif
