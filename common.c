@@ -382,6 +382,9 @@ void parse_directory(const char* dirname,
 						void (*callback)(struct parse_callback_data* pcd),
 						void* user_data)
 {
+	if( !dirname )
+		return;
+
 	if( access(dirname, F_OK) != 0 )
 		return;
 
@@ -495,6 +498,9 @@ static void clear_callback(struct parse_callback_data* pcd)
 
 void clear_directory(const char* dirname, int delete_root)
 {
+	if( !dirname )
+		return;
+
 	parse_directory(dirname, 0, clear_callback, (void*)&delete_root);
 
 	if( delete_root )
