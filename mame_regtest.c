@@ -52,7 +52,7 @@
 #include "config.h"
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
-#define USE_MRT_SYSTEM
+//#define USE_MRT_SYSTEM
 #endif
 
 #define VERSION "0.72"
