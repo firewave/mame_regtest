@@ -642,7 +642,7 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 		close(out);
 	}
 
-	if(hProcess)
+	if((int)hProcess != -1)
 	{
 		int nExitCode = STILL_ACTIVE;
 		while( nExitCode == STILL_ACTIVE )
