@@ -58,6 +58,7 @@
       <AdditionalIncludeDirectories>./iconv/include;./libxml2/include;./zlib/include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <EnablePREfast>false</EnablePREfast>
+      <SmallerTypeCheck>true</SmallerTypeCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

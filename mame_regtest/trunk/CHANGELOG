@@ -528,6 +528,7 @@
 		- updated libxml2 to 2.7.7 and zlib to 1.2.5
 		- Visual Studio builds finally work
 	- handle dirname == NULL in parse_directory() and clear_directory()
+	- enabled "Smaller Type Check" in Visual Studio projects
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
