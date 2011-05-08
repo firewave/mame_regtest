@@ -54,7 +54,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./libxml2/include;./zlib/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./iconv/include;./libxml2/include;./zlib/include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>CompileAsCpp</CompileAs>
       <EnablePREfast>false</EnablePREfast>
@@ -62,7 +62,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>./libxml2/libxml2.lib;./zlib/lib/zdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>./libxml2/lib/libxml2.lib;./zlib/lib/zdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -74,7 +74,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./libxml2/include;./zlib/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./iconv/include;./libxml2/include;./zlib/include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
@@ -82,7 +82,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>./libxml2/libxml2.lib;./zlib/lib/zdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>./libxml2/lib/libxml2.lib;./zlib/lib/zdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
