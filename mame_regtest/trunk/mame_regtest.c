@@ -51,7 +51,7 @@
 #include "common.h"
 #include "config.h"
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #define USE_MRT_SYSTEM
 #endif
 
