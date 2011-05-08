@@ -519,6 +519,7 @@
 	- log name of driver, that is being parsed when "verbose" is set to 1
 	- added append_string_n() to common.c/.h
 	- added mrt_system() to common.c/.h
+	- use mrt_system() with Visual Studio
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
