@@ -41,6 +41,9 @@
 #endif
 
 /* libxml2 */
+#ifdef __MINGW32__
+#define IN_LIBXML
+#endif
 #include "libxml/parser.h"
 #include "libxml/xpath.h"
 
@@ -2162,6 +2165,8 @@ int main(int argc, char *argv[])
 	append_string(&pause_file, "pause");
 	append_string(&pause_file, ".");
 	append_string(&pause_file, pid_str);
+	
+	libxml2_init();
 
 	printf("initializing configuration\n");
 	int config_res = config_init("mame_regtest.xml", "mame_regtest");

@@ -116,7 +116,11 @@ void mrt_free(void *ptr)
 }
 
 /* libxml2 */
+#ifdef __MINGW32__
+#define IN_LIBXML
+#endif
 #include "libxml/parser.h"
+#include "libxml/xmlmemory.h"
 
 xmlDocPtr mrt_xmlNewDoc(const xmlChar* version)
 {
@@ -250,6 +254,14 @@ void mrt_xmlFree(void* ptr)
 
 /* zlib */
 #include "zlib.h"
+
+#ifndef LOG_ALLOC
+/* libxml2 */
+#ifdef __MINGW32__
+#define IN_LIBXML
+#endif
+#include "libxml/xmlmemory.h"
+#endif
 
 #ifndef WIN32
 int mrt_getch()
@@ -665,3 +677,9 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 	return exitcode;
 }
 #endif
+
+void libxml2_init()
+{
+	if(!xmlFree)
+		xmlMemGet(&xmlFree, &xmlMalloc, &xmlRealloc, NULL);
+}

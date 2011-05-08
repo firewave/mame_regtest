@@ -520,6 +520,13 @@
 	- added append_string_n() to common.c/.h
 	- added mrt_system() to common.c/.h
 	- use mrt_system() with Visual Studio
+	- cleaned up makefile
+	- added libxml2_init() to common.c/.h
+	- made everything compile with official libxml2 win32 binaries from ftp://ftp.zlatkovic.com/pub/libxml/
+		- had to define IN_LIBXML  and call listxml2_init() for MinGW
+		- added dependency to iconv.dll
+		- updated libxml2 to 2.7.7 and zlib to 1.2.5
+		- Visual Studio builds finally work
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set

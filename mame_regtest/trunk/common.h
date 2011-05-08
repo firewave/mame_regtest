@@ -132,4 +132,6 @@ void replace_string(const char* input, char** output, const char* old_str, const
 int mrt_system(const char* command, char** stdout_str, char** stderr_str);
 #endif
 
+void libxml2_init();
+
 #endif

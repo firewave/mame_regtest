@@ -18,6 +18,9 @@
 #endif
 
 /* libxml2 */
+#ifdef __MINGW32__
+#define IN_LIBXML
+#endif
 #include "libxml/parser.h"
 #include "libxml/xpath.h"
 
@@ -717,6 +720,8 @@ int main(int argc, char *argv[])
 		printf("usage: create_report <report_name>\n");
 		exit(1);
 	}
+	
+	libxml2_init();
 	
 	if( !config_init("create_report.xml", "create_report") ) {
 		printf("aborting\n");
