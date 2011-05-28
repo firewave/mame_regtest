@@ -6,7 +6,6 @@ mame_regtest
 		- add "start_at" for devices
 		- use transparent crosshair?
 		- add "hang"/deadlock detection (-watchdog / usable from 0.136)
-		- mark the different autosave calls (load / save)
 		- multipass XPath (e.g. first select m6502 cpus and then all with autosave from those nodes)
 		- multithreading mode
 		- configuration rewrite
@@ -18,9 +17,7 @@ mame_regtest
 			- read all options as const to avoid modifications outside the config
 			- report unknown options
 			- use register function to add config values?
-		- store both output file states in case of autosave
 		- add macro to output files/folders for version/revision etc.
-		- test absolute paths in INI (debugfile / rompath)
 		- use the following debugger commands
 			- gtime <milliseconds in hex>
 			- hardreset (causes endless restarts of MAME)
@@ -33,16 +30,17 @@ mame_regtest
 			- call -validate?
 		- add soft/hardreset tests after each call like "autosave" test?
 			- how will it work with -autosave?
-		- add clean/merged mame_regtest configuration to output data
-		- make it possible to use multiple configurations
-			- config_object {
-				void* xml;
-				void* root;
-				config_entries[]
-			}
-		- add memory dumps to the output files for -debug runs?
-		- add option to run MAME in gdb (gdb --batch --eval-command=run --args)
-			- disallow usage of gdb and valgrind at the same time
+		- output data enhancements
+			- add clean/merged mame_regtest configuration to output data
+			- add memory dumps to the output files for -debug runs?
+			- store the INI from the dummy path used for the runs
+			- output the software list only once and only when used
+				- check for existing files
+			- esq(?) outputs some invalid characters - add UTF-8 to header?
+			- use special prefix for non-output XMLs like config, softwarelists, etc. (maybe '_'?)
+			- mark the different autosave calls (load / save)
+			- store both output file states in case of autosave
+		- disallow usage of gdb and valgrind at the same time
 		- make it possible to set affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
 		- add signal/abort handler and cleanup in it
 		- do not check the default ramsize again in bios/ram combination runs
@@ -68,17 +66,11 @@ mame_regtest
 			- process the first entry and call itself with a smaller array
 		- add detection of duplicated bios and ramsize entries
 		- try to create append_to_array() based on split_string()
-		- output the software list only once and only when used
-			- check for existing files
 		- handle multiple software lists in hack
 		- log info about softwarelist entries without matching interface
 		- how to specify a specific device in softwarelist tests?
 		- document all the exitcodes in README
-		- store merged configuration in results folder
-		- store the INI from the dummy path used for the runs
-		- do runs with -log enabled and add reports, that parse for like "unmapped writes" and stuff
-		- avoid duplicated cleanup code for dips and configurations
-		- use macros FREE(), XMLFREE() etc. which includes the setting to NULL
+		- avoid duplicated cleanup code for dips and configurations - use generic function
 		- add options to makefile for DEBUG and LOG_ALLOC
 		- make pointer array dynamic
 		- test again with LOG_ALLOC and *all* features enabled
@@ -87,23 +79,27 @@ mame_regtest
 		- run without XML creation
 		- add option "devicefile_dir" to load the mrt_*.xml from
 			- allow image paths to be absolute or relative to the current folder (no ..)
-		- change the imagexml format to include driver subnoes, so you don't need one for each driver
+		- change the image xml format to include driver subnodes, so you don't need one for each driver
 			- additional format? different filename than the others?
 		- add function to config.c/.h to store configuration as XML
-		- use special prefix for non-output XMLs like config, softwarelists, etc. (maybe '_'?)
 		- add support for multiple configurations
 			- mame_regtest <config1> <config2>
 			- change configuration to store the values in the big array and not external variables
 			- get rid of test-specific static variables
-		- when output directory already exists shown in gdb:
-			warning: Invalid parameter passed to C runtime function.
-		- port mrt_system() to non-windows systems
-		- mrt_system() doesn't work on MinGW
+			- make it possible to use multiple configurations
+				- config_object {
+					void* xml;
+					void* root;
+					config_entries[]
+				}
 		- SetNamedPipeHandleState
 			- PIPE_NOWAIT
-		- compilwer warnings in optimized build:
-			common.c:598: warning: 'out' may be used uninitialized in this function
-			common.c:600: warning: 'err' may be used uninitialized in this function
+		- make sure, that valgrind log and the -log output are not being wiped with store_output=2
+		- bail out when -listxml returns something else than 0
+		- properly handle and report -listxml failure
+		- make it easier to perform batch processing by allowing config overrides via "-<key> <value>" command-line option?
+		- add a test, that the time shown at the end doesn't match the -str 10 value
+		- add windbg support
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -126,6 +122,8 @@ mame_regtest
 			- add sanity checks for maximum bios, ramsize and device count
 		- use different prefix for cfg_type enum / conflicts with config_entry
 		- run test_createconfig in dummy_root to avoid usage of existing mame.ini (and other other command-line option calls)
+		- use macros FREE(), XMLFREE() etc. which includes the setting to NULL
+		- port mrt_system() to non-windows systems
 
 	issues/bugs/errorhandling:
 		- avoid duplicated slashes
@@ -133,7 +131,6 @@ mame_regtest
 		- bail out when invalid config_entry_type found?
 		- test chdir() on start-up and bail out when it fails
 		- do not test dipswitch/configurations when additional information is missing in -listxml
-		- abort when output directory could not be renamed/moved
 		- test with path with whitespaces
 		- are there dipswitches, that are depending on multiple ports?
 		- make "hack_pinmame" fully working
@@ -153,14 +150,19 @@ mame_regtest
 			- add note to "use_debug" about needing a build with USE_DEBUGGER=1 and about the version, that started to include the debugger in non-debug builds
 			- update building instructions in Wiki
 			- verify the version number for software lists
+			- add link to configuration on main mame_regtest page
 		- document upper limit of dipswitches/devices/etc. of 100000		
 
 	compilation:
 		- fix compilation on systems, that already have a htonl() function
+			- #undef htonl might help
 		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER? LSB_FIRST?)
 		- fix Fedora Core 10 compilation (MAX_PATH)
 		- make doesn't work when the additional files already exist and you compile by target (e.g. mame_regtest.exe)
 		- create working x64 version
+		- compiler warnings in optimized build:
+			common.c:598: warning: 'out' may be used uninitialized in this function
+			common.c:600: warning: 'err' may be used uninitialized in this function
 		
 	Visual Studio:
 		- move the Microsoft-specific defines into a seperate header
@@ -209,18 +211,26 @@ mame_regtest
 		- add check for a specific string as option 
 			- replace "called within reset scope by" with it -> field="stderr" string="called within reset scope by"
 			- allow multiple ones
-		- find out what the various negative erorcodes mean
 		- replace hard-coded format with templates
 		- use tables in comparison report?
 		- create output_folder
 			- same behavior as mame_regtest output folder
 		- convert \n to <br> in stdout and stderr output
 		- how to support multiples paths for comparison reports?
-		- try to detect new/missing sets in comparison seperately
+		- try to detect new/missing sets in comparison separately
 		- note differences about bios or ramsize etc. in results
 		- when merged configuration exists in results folder add information to report
 		- comparison doesn't crate output folder - doesn't complain when it's missing either
 		- add optional to list OPTIONAL warnings
+		- add option to print negative exitcodes in hex
+		- add reports, that parse -log output for like "unmapped writes" and stuff
+		- add HTML version of the error report
+		- filter gdb output
+			- stdout
+				- "[New Thread"
+				- "[Inferior"
+			- stderr
+				- "No stack."
 			
 	create_image_xml
 		- add more output to create_image_xml
@@ -236,9 +246,23 @@ mame_regtest
 
 	Test TODOs:
 		- create testset with images for each device in each driver
-		- split up MAME test into #-z
+		- test absolute paths in INI (debugfile / rompath)
+		- nightly test
+			- checkout SVN
+			- get revision number
+			- create config on demand
+			- run test for all 4 flavours for GCC and VS2010
+				- 32bit
+				- 64bit
+				- 32bit debug
+				- 64bit debug
+			- image comparison
+				- compare indiviual test with each other
+					- use 32bit as base
+				- compare against previous revision
+			- upload error report and comparison report to some webspace
 
 	Misc:
-		- create patch to write show_ui() in a file
+		- create patch to write ui_popup() to -log output
 		- MAME patches
 			- add "exit"/"run-and-hide" command to debugger
