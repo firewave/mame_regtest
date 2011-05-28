@@ -200,7 +200,7 @@ static int config_test_softreset = 0;
 static int config_hack_pinmame = 0;
 static int config_write_avi = 0;
 static int config_verbose = 0;
-/* static int config_use_gdb = 0; */
+static int config_use_gdb = 0;
 static int config_write_wav = 0;
 static int config_use_dipswitches = 0;
 static int config_use_configurations = 0;
@@ -246,7 +246,7 @@ struct config_entry mrt_config[] =
 	{ "hack_pinmame",			CFG_INT,		&config_hack_pinmame },
 	{ "write_avi",				CFG_INT,		&config_write_avi },
 	{ "verbose",				CFG_INT,		&config_verbose },
-/*	{ "use_gdb",				CFG_INT,		&config_use_gdb }, */
+	{ "use_gdb",				CFG_INT,		&config_use_gdb },
 	{ "write_wav",				CFG_INT,		&config_write_wav },
 	{ "use_dipswitches",		CFG_INT,		&config_use_dipswitches },
 	{ "use_configurations",		CFG_INT,		&config_use_configurations },
@@ -375,14 +375,13 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 		append_string(sys, " ");
 #endif
 	}
-	/*
 	else if( config_use_gdb && (!callstr || (strcmp(callstr, "listxml") != 0)) ) {
+		/* cannot be done with -listxml sine it messes up the output */
 		append_string(sys, "gdb");
 		append_string(sys, " ");
-		append_string(sys, "--batch --eval-command=run --args");
+		append_string(sys, "--batch --eval-command=run --eval-command=bt --return-child-result --args");
 		append_string(sys, " ");
 	}
-	*/
 
 	append_quoted_string(sys, config_mame_exe);
 }
@@ -2336,7 +2335,7 @@ int main(int argc, char *argv[])
 		printf("test_softreset: %d\n", config_test_softreset);
 		printf("write_avi: %d\n", config_write_avi);
 		printf("verbose: %d\n", config_verbose);
-		/* printf("use_gdb: %d\n", config_use_gdb); */
+		printf("use_gdb: %d\n", config_use_gdb);
 		printf("write_wav: %d\n", config_write_wav);
 		printf("use_dipswitches: %d\n", config_use_dipswitches);
 		printf("use_configurations: %d\n", config_use_configurations);

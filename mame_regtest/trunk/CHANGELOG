@@ -531,6 +531,7 @@
 	- enabled "Smaller Type Check" in Visual Studio projects
 	- added command_to_argv() to common.c
 	- try to rename the output folder until it succeeded
+	- added option "use_gdb" to perform each run within gdb (most of the code was already there, but disabled)
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
