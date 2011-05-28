@@ -1391,9 +1391,11 @@ static int execute_mame2(struct driver_entry* de)
 		append_string(&outputdir, FILESLASH);
 		append_driver_info(&outputdir, de);
 
-		/* TODO: bail out on error */
-		if( rename(dummy_root, outputdir) != 0 )
+		while( rename(dummy_root, outputdir) != 0 )
+		{
+			/* TODO: sleep */
 			printf("could not rename '%s' to '%s'\n", dummy_root, outputdir);
+		}
 			
 		/* clear everything but the "snap" folder */
 		if( config_store_output == 2)
