@@ -1908,23 +1908,6 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 				goto next;
 			}
 
-			if( (app_type == APP_MESS) && config_use_ramsize ) {
-				if( xmlStrcmp(game_children->name, (const xmlChar*)"ramoption") == 0 ) {
-					xmlChar* ram_content = xmlNodeGetContent(game_children);
-					if( ram_content ) {
-						(*new_driv_inf)->ramsizes[(*new_driv_inf)->ram_count++] = atoi((const char*)ram_content);
-						xmlFree(ram_content);
-					}
-					xmlChar* ram_default = xmlGetProp(game_children, (const xmlChar*)"default");
-					if( ram_default ) {
-						if( xmlStrcmp(ram_default, (const xmlChar*)"1") == 0 )
-							(*new_driv_inf)->ram_default = (*new_driv_inf)->ram_count;
-						xmlFree(ram_default);
-					}
-					goto next;
-				}
-			}
-
 			if( config_use_bios ) {
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"biosset") == 0 ) {
 					xmlChar* bios_content = xmlGetProp(game_children, (const xmlChar*)"name");
@@ -1952,6 +1935,21 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 			}
 
 			if( app_type == APP_MESS ) {
+				if( config_use_ramsize && (xmlStrcmp(game_children->name, (const xmlChar*)"ramoption") == 0) ) {
+					xmlChar* ram_content = xmlNodeGetContent(game_children);
+					if( ram_content ) {
+						(*new_driv_inf)->ramsizes[(*new_driv_inf)->ram_count++] = atoi((const char*)ram_content);
+						xmlFree(ram_content);
+					}
+					xmlChar* ram_default = xmlGetProp(game_children, (const xmlChar*)"default");
+					if( ram_default ) {
+						if( xmlStrcmp(ram_default, (const xmlChar*)"1") == 0 )
+							(*new_driv_inf)->ram_default = (*new_driv_inf)->ram_count;
+						xmlFree(ram_default);
+					}
+					goto next;
+				}
+				
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"device") == 0 ) {
 					struct device_info* new_dev_info = (struct device_info*)malloc(sizeof(struct device_info));
 					/* TODO: check allocation */
