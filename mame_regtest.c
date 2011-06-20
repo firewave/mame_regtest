@@ -379,7 +379,7 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 		/* cannot be done with -listxml sine it messes up the output */
 		append_string(sys, "gdb");
 		append_string(sys, " ");
-		append_string(sys, "--batch --eval-command=run --eval-command=bt --return-child-result --args");
+		append_string(sys, "--batch --eval-command=\"set target-charset UTF-8\" --eval-command=run --eval-command=bt --return-child-result --args");
 		append_string(sys, " ");
 	}
 
