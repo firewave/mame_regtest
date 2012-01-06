@@ -33,7 +33,6 @@ mame_regtest
 		- output data enhancements
 			- add clean/merged mame_regtest configuration to output data
 			- add memory dumps to the output files for -debug runs?
-			- store the INI from the dummy path used for the runs
 			- output the software list only once and only when used
 				- check for existing files
 			- esq(?) outputs some invalid characters - add UTF-8 to header?
@@ -100,13 +99,15 @@ mame_regtest
 		- make it easier to perform batch processing by allowing config overrides via "-<key> <value>" command-line option?
 		- add a test, that the time shown at the end doesn't match the -str 10 value
 		- add windbg support
+		- check if gdb exists when use_gdb is set to 1
+		- only parse "softwarelist" and "devices" if necessary - like ramoption
+		- add schemas to XMLs
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
 		- make pointers const (or const * const)
 		- move MNG frame parsing into seperate function
 		- add printf-format support to append_string()
-		- better way to align the dummy_root INI lines
 		- use functions for lists
 			- list_create()
 			- list_next_entry()
@@ -231,6 +232,7 @@ mame_regtest
 				- "[Inferior"
 			- stderr
 				- "No stack."
+		- in comparison report show which is which
 			
 	create_image_xml
 		- add more output to create_image_xml
@@ -246,7 +248,6 @@ mame_regtest
 
 	Test TODOs:
 		- create testset with images for each device in each driver
-		- test absolute paths in INI (debugfile / rompath)
 		- nightly test
 			- checkout SVN
 			- get revision number
