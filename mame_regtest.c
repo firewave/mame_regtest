@@ -137,7 +137,6 @@ static char* temp_folder = NULL;
 static char* stdout_temp_file = NULL;
 static char* stderr_temp_file = NULL;
 #endif
-static char* dummy_ini_folder = NULL;
 static char current_path[_MAX_PATH] = "";
 static char* dummy_root = NULL;
 static char* pause_file = NULL;
@@ -538,60 +537,6 @@ static void build_output_xml(const char* dirname, xmlNodePtr node)
 	parse_directory(dirname, 1, parse_callback, (void*)&node);
 }
 
-static int create_dummy_root_ini()
-{
-	printf("creating 'dummy_root' INI\n");
-	
-	int res = 0;
-	if( (access(dummy_ini_folder, F_OK) == 0) || (mrt_mkdir(dummy_ini_folder) == 0) ) {
-		char* app_string = NULL;
-		append_string(&app_string, dummy_ini_folder);
-		append_string(&app_string, FILESLASH);
-		append_string(&app_string, get_inifile());
-
-		FILE* fp = fopen(app_string, "w");
-		if( fp ) {
-			fprintf(fp, "video              none\n"); /* disable video output */
-			if( !config_use_sound )
-				fprintf(fp, "sound              0\n"); /* disable sound output */
-			if( !config_use_throttle )
-				fprintf(fp, "throttle           0\n"); /* disable throttle */
-			if( !config_use_debug )
-				fprintf(fp, "debug              0\n"); /* disable debug window */
-			else {
-				fprintf(fp, "debug              1\n"); /* enable debug window */
-				/* pass debugscript, so so debugger won't block the execution */
-				fprintf(fp, "debugscript        %s\n", debugscript_file);
-			}
-			fprintf(fp, "mouse              0\n"); /* disable "mouse" so it doesn't grabs the mouse pointer on window creation */
-			fprintf(fp, "window             1\n"); /* run it in windowed mode */
-			if( !config_hack_ftr )
-				fprintf(fp, "seconds_to_run     %s\n", config_str_str);
-			else
-				fprintf(fp, "frames_to_run      %s\n", config_str_str);
-			if( config_rompath_folder && (*config_rompath_folder != 0) ) {
-				if( !config_hack_biospath )
-					fprintf(fp, "rompath            %s\n", config_rompath_folder); /* rompath for MAME/MESS */
-				else
-					fprintf(fp, "biospath           %s\n", config_rompath_folder); /* old biospath for MESS */
-			}
-			if( (app_type == APP_MESS) && config_hashpath_folder && (*config_hashpath_folder != 0) )
-				fprintf(fp, "hashpath            %s\n", config_hashpath_folder); /* hashpath for MESS */
-			fclose(fp);
-			res = 1;
-		}
-		else
-			printf("could not create '%s' in '%s'\n", get_inifile(), dummy_ini_folder);
-			
-		free(app_string);
-		app_string = NULL;
-	}
-	else
-		printf("could not create '%s'\n", dummy_ini_folder);
-
-	return res;
-}
-
 static void cleanup_and_exit(int errcode, const char* errstr)
 {
 	if( global_driv_inf ) {
@@ -610,10 +555,6 @@ static void cleanup_and_exit(int errcode, const char* errstr)
 	}
 	config_free(mrt_config);
 
-	if( dummy_ini_folder ) {
-		free(dummy_ini_folder);
-		dummy_ini_folder = NULL;
-	}
 #ifndef USE_MRT_SYSTEM
 	if( stderr_temp_file ) {
 		free(stderr_temp_file);
@@ -1138,8 +1079,39 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result, char** cmd_
 		append_string(&sys, " ");
 		append_string(&sys, config_additional_options);
 	}
-	append_string(&sys, " -inipath ");
-	append_quoted_string(&sys, dummy_ini_folder);
+	
+	append_string(&sys, " -video none"); /* disable video output */
+	if( !config_use_sound )
+		append_string(&sys, " -nosound"); /* disable sound output */
+	if( !config_use_throttle )
+		append_string(&sys, " -nothrottle"); /* disable throttle */
+	if( !config_use_debug )
+		append_string(&sys, " -nodebug"); /* disable debug window */
+	else {
+		append_string(&sys, " -debug"); /* enable debug window */
+		/* pass debugscript, so so debugger won't block the execution */
+		append_string(&sys, "-debugscript ");
+		append_quoted_string(&sys, debugscript_file);
+	}
+	append_string(&sys, " -nomouse"); /* disable "mouse" so it doesn't grabs the mouse pointer on window creation */
+	append_string(&sys, " -window"); /* run it in windowed mode */
+	if( !config_hack_ftr )
+		append_string(&sys, " -seconds_to_run ");
+	else
+		append_string(&sys, " -frames_to_run ");
+	append_string(&sys, config_str_str);
+	if( config_rompath_folder && (*config_rompath_folder != 0) ) {
+		if( !config_hack_biospath )
+			append_string(&sys, " -rompath "); /* rompath for MAME/MESS */
+		else
+			append_string(&sys, " -biospath "); /* old biospath for MESS */
+		append_quoted_string(&sys, config_rompath_folder);
+	}
+	if( (app_type == APP_MESS) && config_hashpath_folder && (*config_hashpath_folder != 0) )
+	{
+		append_string(&sys, " -hashpath "); /* hashpath for MESS */
+		append_quoted_string(&sys, config_hashpath_folder);
+	}
 	if( config_hack_pinmame ) {
 		append_string(&sys, " -skip_disclaimer");
 		append_string(&sys, " -skip_gameinfo");
@@ -2284,10 +2256,6 @@ int main(int argc, char *argv[])
 	append_string(&stderr_temp_file, "tmp_stderr");
 #endif
 
-	append_string(&dummy_ini_folder, temp_folder);
-	append_string(&dummy_ini_folder, FILESLASH);
-	append_string(&dummy_ini_folder, "dummy_ini");
-
 	if( config_verbose )
 		printf("valgrind: %d\n", config_use_valgrind);
 
@@ -2456,8 +2424,6 @@ int main(int argc, char *argv[])
 	}
 
 	printf("\n"); /* for output formating */
-	if( !create_dummy_root_ini() )
-		cleanup_and_exit(1, "aborted");
 
 	/* setup OSDPROCESSORS */
 	char osdprocessors_tmp[128];
