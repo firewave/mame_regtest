@@ -537,6 +537,7 @@
 	- add defining of _MAX_PATH if missing
 	- replaced itoa() call with snprintf()
 	- fixed linux compilation of common.c/.h
+	- do quote the whole command-line on linux
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set

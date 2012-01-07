@@ -1031,8 +1031,10 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result, char** cmd_
 	char* sys = NULL;
 	
 #ifndef USE_MRT_SYSTEM
+#ifdef WIN32
 	/* the whole command-line has to be quoted - begin */
 	append_string(&sys, "\" ");
+#endif
 #endif
 
 	get_executable(&sys, de, NULL);
@@ -1129,8 +1131,10 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result, char** cmd_
 	append_string(&sys, " 2> ");
 	append_quoted_string(&sys, stderr_temp_file);
 	
+#ifdef WIN32
 	/* the whole command-line has to be quoted - end */
 	append_string(&sys, " \"");
+#endif
 #endif
 	
 	if( config_verbose )
