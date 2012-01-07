@@ -35,6 +35,7 @@
 
 #ifndef WIN32
 #include <arpa/inet.h>
+#include <sys/wait.h>
 #define USE_VALGRIND 1
 #else
 #define USE_VALGRIND 0
@@ -1150,6 +1151,9 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result, char** cmd_
 	int ch_res = chdir(dummy_root);
 #ifndef USE_MRT_SYSTEM
 	int sys_res = system(sys);
+#ifndef WIN32
+	sys_res = WEXITSTATUS(sys_res);
+#endif
 #else
 	char* stdout_str = NULL;
 	char* stderr_str = NULL;
