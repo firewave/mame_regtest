@@ -158,7 +158,6 @@ mame_regtest
 		- fix compilation on systems, that already have a htonl() function
 			- #undef htonl might help
 		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER? LSB_FIRST?)
-		- fix Fedora Core 10 compilation (MAX_PATH)
 		- make doesn't work when the additional files already exist and you compile by target (e.g. mame_regtest.exe)
 		- create working x64 version
 		- compiler warnings in optimized build:

@@ -534,6 +534,9 @@
 	- added option "use_gdb" to perform each run within gdb (most of the code was already there, but disabled)
 	- moved "ramoption" parsing into APP_MESS block
 	- removed usage of .ini files in favour of command-line options
+	- add defining of _MAX_PATH if missing
+	- replaced itoa() call with snprintf()
+	- fixed linux compilation of common.c/.h
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set

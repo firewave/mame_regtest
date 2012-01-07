@@ -1,6 +1,5 @@
 #ifdef LOG_ALLOC
 
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 

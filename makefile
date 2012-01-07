@@ -2,8 +2,10 @@ CC = gcc
 BIN_EXT = .exe
 
 INCLUDES = -I./iconv/include -I./libxml2/include -I./zlib/include
+#INCLUDES = -I/usr/include/libxml2
 
 LIBS = ./libxml2/lib/libxml2.lib ./zlib/lib/zdll.lib
+#LIBS = -lz -lxml2
 
 WARNINGS = -Wall -Wextra -Wformat=2 -Wshadow -Wcast-qual -Wwrite-strings
 #WARNINGS += -Wunreachable-code
