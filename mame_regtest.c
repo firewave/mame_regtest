@@ -19,8 +19,6 @@
 #define snprintf _snprintf
 #undef strdup
 #define strdup _strdup
-#undef itoa
-#define itoa _itoa
 #undef chdir
 #define chdir _chdir
 #undef getcwd
