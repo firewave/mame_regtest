@@ -55,6 +55,11 @@
 //#define USE_MRT_SYSTEM
 #endif
 
+#ifndef _MAX_PATH
+#include <limits.h>
+#define _MAX_PATH PATH_MAX
+#endif
+
 #define VERSION "0.72"
 
 struct device_info {
@@ -975,7 +980,7 @@ static int create_cfg(struct driver_entry* de, int type)
 	if( mameconfig_ver == 10 ) {
 		xmlNodePtr cfg_node = xmlNewNode(NULL, (const xmlChar*)"mameconfig");
 		char tmp[10];
-		itoa(mameconfig_ver, tmp, 10);
+		snprintf(tmp, sizeof(tmp), "%d", mameconfig_ver);
 		xmlNewProp(cfg_node, (const xmlChar*)"version", (const xmlChar*)tmp);
 		
 		xmlDocSetRootElement(cfg_doc, cfg_node);
@@ -988,11 +993,11 @@ static int create_cfg(struct driver_entry* de, int type)
 		xmlNodePtr port_node = xmlNewChild(input_node, NULL, (const xmlChar*)"port", NULL);
 		xmlNewProp(port_node, (const xmlChar*)"tag", (const xmlChar*)inp_name->tag);
 		xmlNewProp(port_node, (const xmlChar*)"type", (const xmlChar*)type_str);
-		itoa(inp_name->mask, tmp, 10);
+		snprintf(tmp, sizeof(tmp), "%d", inp_name->mask);
 		xmlNewProp(port_node, (const xmlChar*)"mask", (const xmlChar*)tmp);
-		itoa(inp_name->defvalue, tmp, 10);
+		snprintf(tmp, sizeof(tmp), "%d", inp_name->defvalue);
 		xmlNewProp(port_node, (const xmlChar*)"defvalue", (const xmlChar*)tmp);
-		itoa(inp_value->value, tmp, 10);
+		snprintf(tmp, sizeof(tmp), "%d", inp_value->value);
 		xmlNewProp(port_node, (const xmlChar*)"value", (const xmlChar*)tmp);
 		
 		res = 1;
@@ -2116,7 +2121,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	itoa(getpid(), pid_str, 10);
+	snprintf(pid_str, sizeof(pid_str), "%d", getpid());
 
 	printf("\n");
 	printf("process: %s\n", pid_str);

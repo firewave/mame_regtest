@@ -1,6 +1,8 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
+#include <stdlib.h>
+
 #ifdef LOG_ALLOC
 
 void* mrt_malloc(size_t size);
