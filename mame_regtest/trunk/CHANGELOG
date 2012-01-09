@@ -539,6 +539,7 @@
 	- fixed linux compilation of common.c/.h
 	- do not quote the whole command-line on linux
 	- report proper exitcode on linux
+	- added create_thread() and wait_for_thread() to common.c/.h
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set

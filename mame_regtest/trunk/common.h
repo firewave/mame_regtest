@@ -136,4 +136,7 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str);
 
 void libxml2_init();
 
+void* create_thread();
+void wait_for_thread(void* thread);
+
 #endif
