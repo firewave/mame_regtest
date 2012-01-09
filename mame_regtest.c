@@ -1017,27 +1017,9 @@ static int create_cfg(struct driver_entry* de, int type)
 	return res;
 }
 
-static int execute_mame(struct driver_entry* de, xmlNodePtr* result, char** cmd_out)
+static char* create_commandline(struct driver_entry* de)
 {
-	print_driver_info(de, stdout);
-	if( config_use_autosave && de->autosave )
-		printf(" (autosave)");
-	printf("\n");
-
-	/* DEBUG!!! */
-	/* return 1; */
-
-	char* sys = NULL;
-	
-#ifndef USE_MRT_SYSTEM
-#ifdef WIN32
-	/* the whole command-line has to be quoted - begin */
-	append_string(&sys, "\" ");
-#endif
-#endif
-
-	get_executable(&sys, de, NULL);
-	append_string(&sys, " ");
+	char* sys = NULL;	
 	append_string(&sys, de->name);
 	if( config_use_autosave && de->autosave )
 		append_string(&sys, " -autosave");
@@ -1122,6 +1104,32 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result, char** cmd_
 		append_string(&sys, " -skip_disclaimer");
 		append_string(&sys, " -skip_gameinfo");
 	}
+	
+	return sys;
+}
+
+static int execute_mame(struct driver_entry* de, const char* parameters, xmlNodePtr* result, char** cmd_out)
+{
+	print_driver_info(de, stdout);
+	if( config_use_autosave && de->autosave )
+		printf(" (autosave)");
+	printf("\n");
+
+	/* DEBUG!!! */
+	/* return 1; */
+
+	char* sys = NULL;
+	
+#ifndef USE_MRT_SYSTEM
+#ifdef WIN32
+	/* the whole command-line has to be quoted - begin */
+	append_string(&sys, "\" ");
+#endif
+#endif
+
+	get_executable(&sys, de, NULL);
+	append_string(&sys, " ");
+	append_string(&sys, parameters);
 
 #ifndef USE_MRT_SYSTEM
 	append_string(&sys, " > ");
@@ -1190,11 +1198,13 @@ static int execute_mame(struct driver_entry* de, xmlNodePtr* result, char** cmd_
 		}
 	}
 
+	/* TODO: what is this all about */
 	if( sys_res != 0 ) {
 	}
 	else { /* sys_res == 0 */
 	}
 
+	/* TODO: why always return 1? */
 	return 1;
 }
 
@@ -1344,8 +1354,9 @@ static int execute_mame2(struct driver_entry* de)
 		}
 	}
 
+	char* params = create_commandline(de);	
 	char* cmd = NULL;
-	res = execute_mame(de, &result1, &cmd);
+	res = execute_mame(de, params, &result1, &cmd);
 	
 	if( cmd ) {
 		xmlNewProp(output_node, (const xmlChar*)"cmd", (const xmlChar*)cmd);
@@ -1359,13 +1370,16 @@ static int execute_mame2(struct driver_entry* de)
 	}
 
 	if( res == 1 && config_use_autosave && de->autosave ) {
-		res = execute_mame(de, &result2, NULL);
+		res = execute_mame(de, params, &result2, NULL);
 
 		if( result2 ) {
 			xmlAddChild(output_node, result2);
 			build_output_xml(dummy_root, result2);
 		}
 	}
+	
+	free(params);
+	params = NULL;
 
 	if( (config_store_output > 0) && (access(dummy_root, F_OK) == 0) ) {
 		char* outputdir = NULL;
@@ -2121,7 +2135,7 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 int main(int argc, char *argv[])
 {
 	printf("mame_regtest %s\n", VERSION);
-
+	
 	if( argc > 2) {
 		printf("usage: mame_regtest <configname>\n");
 		exit(1);
