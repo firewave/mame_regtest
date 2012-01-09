@@ -762,3 +762,38 @@ void libxml2_init()
 	if(!xmlFree)
 		xmlMemGet(&xmlFree, &xmlMalloc, &xmlRealloc, NULL);
 }
+
+#ifdef WIN32
+static void WorkerFuntion(void* data)
+#else
+static void* WorkerFuntion(void* data)
+#endif
+{
+	(void)data;
+#ifdef WIN32
+	_endthread();
+#else
+	pthread_exit(0);
+#endif
+}
+
+void* create_thread()
+{
+#ifdef WIN32
+	return (void*)_beginthread(WorkerFuntion, 0, NULL);
+#else
+	pthread_t thread;
+	int ret = pthread_create(&thread, NULL, WorkerFuntion, NULL);
+	return (void*)thread;
+#endif
+}
+
+void wait_for_thread(void* thread)
+{
+#if WIN32
+	WaitForSingleObject((HANDLE)thread, INFINITE);
+#else
+	void* thread_ret = NULL;
+	int ret = pthread_join((pthread_t)thread, &ret);
+#endif
+}
