@@ -542,6 +542,7 @@
 	- added create_thread() and wait_for_thread() to common.c/.h
 	- moved command-line parameter creation into create_commandline()
 	- added "parameters" parameter to execute_mame()
+	- replaced all system() calls with execute_mame()
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set

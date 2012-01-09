@@ -351,6 +351,7 @@ static const char* get_inifile()
 	return ""; /* shut up compiler */
 }
 
+/* TODO: how to set "callstr" for non-de calls? */
 static void get_executable(char** sys, struct driver_entry* de, const char* callstr)
 {
 #if !USE_VALGRIND
@@ -371,7 +372,7 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 		if( de ) {
 			append_driver_info(sys, de);
 		}
-		else {
+		else if( callstr ) {
 			append_string(sys, callstr);
 		}
 		append_string(sys, ".valgrind_%p");
@@ -592,6 +593,9 @@ static void cleanup_and_exit(int errcode, const char* errstr)
 
 static void print_driver_info(struct driver_entry* de, FILE* print_fd)
 {
+	if( de == NULL )
+		return;
+
 	fprintf(print_fd, "%s: %s", de->sourcefile, de->name);
 	if( de->bios && strlen(de->bios) > 0 )
 		fprintf(print_fd, " (bios %s)", de->bios);
@@ -948,6 +952,9 @@ static int create_cfg(struct driver_entry* de, int type)
 	struct dipswitch_info* inp_name = NULL;
 	struct dipvalue_info* inp_value = NULL;
 	const char* type_str = NULL;
+	
+	if( de == NULL )
+		return res;
 	
 	if( type == CFG_DIP ) {
 		inp_name = de->dipswitch;
@@ -1592,7 +1599,6 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 			}
 			else {
 				char* mame_call = NULL;					
-				get_executable(&mame_call, NULL, driver_softlist);
 				append_string(&mame_call, " -hashpath ");
 				append_string(&mame_call, config_hashpath_folder);
 				append_string(&mame_call, " ");
@@ -1603,10 +1609,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				append_string(&mame_call, driver_softlist);
 				append_string(&mame_call, ".xml");
 		
-				if( config_verbose )
-					printf("%s\n", mame_call);
-		
-				system(mame_call);
+				execute_mame(NULL, mame_call, NULL, NULL);
 				
 				free(mame_call);
 				mame_call = NULL;
@@ -2371,14 +2374,10 @@ int main(int argc, char *argv[])
 
 		printf("writing -listxml output\n");
 		char* mame_call = NULL;
-		get_executable(&mame_call, NULL, "listxml");
 		append_string(&mame_call, " -listxml > ");
 		append_string(&mame_call, config_gamelist_xml_file);
 
-		if( config_verbose )
-			printf("system call: %s\n", mame_call);
-
-		system(mame_call);
+		execute_mame(NULL, mame_call, NULL, NULL);
 
 		if( config_hack_pinmame ) {
 			char* tmp_gamelist_xml = NULL;
@@ -2406,16 +2405,16 @@ int main(int argc, char *argv[])
 
 	printf("\n"); /* for output formating */
 
+	/* TODO: this is not actually a "createconfig" test */
 	if( config_test_createconfig ) {
 		printf("writing '%s'\n", get_inifile());
 		char* mame_call = NULL;
-		get_executable(&mame_call, NULL, "createconfig");
 		append_string(&mame_call, " -showconfig > ");
 		append_string(&mame_call, config_output_folder);
 		append_string(&mame_call, FILESLASH);
 		append_string(&mame_call, get_inifile());
 
-		system(mame_call);
+		execute_mame(NULL, mame_call, NULL, NULL);
 		
 		free(mame_call);
 		mame_call = NULL;
