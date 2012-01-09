@@ -102,6 +102,7 @@ mame_regtest
 		- check if gdb exists when use_gdb is set to 1
 		- only parse "softwarelist" and "devices" if necessary - like ramoption
 		- add schemas to XMLs
+		- gdb --batch hangs on linux since it waits for key input (ubuntu 10.04 x64)
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
