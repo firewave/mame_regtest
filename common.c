@@ -663,9 +663,9 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 	HANDLE hProcess;
 	char szBuffer[512];
 
-	int out;
+	int out = -1;
 	int out_pipe[2];
-	int err;
+	int err = -1;
 	int err_pipe[2];
 	
 	if( stdout_str ) {
