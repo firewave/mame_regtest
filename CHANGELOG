@@ -543,6 +543,7 @@
 	- moved command-line parameter creation into create_commandline()
 	- added "parameters" parameter to execute_mame()
 	- replaced all system() calls with execute_mame()
+	- made redirecting of output and directory changing optional in execute_mame()
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
