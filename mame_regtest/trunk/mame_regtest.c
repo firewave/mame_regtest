@@ -1115,7 +1115,7 @@ static char* create_commandline(struct driver_entry* de)
 	return sys;
 }
 
-static int execute_mame(struct driver_entry* de, const char* parameters, xmlNodePtr* result, char** cmd_out)
+static int execute_mame(struct driver_entry* de, const char* parameters, int redirect, int change_dir, xmlNodePtr* result, char** cmd_out)
 {
 	print_driver_info(de, stdout);
 	if( config_use_autosave && de->autosave )
@@ -1139,11 +1139,13 @@ static int execute_mame(struct driver_entry* de, const char* parameters, xmlNode
 	append_string(&sys, parameters);
 
 #ifndef USE_MRT_SYSTEM
-	append_string(&sys, " > ");
-	append_quoted_string(&sys, stdout_temp_file);
+	if( redirect ) {
+		append_string(&sys, " > ");
+		append_quoted_string(&sys, stdout_temp_file);
 
-	append_string(&sys, " 2> ");
-	append_quoted_string(&sys, stderr_temp_file);
+		append_string(&sys, " 2> ");
+		append_quoted_string(&sys, stderr_temp_file);
+	}
 	
 #ifdef WIN32
 	/* the whole command-line has to be quoted - end */
@@ -1161,7 +1163,9 @@ static int execute_mame(struct driver_entry* de, const char* parameters, xmlNode
 	mrt_mkdir(dummy_root);
 	create_cfg(de, 1);
 	create_cfg(de, 2);
-	int ch_res = chdir(dummy_root);
+	int ch_res = -1;
+	if( change_dir )
+		ch_res = chdir(dummy_root);
 #ifndef USE_MRT_SYSTEM
 	int sys_res = system(sys);
 #ifndef WIN32
@@ -1170,9 +1174,11 @@ static int execute_mame(struct driver_entry* de, const char* parameters, xmlNode
 #else
 	char* stdout_str = NULL;
 	char* stderr_str = NULL;
+	/* TODO: handle "redirect" */
 	int sys_res = mrt_system(sys, &stdout_str, &stderr_str);
 #endif
-	ch_res = chdir(current_path);
+	if( change_dir )
+		ch_res = chdir(current_path);
 	
 	if( !cmd_out )
 		free(sys);
@@ -1185,7 +1191,7 @@ static int execute_mame(struct driver_entry* de, const char* parameters, xmlNode
 		xmlNewProp(*result, (const xmlChar*)"exitcode", (const xmlChar*)tmp);
 #ifndef USE_MRT_SYSTEM
 		char* stdout_str = NULL;
-		if( read_file(stdout_temp_file, &stdout_str) == 0 ) {
+		if( redirect && read_file(stdout_temp_file, &stdout_str) == 0 ) {
 #else
 		if( stdout_str ) {
 #endif
@@ -1195,7 +1201,7 @@ static int execute_mame(struct driver_entry* de, const char* parameters, xmlNode
 		}
 #ifndef USE_MRT_SYSTEM
 		char* stderr_str = NULL;
-		if( read_file(stderr_temp_file, &stderr_str) == 0 ) {
+		if( redirect && read_file(stderr_temp_file, &stderr_str) == 0 ) {
 #else
 		if( stderr_str ) {
 #endif
@@ -1363,7 +1369,7 @@ static int execute_mame2(struct driver_entry* de)
 
 	char* params = create_commandline(de);	
 	char* cmd = NULL;
-	res = execute_mame(de, params, &result1, &cmd);
+	res = execute_mame(de, params, 1, 1, &result1, &cmd);
 	
 	if( cmd ) {
 		xmlNewProp(output_node, (const xmlChar*)"cmd", (const xmlChar*)cmd);
@@ -1377,7 +1383,7 @@ static int execute_mame2(struct driver_entry* de)
 	}
 
 	if( res == 1 && config_use_autosave && de->autosave ) {
-		res = execute_mame(de, params, &result2, NULL);
+		res = execute_mame(de, params, 1, 1, &result2, NULL);
 
 		if( result2 ) {
 			xmlAddChild(output_node, result2);
@@ -1599,7 +1605,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 			}
 			else {
 				char* mame_call = NULL;					
-				append_string(&mame_call, " -hashpath ");
+				append_string(&mame_call, "-hashpath ");
 				append_string(&mame_call, config_hashpath_folder);
 				append_string(&mame_call, " ");
 				append_string(&mame_call, (const char*)actual_driv_inf->name);
@@ -1609,7 +1615,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				append_string(&mame_call, driver_softlist);
 				append_string(&mame_call, ".xml");
 		
-				execute_mame(NULL, mame_call, NULL, NULL);
+				execute_mame(NULL, mame_call, 0, 0, NULL, NULL);
 				
 				free(mame_call);
 				mame_call = NULL;
@@ -2374,10 +2380,10 @@ int main(int argc, char *argv[])
 
 		printf("writing -listxml output\n");
 		char* mame_call = NULL;
-		append_string(&mame_call, " -listxml > ");
+		append_string(&mame_call, "-listxml > ");
 		append_string(&mame_call, config_gamelist_xml_file);
 
-		execute_mame(NULL, mame_call, NULL, NULL);
+		execute_mame(NULL, mame_call, 0, 0, NULL, NULL);
 
 		if( config_hack_pinmame ) {
 			char* tmp_gamelist_xml = NULL;
@@ -2409,15 +2415,17 @@ int main(int argc, char *argv[])
 	if( config_test_createconfig ) {
 		printf("writing '%s'\n", get_inifile());
 		char* mame_call = NULL;
-		append_string(&mame_call, " -showconfig > ");
+		append_string(&mame_call, "-showconfig > ");
 		append_string(&mame_call, config_output_folder);
 		append_string(&mame_call, FILESLASH);
 		append_string(&mame_call, get_inifile());
 
-		execute_mame(NULL, mame_call, NULL, NULL);
+		execute_mame(NULL, mame_call, 0, 0, NULL, NULL);
 		
 		free(mame_call);
 		mame_call = NULL;
+		
+		printf("\n"); /* for output formating */
 	}
 
 	if( global_driv_inf == NULL )
