@@ -668,6 +668,12 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 	int err = -1;
 	int err_pipe[2];
 	
+	if( stdout_str )
+		append_string(stdout_str, "");
+
+	if( stderr_str )
+		append_string(stderr_str, "");
+		
 	if( stdout_str ) {
 		if( pipe(out_pipe, 512, _O_NOINHERIT | O_BINARY ) == -1 )
 			return exitcode;
@@ -721,6 +727,12 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 		int nExitCode = STILL_ACTIVE;
 		while( nExitCode == STILL_ACTIVE )
 		{
+			if(!GetExitCodeProcess(hProcess,(unsigned long*)&nExitCode))
+			{
+				free_array(argv);
+				return exitcode;
+			}
+			
 			if( stdout_str ) {
 				int nOutRead = read(out_pipe[0], szBuffer, 512);
 				if( nOutRead )
@@ -731,12 +743,6 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 				int nErrRead = read(err_pipe[0], szBuffer, 512);
 				if( nErrRead )
 					append_string_n(stderr_str, szBuffer, nErrRead);
-			}
-
-			if(!GetExitCodeProcess(hProcess,(unsigned long*)&nExitCode))
-			{
-				free_array(argv);
-				return exitcode;
 			}
 		}
 
