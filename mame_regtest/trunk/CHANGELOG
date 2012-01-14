@@ -547,6 +547,10 @@
 	- fixed warnings in common.c/.h when compiling with optimizations
 	- mrt_system() did not return valid strings when no output was written at all
 	- mrt_system() might have omitted the last block of the output data
+	- added "stdout_out" parameter to execute_mame() to get the stdout data
+	- removed option "test_createconfig"
+	- added option "test_frontend" to test various frontend options
+	- removed get_inifile()
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set

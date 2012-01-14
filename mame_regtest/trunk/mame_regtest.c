@@ -194,7 +194,6 @@ static char* config_global_device_file = NULL;
 static int config_use_isbios = 0;
 static int config_store_output = 0;
 static int config_clear_output_folder = 0;
-static int config_test_createconfig = 1;
 static char* config_additional_options = NULL;
 static int config_skip_mandatory = 0;
 static int config_osdprocessors = 1;
@@ -210,6 +209,7 @@ static int config_use_configurations = 0;
 static char* config_hashpath_folder = NULL;
 static int config_use_softwarelist = 0;
 static int config_hack_softwarelist = 0;
+static int config_test_frontend = 1;
 
 struct config_entry mrt_config[] =
 {
@@ -240,7 +240,6 @@ struct config_entry mrt_config[] =
 	{ "use_isbios",				CFG_INT,		&config_use_isbios },
 	{ "store_output",			CFG_INT,		&config_store_output },
 	{ "clear_output_folder",	CFG_INT,		&config_clear_output_folder },
-	{ "test_createconfig",		CFG_INT,		&config_test_createconfig },
 	{ "additional_options",		CFG_STR_PTR,	&config_additional_options },
 	{ "skip_mandatory",			CFG_INT,		&config_skip_mandatory },
 	{ "osdprocessors",			CFG_INT,		&config_osdprocessors },
@@ -256,6 +255,7 @@ struct config_entry mrt_config[] =
 	{ "hashpath",				CFG_STR_PTR,	&config_hashpath_folder },
 	{ "use_softwarelist",		CFG_INT,		&config_use_softwarelist },
 	{ "hack_softwarelist",		CFG_INT,		&config_hack_softwarelist },
+	{ "test_frontend",			CFG_INT,		&config_test_frontend },	
 	{ NULL,						CFG_UNK,		NULL }
 };
 
@@ -334,21 +334,6 @@ static void strip_sampleof_pinmame(const char* listxml_in, const char* listxml_o
 		fclose(in_fd);
 		in_fd = NULL;
 	}
-}
-
-static const char* get_inifile()
-{
-	switch( app_type ) {
-		case APP_MAME:
-			return "mame.ini";
-		case APP_MESS:
-			return "mess.ini";
-		case APP_UNKNOWN:
-			printf("invalid application type\n");
-			cleanup_and_exit(1, "aborting");
-	}
-
-	return ""; /* shut up compiler */
 }
 
 /* TODO: how to set "callstr" for non-de calls? */
@@ -1115,7 +1100,7 @@ static char* create_commandline(struct driver_entry* de)
 	return sys;
 }
 
-static int execute_mame(struct driver_entry* de, const char* parameters, int redirect, int change_dir, xmlNodePtr* result, char** cmd_out)
+static int execute_mame(struct driver_entry* de, const char* parameters, int redirect, int change_dir, xmlNodePtr* result, char** cmd_out, char** stdout_out)
 {
 	print_driver_info(de, stdout);
 	if( config_use_autosave && de->autosave )
@@ -1139,10 +1124,12 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 	append_string(&sys, parameters);
 
 #ifndef USE_MRT_SYSTEM
-	if( redirect ) {
+	if( redirect || stdout_out ) {
 		append_string(&sys, " > ");
 		append_quoted_string(&sys, stdout_temp_file);
+	}
 
+	if( redirect ) {
 		append_string(&sys, " 2> ");
 		append_quoted_string(&sys, stderr_temp_file);
 	}
@@ -1174,8 +1161,13 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 #else
 	char* stdout_str = NULL;
 	char* stderr_str = NULL;
-	/* TODO: handle "redirect" */
-	int sys_res = mrt_system(sys, &stdout_str, &stderr_str);
+	int sys_res = -1;
+	if( redirect )
+		sys_res = mrt_system(sys, &stdout_str, &stderr_str);
+	else if( stdout_out )
+		sys_res = mrt_system(sys, stdout_out, NULL);
+	else
+		sys_res = mrt_system(sys, NULL, NULL);
 #endif
 	if( change_dir )
 		ch_res = chdir(current_path);
@@ -1183,6 +1175,12 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 	if( !cmd_out )
 		free(sys);
 	sys = NULL;
+	
+#ifndef USE_MRT_SYSTEM
+	/* TODO: errorhandling */
+	if( stdout_out )
+		read_file(stdout_temp_file, stdout_out);
+#endif
 
 	if( result ) {
 		*result = xmlNewNode(NULL, (const xmlChar*)"result");
@@ -1369,7 +1367,7 @@ static int execute_mame2(struct driver_entry* de)
 
 	char* params = create_commandline(de);	
 	char* cmd = NULL;
-	res = execute_mame(de, params, 1, 1, &result1, &cmd);
+	res = execute_mame(de, params, 1, 1, &result1, &cmd, NULL);
 	
 	if( cmd ) {
 		xmlNewProp(output_node, (const xmlChar*)"cmd", (const xmlChar*)cmd);
@@ -1383,7 +1381,7 @@ static int execute_mame2(struct driver_entry* de)
 	}
 
 	if( res == 1 && config_use_autosave && de->autosave ) {
-		res = execute_mame(de, params, 1, 1, &result2, NULL);
+		res = execute_mame(de, params, 1, 1, &result2, NULL, NULL);
 
 		if( result2 ) {
 			xmlAddChild(output_node, result2);
@@ -1604,21 +1602,39 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				softlist = NULL;
 			}
 			else {
+				char* stdout_str = NULL;
+				
 				char* mame_call = NULL;					
 				append_string(&mame_call, "-hashpath ");
 				append_string(&mame_call, config_hashpath_folder);
 				append_string(&mame_call, " ");
 				append_string(&mame_call, (const char*)actual_driv_inf->name);
-				append_string(&mame_call, " -listsoftware > ");
-				append_string(&mame_call, config_output_folder);
-				append_string(&mame_call, FILESLASH);
-				append_string(&mame_call, driver_softlist);
-				append_string(&mame_call, ".xml");
-		
-				execute_mame(NULL, mame_call, 0, 0, NULL, NULL);
+				append_string(&mame_call, " -listsoftware");
+				
+				execute_mame(NULL, mame_call, 0, 0, NULL, NULL, &stdout_str);
 				
 				free(mame_call);
 				mame_call = NULL;
+
+				char* out_file = NULL;
+				append_string(&out_file, config_output_folder);
+				append_string(&out_file, FILESLASH);
+				append_string(&out_file, driver_softlist);
+				append_string(&out_file, ".xml");
+				
+				/* TODO: errorhandling */
+				FILE* f = fopen(out_file, "w+b");
+				if( f ) {
+					fwrite(stdout_str, 1, strlen(stdout_str), f);
+					fclose(f);
+					f = NULL;
+				}
+				
+				free(out_file);
+				out_file = NULL;
+				
+				free(stdout_str);
+				stdout_str = NULL;
 			}
 	
 			free(driver_softlist);
@@ -2326,7 +2342,6 @@ int main(int argc, char *argv[])
 		printf("use_isbios: %d\n", config_use_isbios);
 		printf("store_output: %d\n", config_store_output);
 		printf("clear_output_folder: %d\n", config_clear_output_folder);
-		printf("test_createconfig: %d\n", config_test_createconfig);
 		if( config_additional_options )
 			printf("additional_options: %s\n", config_additional_options);
 		printf("skip_mandatory: %d\n", config_skip_mandatory);
@@ -2342,6 +2357,7 @@ int main(int argc, char *argv[])
 		if( config_hashpath_folder && (*config_hashpath_folder != 0) )
 			printf("using hashpath folder: %s\n", config_hashpath_folder);
 		printf("use_softwarelist: %d\n", config_use_softwarelist);
+		printf("test_frontend: %d\n", config_test_frontend);
 
 		printf("hack_ftr: %d\n", config_hack_ftr);
 		printf("hack_biospath: %d\n", config_hack_biospath);
@@ -2374,16 +2390,74 @@ int main(int argc, char *argv[])
 	clear_directory(temp_folder, 0);
 
 	printf("\n"); /* for output formating */
+	
+	if( config_test_frontend ) {
+		/* TODO: split out the MESS ones */
+		static const char* const frontend_opts[] = { "validate", "listfull", "listclones", "listbrothers", "listcrc", "listroms", "listsamples", "verifyroms", "verifysamples", "listdevices", "listslots", "listmedia", "listsoftware", "showusage", "showconfig" };
+		unsigned int i = 0;
+		for(; i < sizeof(frontend_opts) / sizeof(char*); ++i)
+		{
+			char* stdout_str = NULL;
+		
+			char* cmd = NULL;
+			append_string(&cmd, "-");
+			append_string(&cmd, frontend_opts[i]);
+
+			execute_mame(NULL, cmd, 0, 0, NULL, NULL, &stdout_str);
+			
+			free(cmd);
+			cmd = NULL;
+			
+			char* out_file = NULL;
+			append_string(&out_file, config_output_folder);
+			append_string(&out_file, FILESLASH);
+			append_string(&out_file, frontend_opts[i]);
+			append_string(&out_file, ".txt");
+			
+			/* TODO: errorhandling */
+			FILE* f = fopen(out_file, "w+b");
+			if( f ) {
+				fwrite(stdout_str, 1, strlen(stdout_str), f);
+				fclose(f);
+				f = NULL;
+			}
+			
+			free(out_file);
+			out_file = NULL;
+
+			free(stdout_str);
+			stdout_str = NULL;
+		}
+	}
+	
+	printf("\n"); /* for output formating */
 
 	if( !config_gamelist_xml_file || (*config_gamelist_xml_file == 0) ) {
 		append_string(&config_gamelist_xml_file, listxml_output); 
 
+		/* TODO: merge this with frontend code? */
 		printf("writing -listxml output\n");
+		char* stdout_str = NULL;
+		
 		char* mame_call = NULL;
-		append_string(&mame_call, "-listxml > ");
-		append_string(&mame_call, config_gamelist_xml_file);
+		append_string(&mame_call, "-listxml");
 
-		execute_mame(NULL, mame_call, 0, 0, NULL, NULL);
+		execute_mame(NULL, mame_call, 0, 0, NULL, NULL, &stdout_str);
+
+		free(mame_call);
+		mame_call = NULL;
+		
+		/* TODO: errorhandling */
+		FILE* f = fopen(config_gamelist_xml_file, "w+b");
+		if( f ) {
+			fwrite(stdout_str, 1, strlen(stdout_str), f);
+			fclose(f);
+			f = NULL;
+		}
+
+		free(stdout_str);
+		stdout_str = NULL;
+		
 
 		if( config_hack_pinmame ) {
 			char* tmp_gamelist_xml = NULL;
@@ -2400,9 +2474,6 @@ int main(int argc, char *argv[])
 			free(tmp_gamelist_xml);
 			tmp_gamelist_xml = NULL;
 		}
-
-		free(mame_call);
-		mame_call = NULL;
 	}
 
 	printf("\n"); /* for output formating */
@@ -2410,24 +2481,7 @@ int main(int argc, char *argv[])
 	parse_listxml(config_gamelist_xml_file, &global_driv_inf);
 
 	printf("\n"); /* for output formating */
-
-	/* TODO: this is not actually a "createconfig" test */
-	if( config_test_createconfig ) {
-		printf("writing '%s'\n", get_inifile());
-		char* mame_call = NULL;
-		append_string(&mame_call, "-showconfig > ");
-		append_string(&mame_call, config_output_folder);
-		append_string(&mame_call, FILESLASH);
-		append_string(&mame_call, get_inifile());
-
-		execute_mame(NULL, mame_call, 0, 0, NULL, NULL);
-		
-		free(mame_call);
-		mame_call = NULL;
-		
-		printf("\n"); /* for output formating */
-	}
-
+	
 	if( global_driv_inf == NULL )
 		cleanup_and_exit(0, "finished");
 
@@ -2454,8 +2508,6 @@ int main(int argc, char *argv[])
 		if( config_test_softreset )
 			printf("'test_softreset' can only be used with 'use_debug'\n");
 	}
-
-	printf("\n"); /* for output formating */
 
 	/* setup OSDPROCESSORS */
 	char osdprocessors_tmp[128];
