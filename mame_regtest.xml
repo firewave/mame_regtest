@@ -58,9 +58,9 @@
 		<option name='valgrind_parameters' value='--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --track-origins=yes'/>
 
 		<!-- additional options -->
-		<option name='test_createconfig' value='1'/>
 		<option name='verbose' value='0'/>
 		<option name='use_gdb' value='0'/>
+		<option name='test_frontend' value='1'/>
 
 		<!-- hacks -->
 		<option name='hack_debug' value='0'/>
