@@ -551,6 +551,7 @@
 	- removed option "test_createconfig"
 	- added option "test_frontend" to test various frontend options
 	- removed get_inifile()
+	- added get_filename_base() to common.c/.h
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set

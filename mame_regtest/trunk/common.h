@@ -115,6 +115,7 @@ int mrt_mkdir(const char* path);
 
 /* you have to free the result */
 char* get_filename(const char* filepath);
+char* get_filename_base(const char* filepath);
 
 void clear_directory(const char* dirname, int delete_root);
 
