@@ -479,6 +479,27 @@ char* get_filename(const char* filepath)
 	return result;	
 }
 
+char* get_filename_base(const char* filepath)
+{
+	char* result = NULL;
+	
+	const char* pos1 = strrchr(filepath, FILESLASH[0]);
+	if( pos1 == NULL )
+		pos1 = filepath;
+	else 
+		pos1 = pos1 + 1;
+	const char* pos2 = strrchr(filepath, '.');
+	if( pos2 == NULL )
+		pos2 = filepath + strlen(filepath);
+		
+	int len = pos2 - pos1;
+	result = (char*)malloc(len+1);
+	strncpy(result, pos1, len);
+	result[len] = '\0';
+
+	return result;
+}
+
 static void clear_callback(struct parse_callback_data* pcd)
 {
 	if( pcd->type == ENTRY_FILE ) {
@@ -565,11 +586,12 @@ char* get_directory(const char* filepath)
 	const char* pos = strrchr(filepath, FILESLASH[0]);
 	if( pos ) {
 		int len = pos - filepath;
-		result = (char*)malloc(len);
+		result = (char*)malloc(len+1);
 		strncpy(result, filepath, len);
+		result[len] = '\0';
 	}
 
-	return result;	
+	return result;
 }
 
 void replace_string(const char* input, char** output, const char* old_str, const char* new_str)
