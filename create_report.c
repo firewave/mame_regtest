@@ -503,10 +503,11 @@ static int create_report_from_filename(const char *const filename, struct report
 				if( png_differs ) {
 					xmlChar* name = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)"/output", (const xmlChar*)"name");
 					xmlChar* srcfile = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)"/output", (const xmlChar*)"sourcefile");
+					char* entry_name_base = get_filename_base(entry_name);
 					
 					char* png_path = NULL;
 					append_string(&png_path, FILESLASH);
-					append_string(&png_path, (const char*)name);
+					append_string(&png_path, (const char*)entry_name_base);
 					append_string(&png_path, FILESLASH);
 					append_string(&png_path, "snap");
 					append_string(&png_path, FILESLASH);
@@ -522,11 +523,10 @@ static int create_report_from_filename(const char *const filename, struct report
 					append_string(&path2, entry_directory);
 					append_string(&path2, png_path);
 					
-					// TODO: use basename instead of entry_name
 					char* outpath = NULL;
 					append_string(&outpath, config_output_folder);
 					append_string(&outpath, FILESLASH);
-					append_string(&outpath, entry_name);
+					append_string(&outpath, entry_name_base);
 					append_string(&outpath, "_diff.png");
 					
 					// TODO: switch the paths for now since somehow pngcmp prints the old one on the right
@@ -558,6 +558,8 @@ static int create_report_from_filename(const char *const filename, struct report
 					path2 = NULL;
 					free(path1);
 					path1 = NULL;
+					free(entry_name_base);
+					entry_name_base = NULL;
 					free(png_path);
 					png_path = NULL;
 					
