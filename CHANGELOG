@@ -562,3 +562,4 @@
 	- added option "recursive"
 	- added header to docuwiki format
 	- added command-line to docuwiki format
+	- added speed comparison report (report_type 2)
