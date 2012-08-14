@@ -262,7 +262,7 @@ struct config_entry mrt_config[] =
 static int get_png_data(const char* png_name, unsigned int *IHDR_width, unsigned int* IHDR_height, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void open_mng_and_skip_sig(const char* mng_name, FILE** mng_fd);
 static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc);
-static void cleanup_and_exit(int errcode, const char* errstr);
+static void cleanup_and_exit(int exitcode, const char* errstr);
 static int get_MHDR_data(FILE* in_fd, unsigned int* MHDR_width, unsigned int* MHDR_height);
 static void cleanup_driver_info_list(struct driver_info* driv_inf);
 
@@ -527,7 +527,7 @@ static void build_output_xml(const char* dirname, xmlNodePtr node)
 	parse_directory(dirname, 1, parse_callback, (void*)&node);
 }
 
-static void cleanup_and_exit(int errcode, const char* errstr)
+static void cleanup_and_exit(int exitcode, const char* errstr)
 {
 	if( global_driv_inf ) {
 		cleanup_driver_info_list(global_driv_inf);
@@ -573,7 +573,7 @@ static void cleanup_and_exit(int errcode, const char* errstr)
 #endif
 
 	printf("%s\n", errstr);
-	exit(errcode);
+	exit(exitcode);
 }
 
 static void print_driver_info(struct driver_entry* de, FILE* print_fd)
@@ -1171,6 +1171,9 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 #endif
 	if( change_dir )
 		ch_res = chdir(current_path);
+	
+	/* TODO: check result */
+	(void)ch_res;
 	
 	if( !cmd_out )
 		free(sys);

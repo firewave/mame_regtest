@@ -552,6 +552,7 @@
 	- added option "test_frontend" to test various frontend options
 	- removed get_inifile()
 	- added get_filename_base() to common.c/.h
+	- fixed some GCC 4.6 compilation warnings
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
