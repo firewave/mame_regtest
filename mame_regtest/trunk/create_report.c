@@ -161,7 +161,7 @@ static int config_ignore_exitcode_4 = 0;
 static int config_show_memleaks = 0;
 static int config_show_clipped = 0;
 static int config_group_data = 0;
-static int config_report_type = 0; /* 0 = result report - 1 = comparison report */
+static int config_report_type = 0; /* 0 = result report - 1 = comparison report - 2 = speed comparison report */
 static char* config_compare_folder = NULL;
 static int config_print_stdout = 0;
 static char* config_output_folder = NULL;
@@ -596,6 +596,105 @@ static int create_report_from_filename(const char *const filename, struct report
 			entry_name = NULL;
 		}
 		break;
+		
+		case 2:
+		{
+			char* entry_name = get_filename(filename);
+			char* entry_directory = get_directory(filename);
+			char* old_path = NULL;
+			append_string(&old_path, r_cb_data->compare_folder);
+			append_string(&old_path, FILESLASH);
+			append_string(&old_path, entry_name);
+			if( access(old_path, F_OK) == 0 ) {
+				int write_set_data = 1;
+
+				xmlDocPtr doc_old = xmlReadFile(old_path, NULL, 0);
+				xmlDocPtr doc = xmlReadFile(filename, NULL, 0);
+
+				xmlXPathContextPtr xpathCtx1 = xmlXPathNewContext(doc_old);
+				xmlXPathContextPtr xpathCtx2 = xmlXPathNewContext(doc);
+				
+				xmlNodePtr output_node = doc->children;
+				xmlNodePtr devices_node = NULL; // TODO
+				PREPARE_KEYS(output_node)
+				
+				xmlChar* attr1 = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)"/output/result", (const xmlChar*)"stdout");
+				xmlChar* attr2 = get_attribute_by_xpath(xpathCtx2, (const xmlChar*)"/output/result", (const xmlChar*)"stdout");
+				
+				if( xmlStrcmp(attr1, attr2) != 0 )
+				{
+					//Average speed: 1055.38% (1 seconds)&#13;&#10;
+					double speed1 = -1;
+					double speed2 = -1;
+					
+					{
+					char* pos1 = strstr((const char*)attr1, "Average speed:");
+					char* pos2 = strstr((const char*)attr1, "% (");
+					if( pos1 && pos2 )
+					{
+						pos1 += 14;
+						char* temp = NULL;
+						append_string_n(&temp, pos1, pos2-pos1);
+						speed1 = atof(temp);
+						free(temp);
+						temp = NULL;
+					}
+					}
+					{
+					char* pos1 = strstr((const char*)attr2, "Average speed:");
+					char* pos2 = strstr((const char*)attr2, "% (");
+					if( pos1 && pos2 )
+					{
+						pos1 += 14;
+						char* temp = NULL;
+						append_string_n(&temp, pos1, pos2-pos1);
+						speed2 = atof(temp);
+						free(temp);
+						temp = NULL;
+					}
+					}
+					
+					PRINT_INFO
+					fprintf(r_cb_data->report_fd, "|%.2f|%.2f|%.2f|%.2f\n", speed1, speed2, speed2 - speed1, (speed2 / speed1) * 100 - 100);
+				}
+				
+				if( attr2 )
+				{
+					xmlFree(attr2);
+					attr2 = NULL;
+				}
+				if( attr1 )
+				{
+					xmlFree(attr1);
+					attr1 = NULL;
+				}
+				
+				FREE_KEYS
+
+				if( xpathCtx2 )
+					xmlXPathFreeContext(xpathCtx2);
+				if( xpathCtx1 )
+					xmlXPathFreeContext(xpathCtx1);
+
+				xmlFreeDoc(doc);
+				doc = NULL;
+				xmlFreeDoc(doc_old);
+				doc = NULL;
+				
+				if( write_set_data == 0 )
+					fprintf(r_cb_data->report_fd, "</p>\n");
+			}
+			else {
+				fprintf(r_cb_data->report_fd, "%s - new\n", entry_name);
+			}
+			free(old_path);
+			old_path = NULL;
+			free(entry_directory);
+			entry_directory = NULL;
+			free(entry_name);
+			entry_name = NULL;
+		}
+		break;
 	}
 	
 	return data_written;
@@ -669,6 +768,9 @@ static void create_report()
 		fprintf(report_fd, "<meta http-equiv=\"Content-type\" content=\"text/html;charset=UTF-8\"/>\n");
 		fprintf(report_fd, "</head>\n");
 		fprintf(report_fd, "<body>\n");
+	}
+	else if ( config_report_type == 2 ) {
+		report_fd = fopen(config_output_file, "wb");
 	}
 		
 	r_cb_data.report_fd = report_fd;
