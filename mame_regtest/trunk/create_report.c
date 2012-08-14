@@ -529,15 +529,12 @@ static int create_report_from_filename(const char *const filename, struct report
 					append_string(&outpath, entry_name_base);
 					append_string(&outpath, "_diff.png");
 					
-					// TODO: switch the paths for now since somehow pngcmp prints the old one on the right
 					char* pngcmp_cmd = NULL;
 					append_string(&pngcmp_cmd, "pngcmp");
 					append_string(&pngcmp_cmd, " ");
-					//append_string(&pngcmp_cmd, path1);
-					append_string(&pngcmp_cmd, path2);
-					append_string(&pngcmp_cmd, " ");
-					//append_string(&pngcmp_cmd, path2);
 					append_string(&pngcmp_cmd, path1);
+					append_string(&pngcmp_cmd, " ");
+					append_string(&pngcmp_cmd, path2);
 					append_string(&pngcmp_cmd, " ");
 					append_string(&pngcmp_cmd, outpath);
 					
