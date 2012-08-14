@@ -499,6 +499,7 @@ static int create_report_from_filename(const char *const filename, struct report
 				COMPARE_ATTRIBUTE("/output/result", "exitcode", dummy)
 				COMPARE_ATTRIBUTE("/output/result", "stderr", dummy)
 				COMPARE_ATTRIBUTE("/output/result/dir[@name='snap']//file", "png_crc", png_differs)
+				(void)dummy;
 				
 				if( png_differs ) {
 					xmlChar* name = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)"/output", (const xmlChar*)"name");
