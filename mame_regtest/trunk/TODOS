@@ -23,11 +23,6 @@ mame_regtest
 			- hardreset (causes endless restarts of MAME)
 			- snap
 		- add option to override debugscript
-		- use more command-line options
-			- -verify*
-			- -list*
-			- test frontend functions (-listfull etc.)
-			- call -validate?
 		- add soft/hardreset tests after each call like "autosave" test?
 			- how will it work with -autosave?
 		- output data enhancements
@@ -103,6 +98,32 @@ mame_regtest
 		- only parse "softwarelist" and "devices" if necessary - like ramoption
 		- add schemas to XMLs
 		- gdb --batch hangs on linux since it waits for key input (ubuntu 10.04 x64)
+		- test thread code on linux
+		- use pthread on windows?
+		- need to quote all usage of "output_path"
+		- test frontend before parsing
+		- how to handle chdir() stuff now?
+			- use fork code and se in forked code
+		- mrt_system() sometimes hangs
+		- prevent gdb stdout output in frontend and -listxml files
+		- gdb output is not being demangled
+			- add --run-command="set print demangle on" or "set demangle-style auto"
+		- comparison report doesn't create output folder
+		- validate all software lists
+		- errors about devices are written to stderr - how to get them?
+			- also create XMLs for the frontend functions
+		- -verifyroms needs -rp
+		- -verifysamples needs sample path
+		- use -samplepath
+		- MAME needs option to disable crosshair
+		- check if image files exist before trying to load them
+		- how to use one XML with multiple drivers - check parent - child relationship?
+		- for mandatory devices add a mode, that will load the first entry from the softlist if one exists
+		- mame_regtest takes a lot of CPU after running a command with a lot of output - improve reading of stdout? use move instead of read and write?
+		- create small wrapper application to move chdir() out of main application to parallize processing
+			chdir()
+			system()
+			chdir()
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -161,9 +182,6 @@ mame_regtest
 		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER? LSB_FIRST?)
 		- make doesn't work when the additional files already exist and you compile by target (e.g. mame_regtest.exe)
 		- create working x64 version
-		- compiler warnings in optimized build:
-			common.c:598: warning: 'out' may be used uninitialized in this function
-			common.c:600: warning: 'err' may be used uninitialized in this function
 		
 	Visual Studio:
 		- move the Microsoft-specific defines into a seperate header
