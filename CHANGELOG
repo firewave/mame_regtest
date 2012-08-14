@@ -553,6 +553,7 @@
 	- removed get_inifile()
 	- added get_filename_base() to common.c/.h
 	- fixed some GCC 4.6 compilation warnings
+	- added option "use_slots" to test slots 
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
@@ -565,3 +566,4 @@
 	- added command-line to docuwiki format
 	- added speed comparison report (report_type 2)
 	- fixed PNG comparison - images were in the wrong order
+	- added support for slots

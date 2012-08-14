@@ -74,6 +74,13 @@ enum cfg_type {
 	CFG_CONF 	= 2
 };
 
+struct slot_info {
+	xmlChar* name;
+	int slotoption_count;
+	xmlChar* slotoptions[256];
+	struct slot_info* next;
+};
+
 struct dipvalue_info {
 	xmlChar* name;
 	unsigned int value;
@@ -105,6 +112,7 @@ struct driver_info {
 	struct dipswitch_info* configurations;
 	int has_softlist;
 	xmlChar* softwarelist;
+	struct slot_info* slots;
 	struct driver_info* next;
 };
 
@@ -128,6 +136,8 @@ struct driver_entry {
 	struct dipvalue_info* dipvalue;
 	struct dipswitch_info* configuration;
 	struct dipvalue_info* confsetting;
+	struct slot_info* slot;
+	const char* slotoption;
 };
 
 static int app_type = 0;
@@ -210,6 +220,7 @@ static char* config_hashpath_folder = NULL;
 static int config_use_softwarelist = 0;
 static int config_hack_softwarelist = 0;
 static int config_test_frontend = 1;
+static int config_use_slots = 0;
 
 struct config_entry mrt_config[] =
 {
@@ -255,7 +266,8 @@ struct config_entry mrt_config[] =
 	{ "hashpath",				CFG_STR_PTR,	&config_hashpath_folder },
 	{ "use_softwarelist",		CFG_INT,		&config_use_softwarelist },
 	{ "hack_softwarelist",		CFG_INT,		&config_hack_softwarelist },
-	{ "test_frontend",			CFG_INT,		&config_test_frontend },	
+	{ "test_frontend",			CFG_INT,		&config_test_frontend },
+	{ "use_slots",				CFG_INT,		&config_use_slots },
 	{ NULL,						CFG_UNK,		NULL }
 };
 
@@ -590,6 +602,8 @@ static void print_driver_info(struct driver_entry* de, FILE* print_fd)
 		fprintf(print_fd, " (dipswitch %s value %s)", de->dipswitch->name, de->dipvalue->name);
 	if( de->configuration && de->configuration->name && de->confsetting && de->confsetting->name )
 		fprintf(print_fd, " (configuration %s value %s)", de->configuration->name, de->confsetting->name);
+	if( de->slot && de->slot->name && de->slotoption )
+		fprintf(print_fd, " (slot %s option %s)", de->slot->name, de->slotoption);
 	struct image_entry* images = de->images;
 	while( images ) {
 		if( (images->device_briefname && xmlStrlen(images->device_briefname) > 0) &&
@@ -1025,6 +1039,12 @@ static char* create_commandline(struct driver_entry* de)
 		snprintf(ram_buf, sizeof(ram_buf), "%d", de->ramsize);
 		append_string(&sys, ram_buf);
 	}
+	if( de->slot && de->slotoption ) {
+		append_string(&sys, " -");
+		append_string(&sys, (const char*)de->slot->name);
+		append_string(&sys, " ");
+		append_string(&sys, de->slotoption);
+	}
 	struct image_entry* images = de->images;
 	while(images) {
 		if( (images->device_briefname && xmlStrlen(images->device_briefname) > 0) && 
@@ -1291,6 +1311,21 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 			free(configuration);				
 			configuration = next_configuration;
 		};
+		
+		struct slot_info* slot = actual_driv_inf->slots;
+		while( slot != NULL ) {
+			xmlFree(slot->name);
+			int i = 0;
+			for( ; i < slot->slotoption_count; ++i )
+			{
+				xmlFree(slot->slotoptions[i]);
+				slot->slotoptions[i] = NULL;
+			}
+			
+			struct slot_info* next_slot = slot->next;
+			free(slot);
+			slot = next_slot;
+		};
 
 		if( actual_driv_inf->next ) {
 			struct driver_info* tmp_driv_inf = actual_driv_inf;
@@ -1366,6 +1401,10 @@ static int execute_mame2(struct driver_entry* de)
 
 			images = images->next;
 		}
+	}
+	if( de->slot && de->slot->name && de->slotoption ) {
+		xmlNewProp(output_node, (const xmlChar*)"slot", (const xmlChar*)de->slot->name);
+		xmlNewProp(output_node, (const xmlChar*)"slotoption", (const xmlChar*)de->slotoption);
 	}
 
 	char* params = create_commandline(de);	
@@ -1753,6 +1792,30 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 			}
 		}
 		
+		if( actual_driv_inf->slots ) {
+			int slot_count = -1;
+			struct slot_info* slot = actual_driv_inf->slots;
+			while( slot != NULL ) {
+				++slot_count;
+				de.slot = slot;
+
+				int slotoption_count = 0;
+				for( ; slotoption_count < slot->slotoption_count; ++slotoption_count )
+				{
+					snprintf(de.postfix, sizeof(de.postfix), "slt%05dopt%05d", slot_count, slotoption_count);
+
+					de.slotoption = (const char*)slot->slotoptions[slotoption_count];
+					
+					res = execute_mame3(&de, actual_driv_inf);
+				}
+
+				slot = slot->next;
+			};
+			
+			de.slot = NULL;
+			de.slotoption = NULL;
+		}
+		
 		if( actual_driv_inf->next )
 			actual_driv_inf = actual_driv_inf->next;
 		else
@@ -1910,6 +1973,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 		struct device_info* last_dev_info = NULL;
 		struct dipswitch_info* last_dip_info = NULL;
 		struct dipswitch_info* last_cfg_info = NULL;
+		struct slot_info* last_slot_info = NULL;
 
 		xmlNodePtr game_children = game_child->children;
 
@@ -2026,6 +2090,61 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 						(*new_driv_inf)->softwarelist = xmlGetProp(game_children, (const xmlChar*)"name");
 					}
 					
+					goto next;
+				}
+				
+				if( config_use_slots && (xmlStrcmp(game_children->name, (const xmlChar*)"slot") == 0) ) {
+					struct slot_info* new_slot_info = (struct slot_info*)malloc(sizeof(struct slot_info));
+					/* TODO: check allocation */
+					memset(new_slot_info, 0x00, sizeof(struct slot_info));
+				
+					xmlChar* slot_name = xmlGetProp(game_children, (const xmlChar*)"name");
+					if( slot_name )
+					{
+						//printf("slot_name: %s\n", (const char*)slot_name);
+						new_slot_info->name = slot_name;
+					}
+					
+					xmlNodePtr slot_childs = game_children->children;
+					while( slot_childs != NULL ) {
+						xmlChar* slotoption_default = xmlGetProp(slot_childs, (const xmlChar*)"default");
+						if( slotoption_default ) {
+							//printf("slotoption_default: %s\n", (const char*)slotoption_default);
+							int def = 0;
+							if( xmlStrcmp(slotoption_default, (const xmlChar*)"yes") == 0 )
+								def = 1;
+							xmlFree(slotoption_default);
+							if( def == 1)
+							{
+								slot_childs = slot_childs->next;
+								continue;
+							}
+						}						
+						
+						xmlChar* slotoption_name = xmlGetProp(slot_childs, (const xmlChar*)"name");
+						if( slotoption_name )
+						{
+							//printf("slotoption_name: %s\n", (const char*)slotoption_name);
+							new_slot_info->slotoptions[new_slot_info->slotoption_count++] = slotoption_name;
+						}
+					
+						slot_childs = slot_childs->next;
+					}
+					
+					if( new_slot_info->slotoptions[0] == NULL ) {
+						//printf("no non-default slotoptions\n");
+						free(new_slot_info);
+						new_slot_info = NULL;
+						goto next;
+					}
+					
+					if( (*new_driv_inf)->slots == NULL )
+						(*new_driv_inf)->slots = new_slot_info;
+					
+					if( last_slot_info )
+						last_slot_info->next = new_slot_info;
+					last_slot_info = new_slot_info;
+				
 					goto next;
 				}
 			}
@@ -2361,6 +2480,7 @@ int main(int argc, char *argv[])
 			printf("using hashpath folder: %s\n", config_hashpath_folder);
 		printf("use_softwarelist: %d\n", config_use_softwarelist);
 		printf("test_frontend: %d\n", config_test_frontend);
+		printf("use_slots: %d\n", config_use_slots);
 
 		printf("hack_ftr: %d\n", config_hack_ftr);
 		printf("hack_biospath: %d\n", config_hack_biospath);
