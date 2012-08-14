@@ -258,6 +258,8 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 		fprintf(r_cb_data->report_fd, " (dipswitch %s value %s)", dipswitch_key, dipvalue_key); \
 	if( configuration_key && confsetting_key ) \
 		fprintf(r_cb_data->report_fd, " (configuration %s value %s)", configuration_key, confsetting_key); \
+	if( slot_key && slotoption_key ) \
+		fprintf(r_cb_data->report_fd, " (slot %s option %s)", slot_key, slotoption_key); \
 	if( devices_node ) \
 	{ \
 		xmlAttrPtr dev_attrs = devices_node->properties; \
@@ -323,8 +325,14 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 	xmlChar* configuration_key = xmlGetProp(output_node, (const xmlChar*)"configuration"); \
 	xmlChar* confsetting_key = xmlGetProp(output_node, (const xmlChar*)"confsetting"); \
 	xmlChar* cmd_key = xmlGetProp(output_node, (const xmlChar*)"cmd"); \
+	xmlChar* slot_key = xmlGetProp(output_node, (const xmlChar*)"slot"); \
+	xmlChar* slotoption_key = xmlGetProp(output_node, (const xmlChar*)"slotoption"); \
 	
 #define FREE_KEYS \
+	xmlFree(slotoption_key); \
+	slotoption_key = NULL; \
+	xmlFree(slot_key); \
+	slot_key = NULL; \
 	xmlFree(cmd_key); \
 	cmd_key = NULL; \
 	xmlFree(confsetting_key); \
@@ -407,6 +415,8 @@ static int create_report_from_filename(const char *const filename, struct report
 										fprintf(r_cb_data->report_fd, "  * Dipswitch: ''%s'' Value: ''%s'' \n", dipswitch_key, dipvalue_key);
 									if( configuration_key && confsetting_key )
 										fprintf(r_cb_data->report_fd, "  * Configuration: ''%s'' Value: ''%s'' \n", configuration_key, confsetting_key);
+									if( slot_key && slotoption_key )
+										fprintf(r_cb_data->report_fd, "  * Slot: ''%s'' Option: ''%s'' \n", slot_key, slotoption_key);
 									if( devices_node )
 									{
 										xmlAttrPtr dev_attrs = devices_node->properties;
