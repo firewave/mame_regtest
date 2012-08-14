@@ -1090,7 +1090,7 @@ static char* create_commandline(struct driver_entry* de)
 	else {
 		append_string(&sys, " -debug"); /* enable debug window */
 		/* pass debugscript, so so debugger won't block the execution */
-		append_string(&sys, "-debugscript ");
+		append_string(&sys, " -debugscript ");
 		append_quoted_string(&sys, debugscript_file);
 	}
 	append_string(&sys, " -nomouse"); /* disable "mouse" so it doesn't grabs the mouse pointer on window creation */
