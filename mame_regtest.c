@@ -349,7 +349,7 @@ static void strip_sampleof_pinmame(const char* listxml_in, const char* listxml_o
 }
 
 /* TODO: how to set "callstr" for non-de calls? */
-static void get_executable(char** sys, struct driver_entry* de, const char* callstr)
+static void get_executable(char** sys, struct driver_entry* de, const char* callstr, const char* parameters)
 {
 #if !USE_VALGRIND
 	/* shut up compiler */
@@ -376,7 +376,7 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 		append_string(sys, " ");
 #endif
 	}
-	else if( config_use_gdb && (!callstr || (strcmp(callstr, "listxml") != 0)) ) {
+	else if( config_use_gdb && (!callstr || (strcmp(callstr, "listxml") != 0)) && (!parameters || (strstr(parameters, "-list") == NULL && strstr(parameters, "-validate") == NULL && strstr(parameters, "-show") == NULL && strstr(parameters, "-verify") == NULL)) ) {
 		/* cannot be done with -listxml sine it messes up the output */
 		append_string(sys, "gdb");
 		append_string(sys, " ");
@@ -1123,7 +1123,7 @@ static char* create_commandline(struct driver_entry* de)
 static int execute_mame(struct driver_entry* de, const char* parameters, int redirect, int change_dir, xmlNodePtr* result, char** cmd_out, char** stdout_out)
 {
 	print_driver_info(de, stdout);
-	if( config_use_autosave && de->autosave )
+	if( config_use_autosave && de && de->autosave )
 		printf(" (autosave)");
 	printf("\n");
 
@@ -1139,7 +1139,7 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 #endif
 #endif
 
-	get_executable(&sys, de, NULL);
+	get_executable(&sys, de, NULL, parameters);
 	append_string(&sys, " ");
 	append_string(&sys, parameters);
 
@@ -2515,11 +2515,15 @@ int main(int argc, char *argv[])
 	printf("\n"); /* for output formating */
 	
 	if( config_test_frontend ) {
-		/* TODO: split out the MESS ones */
+		printf("testing frontend options\n");
 		static const char* const frontend_opts[] = { "validate", "listfull", "listclones", "listbrothers", "listcrc", "listroms", "listsamples", "verifyroms", "verifysamples", "listdevices", "listslots", "listmedia", "listsoftware", "showusage", "showconfig" };
 		unsigned int i = 0;
 		for(; i < sizeof(frontend_opts) / sizeof(char*); ++i)
 		{
+			// TODO: disable again when frontends write output XMLs
+			//if( config_verbose )
+				printf("testing frontend option -%s\n", frontend_opts[i]);
+		
 			char* stdout_str = NULL;
 		
 			char* cmd = NULL;
