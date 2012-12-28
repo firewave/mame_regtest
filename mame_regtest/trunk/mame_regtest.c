@@ -2596,7 +2596,7 @@ int main(int argc, char *argv[])
 		free(stdout_str);
 		stdout_str = NULL;
 		
-		if( listxml_res != 0)
+		if( listxml_res == 0)
 		{
 			fprintf(stderr, "-listxml writing failed\n");
 			cleanup_and_exit(1, "aborting");
