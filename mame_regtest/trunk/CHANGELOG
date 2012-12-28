@@ -566,6 +566,9 @@
 	- check "xpath_expr" for DRIVER_ROOT
 	- disallow usage of "use_gdb" and "use_valgrind" at the same time
 	- do not check the default ramsize again in combined bios/ram runs
+	- renamed clear_directory_nosnap() to clear_directory_2()
+	- renamed clear_callback_nosnap() to clear_callback_2()
+	- do not remove the -log and valgrind output with "store_output" set to 2
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
