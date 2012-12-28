@@ -1232,14 +1232,7 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 		}
 	}
 
-	/* TODO: what is this all about */
-	if( sys_res != 0 ) {
-	}
-	else { /* sys_res == 0 */
-	}
-
-	/* TODO: why always return 1? */
-	return 1;
+	return sys_res == 0 ? 1 : 0;
 }
 
 static void cleanup_driver_info_list(struct driver_info* driv_inf)

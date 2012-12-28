@@ -557,6 +557,7 @@
 	- improved configuration loading error messages
 	- added -verifysoftware to "test_frontend"
 	- only parse "devices" if necessary
+	- execute_mame() now correctly returns if the execution was successful (fixes second autosave being executed when the first one failed)
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
