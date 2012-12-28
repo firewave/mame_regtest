@@ -7,7 +7,12 @@ mame_regtest
 		- use transparent crosshair?
 		- add "hang"/deadlock detection (-watchdog / usable from 0.136)
 		- multipass XPath (e.g. first select m6502 cpus and then all with autosave from those nodes)
+			- use '&' instead of '|'
 		- multithreading mode
+			- test thread code on linux
+			- use pthread on windows?
+			- how to handle chdir() stuff now?
+				- use fork code and set in forked code
 		- configuration rewrite
 			- empty options will not properly overwrite/reset existing options to default values
 			- print config values in read function (or put in array and print function for array)
@@ -34,10 +39,8 @@ mame_regtest
 			- use special prefix for non-output XMLs like config, softwarelists, etc. (maybe '_'?)
 			- mark the different autosave calls (load / save)
 			- store both output file states in case of autosave
-		- disallow usage of gdb and valgrind at the same time
 		- make it possible to set affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
 		- add signal/abort handler and cleanup in it
-		- do not check the default ramsize again in bios/ram combination runs
 		- take a look at messtest for "hardreset" tests and extended image testing
 		- image testing
 			- attribute to disable an image entry in the XML
@@ -54,7 +57,6 @@ mame_regtest
 				- how to load software.dtd? must be in same path as executable
 		- measure the real time necessary for the execution to detect slowdowns
 		- add support for disks in softlist
-		- delete all existing dummy_root and mrt_temp folders on start-up?
 		- all bios/ramsize/configuration/dipswitch combinations
 			- call function with array
 			- process the first entry and call itself with a smaller array
@@ -65,7 +67,6 @@ mame_regtest
 		- how to specify a specific device in softwarelist tests?
 		- document all the exitcodes in README
 		- avoid duplicated cleanup code for dips and configurations - use generic function
-		- add options to makefile for DEBUG and LOG_ALLOC
 		- make pointer array dynamic
 		- test again with LOG_ALLOC and *all* features enabled
 		- prepare softwarelists before processing the data and store the path in the driver_info
@@ -88,27 +89,18 @@ mame_regtest
 				}
 		- SetNamedPipeHandleState
 			- PIPE_NOWAIT
-		- make sure, that valgrind log and the -log output are not being wiped with store_output=2
-		- bail out when -listxml returns something else than 0
 		- properly handle and report -listxml failure
 		- make it easier to perform batch processing by allowing config overrides via "-<key> <value>" command-line option?
-		- add a test, that the time shown at the end doesn't match the -str 10 value
-		- add windbg support
-		- check if gdb exists when use_gdb is set to 1
-		- only parse "softwarelist" and "devices" if necessary - like ramoption
+		- add a test, that the time shown at the end doesn't match the -str 10 value?
+		- use_gdb
+			- check if gdb exists when use_gdb is set to 1
+			- gdb --batch hangs on linux since it waits for key input (ubuntu 10.04 x64)
+			- prevent gdb stdout output in frontend and -listxml files
+			- gdb output is not being demangled
+				- add --run-command="set print demangle on" or "set demangle-style auto"
 		- add schemas to XMLs
-		- gdb --batch hangs on linux since it waits for key input (ubuntu 10.04 x64)
-		- test thread code on linux
-		- use pthread on windows?
 		- need to quote all usage of "output_path"
-		- test frontend before parsing
-		- how to handle chdir() stuff now?
-			- use fork code and se in forked code
 		- mrt_system() sometimes hangs
-		- prevent gdb stdout output in frontend and -listxml files
-		- gdb output is not being demangled
-			- add --run-command="set print demangle on" or "set demangle-style auto"
-		- comparison report doesn't create output folder
 		- validate all software lists
 		- errors about devices are written to stderr - how to get them?
 			- also create XMLs for the frontend functions
@@ -124,6 +116,16 @@ mame_regtest
 			chdir()
 			system()
 			chdir()
+		- device bioses
+		- speed up -listxml writing
+		- add generic support to run MAME in a different program instead of hardcoding it to gdb and valgrind
+			- add drmemory support
+			- add windbg support
+		- how to support "slot in slot"?
+		- add support to run a select list of softlist items
+		- create testset for mandatory devices, that don't have a softlist
+		- add option to disable "verifysoftware" on older versions
+		- add filename to PNG and MNG parsing errors
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -150,7 +152,6 @@ mame_regtest
 
 	issues/bugs/errorhandling:
 		- avoid duplicated slashes
-		- properly handle invalid XPath expressions (check for DRIVER_ROOT)
 		- bail out when invalid config_entry_type found?
 		- test chdir() on start-up and bail out when it fails
 		- do not test dipswitch/configurations when additional information is missing in -listxml
@@ -174,7 +175,8 @@ mame_regtest
 			- update building instructions in Wiki
 			- verify the version number for software lists
 			- add link to configuration on main mame_regtest page
-		- document upper limit of dipswitches/devices/etc. of 100000		
+		- document upper limit of dipswitches/devices/etc. of 100000
+		- put all the wiki documentation up on breaken.de
 
 	compilation:
 		- fix compilation on systems, that already have a htonl() function
