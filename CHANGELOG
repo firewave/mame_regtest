@@ -570,6 +570,7 @@
 	- renamed clear_callback_nosnap() to clear_callback_2()
 	- do not remove the -log and valgrind output with "store_output" set to 2
 	- added support for running only the first entry of the softwarelist when "use_softwarelist" is set to 2
+	- removed unnecessary returnvalues from execute_mame2() and execute_mame3()
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
