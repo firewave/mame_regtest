@@ -556,6 +556,7 @@
 	- added option "use_slots" to test slots
 	- improved configuration loading error messages
 	- added -verifysoftware to "test_frontend"
+	- only parse "devices" if necessary
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set

@@ -2042,7 +2042,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					goto next;
 				}
 				
-				if( xmlStrcmp(game_children->name, (const xmlChar*)"device") == 0 ) {
+				if( config_use_devices && xmlStrcmp(game_children->name, (const xmlChar*)"device") == 0 ) {
 					struct device_info* new_dev_info = (struct device_info*)malloc(sizeof(struct device_info));
 					/* TODO: check allocation */
 					memset(new_dev_info, 0x00, sizeof(struct device_info));
