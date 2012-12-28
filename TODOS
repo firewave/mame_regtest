@@ -110,7 +110,6 @@ mame_regtest
 		- MAME needs option to disable crosshair
 		- check if image files exist before trying to load them
 		- how to use one XML with multiple drivers - check parent - child relationship?
-		- for mandatory devices add a mode, that will load the first entry from the softlist if one exists
 		- mame_regtest takes a lot of CPU after running a command with a lot of output - improve reading of stdout? use move instead of read and write?
 		- create small wrapper application to move chdir() out of main application to parallize processing
 			chdir()

@@ -1510,10 +1510,13 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 				int i = 0;
 				for( ; i < soft_nodeset->nodeNr; ++i )
 				{
+					if( config_use_softwarelist == 2 && software_count == 1 )
+						break;
+				
 					struct image_entry* images = NULL;
 					if( read_softlist_entry(soft_nodeset->nodeTab[i], &images, actual_driv_inf) == 0 )
 						continue;
-
+						
 					snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05d", initial_postfix, software_count);
 
 					de->images = images;
