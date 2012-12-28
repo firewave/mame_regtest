@@ -2565,7 +2565,7 @@ int main(int argc, char *argv[])
 		char* mame_call = NULL;
 		append_string(&mame_call, "-listxml");
 
-		execute_mame(NULL, mame_call, 0, 0, NULL, NULL, &stdout_str);
+		int listxml_res = execute_mame(NULL, mame_call, 0, 0, NULL, NULL, &stdout_str);
 
 		free(mame_call);
 		mame_call = NULL;
@@ -2581,6 +2581,11 @@ int main(int argc, char *argv[])
 		free(stdout_str);
 		stdout_str = NULL;
 		
+		if( listxml_res != 0)
+		{
+			printf("-listxml writing failed\n");
+			cleanup_and_exit(1, "aborting");
+		}
 
 		if( config_hack_pinmame ) {
 			char* tmp_gamelist_xml = NULL;
