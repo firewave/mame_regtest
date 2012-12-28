@@ -294,13 +294,13 @@ static xmlNodeSetPtr get_xpath_nodeset(xmlDocPtr doc, const xmlChar* xpath_expr)
 			xmlXPathFreeObject(xpathObj);
 		}
 		else {
-			printf("could not evaluate XPath expression\n");
+			fprintf(stderr, "could not evaluate XPath expression\n");
 		}
 
 		xmlXPathFreeContext(xpathCtx);
 	}
 	else {
-		printf("could not create XPath context\n");
+		fprintf(stderr, "could not create XPath context\n");
 	}
 	
 	return nodeset;
@@ -400,7 +400,7 @@ static int parse_mng(const char* file, xmlNodePtr filenode)
 
 	int res = get_MHDR_data(mng_fd, &MHDR_width, &MHDR_height);
 	if( res == 0 ) {
-		printf("could not get MHDR data from '%s'\n", file);
+		fprintf(stderr, "could not get MHDR data from '%s'\n", file);
 		fclose(mng_fd);
 		mng_fd = NULL;
 		return frame;
@@ -438,7 +438,7 @@ static int parse_mng(const char* file, xmlNodePtr filenode)
 			break;
 		}
 		else if( res == 0 ) {
-			printf("unexpected error parsing MNG '%s'\n", file);
+			fprintf(stderr, "unexpected error parsing MNG '%s'\n", file);
 			break;
 		}
 	}
@@ -584,7 +584,7 @@ static void cleanup_and_exit(int exitcode, const char* errstr)
 	print_leaked_pointers();
 #endif
 
-	printf("%s\n", errstr);
+	fprintf(stderr, "%s\n", errstr);
 	exit(exitcode);
 }
 
@@ -717,14 +717,14 @@ static int get_MHDR_data(FILE* in_fd, unsigned int* MHDR_width, unsigned int* MH
 	unsigned char chunk_name[4] = "";
 
 	if( fread(&chunk_size, sizeof(unsigned int), 1, in_fd) != 1 ) {
-		printf("could not read chunk size\n");
+		fprintf(stderr, "could not read chunk size\n");
 		return 0;
 	}
 
 	reversed_chunk_size = htonl(chunk_size);
 
 	if( fread(chunk_name, sizeof(unsigned char), 4, in_fd) != 4 ) {
-		printf("could not read chunk name\n");
+		fprintf(stderr, "could not read chunk name\n");
 		return 0;
 	}
 
@@ -732,12 +732,12 @@ static int get_MHDR_data(FILE* in_fd, unsigned int* MHDR_width, unsigned int* MH
 		unsigned int width = 0, height = 0;
 
 		if( fread(&width, sizeof(unsigned int), 1, in_fd) != 1 ) {
-				printf("could not read MHDR chunk width\n");
+				fprintf(stderr, "could not read MHDR chunk width\n");
 				return 0;
 		}
 
 		if( fread(&height, sizeof(unsigned int), 1, in_fd) != 1 ) {
-				printf("could not read MHDR chunk height\n");
+				fprintf(stderr, "could not read MHDR chunk height\n");
 				return 0;
 		}
 
@@ -750,7 +750,7 @@ static int get_MHDR_data(FILE* in_fd, unsigned int* MHDR_width, unsigned int* MH
 		return 1;
 	}
 
-	printf("could not find MHDR chunk\n");
+	fprintf(stderr, "could not find MHDR chunk\n");
 
 	return 0;
 }
@@ -762,14 +762,14 @@ static int get_IHDR_data(FILE* in_fd, unsigned int* IHDR_width, unsigned int* IH
 	unsigned char chunk_name[4] = "";
 
 	if( fread(&chunk_size, sizeof(unsigned int), 1, in_fd) != 1 ) {
-		printf("could not read chunk size\n");
+		fprintf(stderr, "could not read IHDR chunk size\n");
 		return 0;
 	}
 
 	reversed_chunk_size = htonl(chunk_size);
 	
 	if( fread(chunk_name, sizeof(unsigned char), 4, in_fd) != 4 ) {
-		printf("could not read chunk name\n");
+		fprintf(stderr, "could not read IHDR chunk name\n");
 		return 0;
 	}
 
@@ -777,12 +777,12 @@ static int get_IHDR_data(FILE* in_fd, unsigned int* IHDR_width, unsigned int* IH
 		unsigned int width = 0, height = 0;
 		
 		if( fread(&width, sizeof(unsigned int), 1, in_fd) != 1 ) {
-				printf("could not read IHDR chunk width\n");
+				fprintf(stderr, "could not read IHDR chunk width\n");
 				return 0;
 		}
 		
 		if( fread(&height, sizeof(unsigned int), 1, in_fd) != 1 ) {
-				printf("could not read IHDR chunk height\n");
+				fprintf(stderr, "could not read IHDR chunk height\n");
 				return 0;
 		}
 
@@ -795,7 +795,7 @@ static int get_IHDR_data(FILE* in_fd, unsigned int* IHDR_width, unsigned int* IH
 		return 1;
 	}
 
-	printf("could not find IHDR chunk\n");
+	fprintf(stderr, "could not find IHDR chunk\n");
 
 	return 0;
 }
@@ -808,14 +808,14 @@ static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, uns
 
 	for( ; ; ) {
 		if( fread(&chunk_size, sizeof(unsigned int), 1, in_fd) != 1 ) {
-			printf("could not read chunk size\n");
+			fprintf(stderr, "could not read IDAT chunk size\n");
 			return 0;
 		}
 
 		reversed_chunk_size = htonl(chunk_size);
 		
 		if( fread(chunk_name, sizeof(unsigned char), 4, in_fd) != 4 ) {
-			printf("could not read chunk name\n");
+			fprintf(stderr, "could not read IDAT chunk name\n");
 			return 0;
 		}
 
@@ -824,7 +824,7 @@ static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, uns
 			
 			unsigned int chunk_crc = 0;
 			if( fread(&chunk_crc, sizeof(unsigned int), 1, in_fd) != 1 ) {
-				printf("could not read IDAT chunk CRC\n");
+				fprintf(stderr, "could not read IDAT chunk CRC\n");
 				return 0;
 			}
 			else {
@@ -855,7 +855,7 @@ static int get_png_data(const char* png_name, unsigned int *IHDR_width, unsigned
 {
 	FILE* png_fd = fopen(png_name, "rb");
 	if( png_fd == NULL ) {
-		printf("could not open %s\n", png_name);
+		fprintf(stderr, "could not open %s\n", png_name);
 		return 0;
 	}
 
@@ -864,27 +864,27 @@ static int get_png_data(const char* png_name, unsigned int *IHDR_width, unsigned
 	unsigned char sig[8] = "";
 	
 	if( fread(sig, sizeof(unsigned char), 8, png_fd) != 8 ) {
-		printf("could not read signature: %s\n", png_name);
+		fprintf(stderr, "could not read PNG signature: %s\n", png_name);
 		fclose(png_fd);
 		return 0;
 	}
 
 	if( memcmp(png_sig, sig, 8) != 0 ) {
-		printf("contains no PNG signature: %s\n", png_name);
+		fprintf(stderr, "contains no PNG signature: %s\n", png_name);
 		fclose(png_fd);
 		return 0;		
 	}
 
 	int IHDR_res = get_IHDR_data(png_fd, IHDR_width, IHDR_height);
 	if( IHDR_res != 1 ) {
-		printf("error getting IHDR data: %s\n", png_name);
+		fprintf(stderr, "error getting IHDR data: %s\n", png_name);
 		fclose(png_fd);
 		return IHDR_res;
 	}
 
 	int IDAT_res = internal_get_next_IDAT_data(png_fd, IDAT_size, IDAT_crc);
 	if( IDAT_res != 1 ) 
-		printf("error getting IDAT data: %s\n", png_name);
+		fprintf(stderr, "error getting IDAT data: %s\n", png_name);
 
 	fclose(png_fd);
 
@@ -895,7 +895,7 @@ static void open_mng_and_skip_sig(const char* mng_name, FILE** mng_fd)
 {
 	*mng_fd = fopen(mng_name, "rb");
 	if( *mng_fd == NULL ) {
-		printf("could not open %s\n", mng_name);
+		fprintf(stderr, "could not open %s\n", mng_name);
 		return;
 	}
 
@@ -904,14 +904,14 @@ static void open_mng_and_skip_sig(const char* mng_name, FILE** mng_fd)
 	unsigned char sig[8] = "";
 
 	if( fread(sig, sizeof(unsigned char), 8, *mng_fd) != 8 ) {
-		printf("could not read signature: %s\n", mng_name);
+		fprintf(stderr, "could not read MNG signature: %s\n", mng_name);
 		fclose(*mng_fd);
 		*mng_fd = NULL;
 		return;
 	}
 
 	if( memcmp(mng_sig, sig, 8) != 0 ) {
-		printf("contains no MNG signature: %s\n", mng_name);
+		fprintf(stderr, "contains no MNG signature: %s\n", mng_name);
 		fclose(*mng_fd);
 		*mng_fd = NULL;
 		return;
@@ -1008,7 +1008,7 @@ static int create_cfg(struct driver_entry* de, int type)
 		res = 1;
 	}
 	else {
-		printf("unknown 'mameconfig' version\n");
+		fprintf(stderr, "unknown 'mameconfig' version\n");
 	}
 
 	if( res == 1 )	
@@ -1335,12 +1335,12 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 static int execute_mame2(struct driver_entry* de)
 {
 	if( !de->name || *de->name == 0 ) {
-		printf("empty game name\n");
+		fprintf(stderr, "empty game name\n");
 		return 0;
 	}
 
 	if( !de->sourcefile || *de->sourcefile == 0 ) {
-		printf("empty sourcefile\n");
+		fprintf(stderr, "empty sourcefile\n");
 		return 0;
 	}
 
@@ -1436,7 +1436,7 @@ static int execute_mame2(struct driver_entry* de)
 		while( rename(dummy_root, outputdir) != 0 )
 		{
 			/* TODO: sleep */
-			printf("could not rename '%s' to '%s'\n", dummy_root, outputdir);
+			fprintf(stderr, "could not rename '%s' to '%s'\n", dummy_root, outputdir);
 		}
 			
 		/* clear everything but the "snap" folder */
@@ -1535,7 +1535,7 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 			soft_doc = NULL;
 		}
 		else {
-			printf("could not read '%s'\n", driver_softlist_file);
+			fprintf(stderr, "could not read '%s'\n", driver_softlist_file);
 		}
 
 		free(driver_softlist_file);
@@ -1948,14 +1948,14 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 				sourcefile = xmlStrdup((const xmlChar*)"pinmame.c");
 			}
 			else {
-				printf("'sourcefile' attribute is empty\n");
+				fprintf(stderr, "'sourcefile' attribute is empty\n");
 				return;
 			}
 		}
 
 		*new_driv_inf = (struct driver_info*)malloc(sizeof(struct driver_info));
 		if( !*new_driv_inf ) {
-			printf("could not allocate driver_info\n");
+			fprintf(stderr, "could not allocate driver_info\n");
 			return;
 		}
 		memset(*new_driv_inf, 0x00, sizeof(struct driver_info));
@@ -2164,7 +2164,7 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 			else if( xmlStrcmp(root->name, (const xmlChar*)"mess") == 0 )
 				app_type = APP_MESS;
 			else
-				printf("Unknown -listxml output\n");
+				fprintf(stderr, "Unknown -listxml output\n");
 
 			if( app_type != APP_UNKNOWN ) {
 				xmlChar* debug_attr = xmlGetProp(root, (const xmlChar*)"debug");
@@ -2271,7 +2271,7 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 		xmlFreeDoc(doc);
 	}
 	else {
-		printf("could not parse -listxml output\n");
+		fprintf(stderr, "could not parse -listxml output\n");
 	}
 }
 
@@ -2290,7 +2290,7 @@ int main(int argc, char *argv[])
 	printf("process: %s\n", pid_str);
 
 	if( getcwd(current_path, sizeof(current_path)) == NULL ) {
-		printf("could not get current working path\n");
+		fprintf(stderr, "could not get current working path\n");
 		exit(1);
 	}
 	
@@ -2337,12 +2337,12 @@ int main(int argc, char *argv[])
 	}
 
 	if( !config_mame_exe || (*config_mame_exe == 0) ) {
-		printf("'executable' is empty or missing\n");
+		fprintf(stderr, "'executable' is empty or missing\n");
 		cleanup_and_exit(1, "aborting");
 	}
 
 	if( access(config_mame_exe, F_OK ) == -1 ) {
-		printf("'%s' does not exist\n", config_mame_exe);
+		fprintf(stderr, "'%s' does not exist\n", config_mame_exe);
 		cleanup_and_exit(1, "aborting");
 	}
 	if( config_verbose )
@@ -2350,13 +2350,13 @@ int main(int argc, char *argv[])
 
 	if( access(config_output_folder, F_OK) == 0 ) {
 		if( !config_clear_output_folder ) {
-			printf("output folder '%s' found\n", config_output_folder);
+			fprintf(stderr, "output folder '%s' already exists\n", config_output_folder);
 			cleanup_and_exit(1, "aborting");
 		}
 	}
 	else {
 		if( mrt_mkdir(config_output_folder) != 0 ) {
-			printf("could not create folder '%s'\n", config_output_folder);
+			fprintf(stderr, "could not create folder '%s'\n", config_output_folder);
 			cleanup_and_exit(1, "aborting");
 		}
 	}
@@ -2385,7 +2385,7 @@ int main(int argc, char *argv[])
 	if( config_write_mng ) {
 		if( config_hack_mngwrite ) {
 			if( mrt_mkdir("mng") != 0 ) {
-				printf("could not create folder 'mng' - disabling MNG writing\n");
+				fprintf(stderr, "could not create folder 'mng' - disabling MNG writing\n");
 				config_write_mng = 0;
 			}
 		}
@@ -2401,7 +2401,7 @@ int main(int argc, char *argv[])
 	append_string(&temp_folder, pid_str);
 
 	if( (access(temp_folder, F_OK) != 0) && mrt_mkdir(temp_folder) != 0 ) {
-		printf("could not create folder '%s'\n", temp_folder);
+		fprintf(stderr, "could not create folder '%s'\n", temp_folder);
 		cleanup_and_exit(1, "aborting");
 	}
 
@@ -2409,7 +2409,7 @@ int main(int argc, char *argv[])
 		if( config_verbose )
 			printf("using output folder: %s\n", temp_folder);
 		if( access(temp_folder, F_OK) != 0 ) {
-			printf("temp folder '%s' not found\n", temp_folder);
+			fprintf(stderr, "temp folder '%s' not found\n", temp_folder);
 			cleanup_and_exit(1, "aborting");
 		}
 	}
@@ -2440,7 +2440,7 @@ int main(int argc, char *argv[])
 		if( config_verbose )
 			printf("valgrind_parameters: %s\n", config_valgrind_parameters);
 #else
-		printf("valgrind support not available on this platform");
+		fprintf(stderr, "valgrind support not available on this platform");
 #endif
 	}
 
@@ -2488,17 +2488,17 @@ int main(int argc, char *argv[])
 	}
 
 	if( *config_str_str == 0 ) {
-		printf("'str' value cannot be empty\n");
+		fprintf(stderr, "'str' value cannot be empty\n");
 		cleanup_and_exit(1, "aborting");		
 	}
 
 	if( config_hack_ftr && (atoi(config_str_str) < 2)) {
-		printf("'str' value has to be at least '2' when used with 'hack_ftr'\n");
+		fprintf(stderr, "'str' value has to be at least '2' when used with 'hack_ftr'\n");
 		cleanup_and_exit(1, "aborting");
 	}
 	
 	if( config_use_softwarelist && (!config_hashpath_folder || (*config_hashpath_folder == 0)) )
-		printf("'hashpath' is empty - no software lists available for testing\n");
+		fprintf(stderr, "'hashpath' is empty - no software lists available for testing\n");
 
 	if( config_clear_output_folder ) {
 		printf("clearing existing output folder\n");
@@ -2583,7 +2583,7 @@ int main(int argc, char *argv[])
 		
 		if( listxml_res != 0)
 		{
-			printf("-listxml writing failed\n");
+			fprintf(stderr, "-listxml writing failed\n");
 			cleanup_and_exit(1, "aborting");
 		}
 
@@ -2623,7 +2623,7 @@ int main(int argc, char *argv[])
 
 		FILE* debugscript_fd = fopen(debugscript_file, "w");
 		if( !debugscript_fd ) {
-			printf("could not open %s\n", debugscript_file);
+			fprintf(stderr, "could not open %s\n", debugscript_file);
 			cleanup_and_exit(1, "aborted");
 		}
 		if( config_test_softreset )
@@ -2634,7 +2634,7 @@ int main(int argc, char *argv[])
 	}
 	else {
 		if( config_test_softreset )
-			printf("'test_softreset' can only be used with 'use_debug'\n");
+			fprintf(stderr, "'test_softreset' can only be used with 'use_debug'\n");
 	}
 
 	/* setup OSDPROCESSORS */
