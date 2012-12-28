@@ -1650,6 +1650,8 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				append_string(&mame_call, (const char*)actual_driv_inf->name);
 				append_string(&mame_call, " -listsoftware");
 				
+				if( config_verbose )
+					printf("writing -listsoftware %s output\n", (const char*)actual_driv_inf->name);
 				execute_mame(NULL, mame_call, 0, 0, NULL, NULL, &stdout_str);
 				
 				free(mame_call);
@@ -2043,7 +2045,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					goto next;
 				}
 				
-				if( config_use_devices && xmlStrcmp(game_children->name, (const xmlChar*)"device") == 0 ) {
+				if( (config_use_devices || config_use_softwarelist) && xmlStrcmp(game_children->name, (const xmlChar*)"device") == 0 ) {
 					struct device_info* new_dev_info = (struct device_info*)malloc(sizeof(struct device_info));
 					/* TODO: check allocation */
 					memset(new_dev_info, 0x00, sizeof(struct device_info));
