@@ -555,6 +555,7 @@
 	- fixed some GCC 4.6 compilation warnings
 	- added option "use_slots" to test slots
 	- improved configuration loading error messages
+	- added -verifysoftware to "test_frontend"
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
