@@ -1,9 +1,7 @@
 mame_regtest
 (c) Copyright 2005-2012 by Oliver Stoeneberg
 
-http://mess.redump.net/tools:mame_regtest
-http://mess.redump.net/tools:mame_regtest:config (documentation of the options in the XML)
-http://www.breaken.de/mame_regtest (outdated)
+http://www.breaken.de/mame_regtest
 
 notes:
 	- you need libxml2-2.6.27 to compile this
