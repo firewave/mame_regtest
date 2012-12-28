@@ -2433,7 +2433,6 @@ int main(int argc, char *argv[])
 	if( config_verbose )
 		printf("valgrind: %d\n", config_use_valgrind);
 
-
 	if( config_use_valgrind )
 	{
 #if USE_VALGRIND
@@ -2501,6 +2500,11 @@ int main(int argc, char *argv[])
 	if( config_hack_ftr && (atoi(config_str_str) < 2)) {
 		fprintf(stderr, "'str' value has to be at least '2' when used with 'hack_ftr'\n");
 		cleanup_and_exit(1, "aborting");
+	}
+	
+	if( config_use_valgrind && config_use_gdb ) {
+		fprintf(stderr, "'use_valgrind' and 'use_gdb' cannot be used together\n");
+		cleanup_and_exit(1, "aborting");	
 	}
 	
 	if( config_use_softwarelist && (!config_hashpath_folder || (*config_hashpath_folder == 0)) )

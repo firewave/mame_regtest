@@ -564,6 +564,7 @@
 	- added makefile options DEBUG and LOG_ALLOC
 	- removed obsolete wiki links from README
 	- check "xpath_expr" for DRIVER_ROOT
+	- disallow usage of "use_gdb" and "use_valgrind" at the same time
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
