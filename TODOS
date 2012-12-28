@@ -126,6 +126,9 @@ mame_regtest
 		- create testset for mandatory devices, that don't have a softlist
 		- add option to disable "verifysoftware" on older versions
 		- add filename to PNG and MNG parsing errors
+		-
+			file:///c:/Emulation/mame_regtest/mrt_output.mess.r19872.plain.v64d/mbc200.xml:3: parser error : Input is not proper UTF-8, indicate encoding ! Bytes: 0xFF 0x26 0x23 0x31
+			<result exitcode="0" stdout="A ff  &#13;&#10;A 00 " stderr="">
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
