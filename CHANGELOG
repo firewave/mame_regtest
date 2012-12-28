@@ -553,7 +553,8 @@
 	- removed get_inifile()
 	- added get_filename_base() to common.c/.h
 	- fixed some GCC 4.6 compilation warnings
-	- added option "use_slots" to test slots 
+	- added option "use_slots" to test slots
+	- improved configuration loading error messages
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set

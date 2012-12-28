@@ -32,25 +32,25 @@ static xmlNodePtr global_config_root = NULL;
 int config_init(const char* config_xml, const char* root_node)
 {
 	if( access(config_xml, F_OK) == -1 ) {
-		printf("'%s' does not exist\n", config_xml);
+		printf("configuration file '%s' does not exist\n", config_xml);
 		return 0;
 	}
-	printf("using configuration '%s'\n", config_xml);
+	printf("using configuration file '%s'\n", config_xml);
 
 	global_config_doc = xmlReadFile(config_xml, NULL, 0);
 	if( !global_config_doc ) {
-		printf("could not load configuration\n");
+		printf("could not load configuration file\n");
 		return 0;
 	}
 
 	global_config_root = xmlDocGetRootElement(global_config_doc);
 	if( !global_config_root ) {
-		printf("invalid configuration - no root element\n");
+		printf("invalid configuration file - no root element\n");
 		return 0;
 	}
 
 	if( xmlStrcmp(global_config_root->name, (const xmlChar*)root_node) != 0 ) {
-		printf("invalid configuration - no '%s' element\n", root_node);
+		printf("invalid configuration file - no '%s' element\n", root_node);
 		return 0;
 	}
 
