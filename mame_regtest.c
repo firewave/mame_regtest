@@ -1790,6 +1790,9 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 					res = execute_mame3(&de, actual_driv_inf);
 				}
 			}
+			
+			de.bios = NULL;
+			de.ramsize = 0;
 		}
 		
 		if( actual_driv_inf->slots ) {
