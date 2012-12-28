@@ -1776,6 +1776,10 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				int ram_i = 0;
 				for( ; ram_i < actual_driv_inf->ram_count; ++ram_i )
 				{
+					/* do not check again - already done in the -bios runs */
+					if( actual_driv_inf->ramsizes[ram_i] == actual_driv_inf->ram_default )
+						continue;
+				
 					snprintf(de.postfix, sizeof(de.postfix), "bios%05dram%05d", bios_i, ram_i);
 
 					de.ramsize = actual_driv_inf->ramsizes[ram_i];
