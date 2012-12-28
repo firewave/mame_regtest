@@ -1333,16 +1333,16 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 	}
 }
 
-static int execute_mame2(struct driver_entry* de)
+static void execute_mame2(struct driver_entry* de)
 {
 	if( !de->name || *de->name == 0 ) {
 		fprintf(stderr, "empty game name\n");
-		return 0;
+		return;
 	}
 
 	if( !de->sourcefile || *de->sourcefile == 0 ) {
 		fprintf(stderr, "empty sourcefile\n");
-		return 0;
+		return;
 	}
 
 	if( access(pause_file, F_OK) == 0 ) {
@@ -1353,7 +1353,6 @@ static int execute_mame2(struct driver_entry* de)
 		printf("\n");
 	}
 
-	int res = 0;
 	xmlNodePtr result1 = NULL;
 	xmlNodePtr result2 = NULL;
 
@@ -1403,7 +1402,7 @@ static int execute_mame2(struct driver_entry* de)
 
 	char* params = create_commandline(de);	
 	char* cmd = NULL;
-	res = execute_mame(de, params, 1, 1, &result1, &cmd, NULL);
+	int res = execute_mame(de, params, 1, 1, &result1, &cmd, NULL);
 	
 	if( cmd ) {
 		xmlNewProp(output_node, (const xmlChar*)"cmd", (const xmlChar*)cmd);
@@ -1466,22 +1465,12 @@ static int execute_mame2(struct driver_entry* de)
 		xmlFreeDoc(output_doc);
 		output_doc = NULL;
 	}
-
-	return res;
 }
 
-static int execute_mame3(struct driver_entry* de, struct driver_info* actual_driv_inf)
+static void execute_mame3(struct driver_entry* de, struct driver_info* actual_driv_inf)
 {
-	int res = 0;
-	
-	if( config_skip_mandatory && de->device_mandatory ) {
-		res = 1;
-	}
-	else {
-		res = execute_mame2(de);
-		if( res == 0 )
-			return res;
-	}
+	if( !(config_skip_mandatory && de->device_mandatory) )
+		execute_mame2(de);
 	
 	int software_count = 0;
 
@@ -1521,7 +1510,7 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 
 					de->images = images;
 
-					res = execute_mame2(de);
+					execute_mame2(de);
 
 					free_image_entries(images);
 					de->images = NULL;
@@ -1574,7 +1563,7 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 
 						de->images = images;
 
-						res = execute_mame2(de);
+						execute_mame2(de);
 
 						free_image_entries(images);
 						de->images = NULL;
@@ -1595,8 +1584,6 @@ static int execute_mame3(struct driver_entry* de, struct driver_info* actual_dri
 		free(device_file);
 		device_file = NULL;
 	}
-
-	return res;
 }
 
 static void process_driver_info_list(struct driver_info* driv_inf)
@@ -1605,8 +1592,8 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 		return;
 
 	struct driver_info* actual_driv_inf = driv_inf;
-	int res = 0;
-	do {
+	for(;;)
+	{
 		struct driver_entry de;
 		memset(&de, 0x00, sizeof(struct driver_entry));
 		de.name = (const char*)actual_driv_inf->name;
@@ -1685,7 +1672,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 		/* only run with the default options when no additional bioses or ramsizes are available to avoid duplicate runs */
 		if( actual_driv_inf->bios_count <= 1 &&
 			actual_driv_inf->ram_count <= 1 ) {
-			res = execute_mame3(&de, actual_driv_inf);
+			execute_mame3(&de, actual_driv_inf);
 		}
 
 		if( actual_driv_inf->bios_count > 1 ) {
@@ -1696,7 +1683,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				
 				de.bios = (const char*)actual_driv_inf->bioses[i];
 				
-				res = execute_mame3(&de, actual_driv_inf);
+				execute_mame3(&de, actual_driv_inf);
 			}
 
 			de.bios = NULL;
@@ -1710,7 +1697,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 
 				de.ramsize = actual_driv_inf->ramsizes[i];
 
-				res = execute_mame3(&de, actual_driv_inf);
+				execute_mame3(&de, actual_driv_inf);
 			}
 
 			de.ramsize = 0;
@@ -1732,7 +1719,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 
 					de.dipvalue = dipvalue;
 					
-					res = execute_mame3(&de, actual_driv_inf);
+					execute_mame3(&de, actual_driv_inf);
 					
 					dipvalue = dipvalue->next;
 				};
@@ -1760,7 +1747,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 
 					de.confsetting = confsetting;
 					
-					res = execute_mame3(&de, actual_driv_inf);
+					execute_mame3(&de, actual_driv_inf);
 					
 					confsetting = confsetting->next;
 				};
@@ -1790,7 +1777,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 
 					de.ramsize = actual_driv_inf->ramsizes[ram_i];
 
-					res = execute_mame3(&de, actual_driv_inf);
+					execute_mame3(&de, actual_driv_inf);
 				}
 			}
 			
@@ -1812,7 +1799,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 
 					de.slotoption = (const char*)slot->slotoptions[slotoption_count];
 					
-					res = execute_mame3(&de, actual_driv_inf);
+					execute_mame3(&de, actual_driv_inf);
 				}
 
 				slot = slot->next;
@@ -1826,7 +1813,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 			actual_driv_inf = actual_driv_inf->next;
 		else
 			break;
-	} while(res == 1);
+	}
 }
 
 static int parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_info** new_driv_inf, struct dipswitch_info** last_dip_info, int type)
