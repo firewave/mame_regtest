@@ -465,15 +465,16 @@ static FILE* mrt_fopen(const char* filename, const char* attr)
 	return result;
 }
 
-static void clear_callback_nosnap(struct parse_callback_data* pcd)
+static void clear_callback_2(struct parse_callback_data* pcd)
 {
-	if( pcd->type == ENTRY_FILE ) {
+	/* do not delete the -log or valgrind output */
+	if( pcd->type == ENTRY_FILE && strstr(pcd->entry_name, ".valgrind_") == NULL && strcmp(pcd->entry_name, "error.log") != 0 ) {
 		remove(pcd->fullname);
 	}
 	/* do not delete the "snap" folder */
 	else if( (pcd->type == ENTRY_DIR_END) && (strcmp(pcd->entry_name, "snap") != 0) ) {
 		int delete_root = 1;
-		parse_directory(pcd->fullname, 0, clear_callback_nosnap, (void*)&delete_root);
+		parse_directory(pcd->fullname, 0, clear_callback_2, (void*)&delete_root);
 	}
 	else if( pcd->type == ENTRY_END ) {
 		int* delete_root = (int*)pcd->user_data;
@@ -482,9 +483,9 @@ static void clear_callback_nosnap(struct parse_callback_data* pcd)
 	}
 }
 
-static void clear_directory_nosnap(const char* dirname, int delete_root)
+static void clear_directory_2(const char* dirname, int delete_root)
 {
-	parse_directory(dirname, 0, clear_callback_nosnap, (void*)&delete_root);
+	parse_directory(dirname, 0, clear_callback_2, (void*)&delete_root);
 
 	if( delete_root )
 		rmdir(dirname);
@@ -1441,7 +1442,7 @@ static int execute_mame2(struct driver_entry* de)
 			
 		/* clear everything but the "snap" folder */
 		if( config_store_output == 2)
-			clear_directory_nosnap(outputdir, 0);
+			clear_directory_2(outputdir, 0);
 
 		free(outputdir);
 		outputdir = NULL;
