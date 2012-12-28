@@ -563,6 +563,7 @@
 	- improve some log messages
 	- added makefile options DEBUG and LOG_ALLOC
 	- removed obsolete wiki links from README
+	- check "xpath_expr" for DRIVER_ROOT
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set

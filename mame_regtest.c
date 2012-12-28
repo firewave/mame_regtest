@@ -2184,6 +2184,12 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 				mameconfig_attr = NULL;
 
 				if( config_xpath_expr && (*config_xpath_expr != 0) ) {
+					if( strstr(config_xpath_expr, xpath_placeholder) == NULL )
+					{
+						fprintf(stderr, "Invalid 'xpath_expr' - DRIVER_ROOT missing");
+						return;
+					}
+				
 					char* real_xpath_expr = NULL;
 					if( app_type == APP_MAME )
 						replace_string(config_xpath_expr, &real_xpath_expr, xpath_placeholder, "/mame/game");
