@@ -559,6 +559,8 @@
 	- only parse "devices" if necessary
 	- execute_mame() now correctly returns if the execution was successful (fixes second autosave being executed when the first one failed)
 	- bail out when -listxml failed
+	- write all errors to stderr
+	- improve some log messages
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
