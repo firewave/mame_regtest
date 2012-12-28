@@ -561,6 +561,7 @@
 	- bail out when -listxml failed
 	- write all errors to stderr
 	- improve some log messages
+	- added makefile options DEBUG and LOG_ALLOC
 	
 	create_report
 	- added a summary at the end when "dokuwiki_format" is set
