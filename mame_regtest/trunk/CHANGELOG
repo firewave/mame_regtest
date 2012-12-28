@@ -569,3 +569,4 @@
 	- added speed comparison report (report_type 2)
 	- fixed PNG comparison - images were in the wrong order
 	- added support for slots
+	- create "output_folder"

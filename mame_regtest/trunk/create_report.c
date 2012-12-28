@@ -765,6 +765,8 @@ static void create_report()
 		append_string(&outputfile, config_output_folder);
 		append_string(&outputfile, FILESLASH);
 		append_string(&outputfile, "mrt_diff.html");
+		mrt_mkdir(config_output_folder);
+		/* TODO: check result */
 		report_fd = fopen(outputfile, "wb");
 		free(outputfile);
 		outputfile = NULL;
