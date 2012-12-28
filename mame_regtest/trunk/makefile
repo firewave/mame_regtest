@@ -8,11 +8,19 @@ LIBS = ./libxml2/lib/libxml2.lib ./zlib/lib/zdll.lib
 #LIBS = -lz -lxml2
 
 WARNINGS = -Wall -Wextra -Wformat=2 -Wshadow -Wcast-qual -Wwrite-strings
-#WARNINGS += -Wunreachable-code
+#WARNINGS += -Wunreachable-code -Wconversion
 
-#CFLAGS = -g $(WARNINGS) $(INCLUDES)
-CFLAGS = -O3 -s $(WARNINGS) $(INCLUDES)
-#CFLAGS += -DLOG_ALLOC
+CFLAGS = $(WARNINGS) $(INCLUDES)
+
+ifdef DEBUG
+CFLAGS += -g
+else
+CFLAGS += -O3 -s
+endif
+
+ifdef LOG_ALLOC
+CFLAGS += -DLOG_ALLOC
+endif
 
 all: mame_regtest$(BIN_EXT) create_image_xml$(BIN_EXT) create_report$(BIN_EXT)
 
