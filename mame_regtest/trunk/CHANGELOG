@@ -587,3 +587,6 @@
 	- create "output_folder"
 	
 0.73
+	- fixed potential memory leak in strip_sampleof_pinmame() detected by cppcheck
+	- fixed various cppcheck warnings
+	- fixed wrong variable being used in non-WIN32 code of wait_for_thread()

@@ -321,7 +321,7 @@ static void strip_sampleof_pinmame(const char* listxml_in, const char* listxml_o
 	
 	FILE* out_fd = fopen(listxml_out, "wb");
 	
-	if( in_fd ) {
+	if( in_fd && out_fd ) {
 		const size_t sampleof_size = strlen(" sampleof=\"pinmame\"");
 		char buf[4096];
 		while ( fgets(buf, sizeof(buf), in_fd) ) {
@@ -339,10 +339,14 @@ static void strip_sampleof_pinmame(const char* listxml_in, const char* listxml_o
 				fwrite(buf, 1, strlen(buf), out_fd);
 			}
 		}
-		
+	}
+
+	if( out_fd ) {
 		fclose(out_fd);
 		out_fd = NULL;
-
+	}
+	
+	if( in_fd ) {
 		fclose(in_fd);
 		in_fd = NULL;
 	}
@@ -1416,7 +1420,7 @@ static void execute_mame2(struct driver_entry* de)
 	}
 
 	if( res == 1 && config_use_autosave && de->autosave ) {
-		res = execute_mame(de, params, 1, 1, &result2, NULL, NULL);
+		execute_mame(de, params, 1, 1, &result2, NULL, NULL);
 
 		if( result2 ) {
 			xmlAddChild(output_node, result2);

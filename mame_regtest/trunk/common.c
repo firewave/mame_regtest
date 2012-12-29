@@ -79,7 +79,7 @@ void* mrt_malloc(size_t size)
 	init_pointer_array();
 
 	void* ptr = malloc(size);
-	printf("%d - malloc - %d - %p\n", ++m, size, ptr);
+	printf("%d - malloc - %u - %p\n", ++m, size, ptr);
 	add_pointer(ptr);
 	return ptr;
 }
@@ -99,7 +99,7 @@ void* mrt_realloc(void* ptr, size_t size)
 	init_pointer_array();
 
 	void* ptr2 = realloc(ptr, size);
-	printf("%d - realloc - %p - %d - %p\n", (ptr == NULL) ? ++m : -1, ptr, size, ptr2);
+	printf("%d - realloc - %p - %u - %p\n", (ptr == NULL) ? ++m : -1, ptr, size, ptr2);
 	replace_pointer(ptr, ptr2);
 	return ptr2;
 }
@@ -683,7 +683,6 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 {
 	int exitcode = -1;
 	HANDLE hProcess;
-	char szBuffer[512];
 
 	int out = -1;
 	int out_pipe[2];
@@ -746,6 +745,7 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 
 	if((int)hProcess != -1)
 	{
+		char szBuffer[512];
 		int nExitCode = STILL_ACTIVE;
 		while( nExitCode == STILL_ACTIVE )
 		{
@@ -811,6 +811,7 @@ void* create_thread()
 	return (void*)_beginthread(WorkerFuntion, 0, NULL);
 #else
 	pthread_t thread;
+	/* TODO: check result */
 	int ret = pthread_create(&thread, NULL, WorkerFuntion, NULL);
 	return (void*)thread;
 #endif
@@ -822,6 +823,7 @@ void wait_for_thread(void* thread)
 	WaitForSingleObject((HANDLE)thread, INFINITE);
 #else
 	void* thread_ret = NULL;
-	int ret = pthread_join((pthread_t)thread, &ret);
+	/* TODO: check result */
+	int ret = pthread_join((pthread_t)thread, &thread_ret);
 #endif
 }
