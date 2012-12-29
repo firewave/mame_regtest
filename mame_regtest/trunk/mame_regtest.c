@@ -59,7 +59,7 @@
 #define _MAX_PATH PATH_MAX
 #endif
 
-#define VERSION "0.72"
+#define VERSION "0.73"
 
 struct device_info {
 	xmlChar* name;

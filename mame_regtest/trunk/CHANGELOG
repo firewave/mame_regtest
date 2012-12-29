@@ -585,3 +585,5 @@
 	- fixed PNG comparison - images were in the wrong order
 	- added support for slots
 	- create "output_folder"
+	
+0.73
