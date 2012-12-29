@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<create_report>
+	<report_10>
+		<option name='report_type' value='0'/>
+		<option name='xml_folder' value='d:\mess\mrt_output'/>
+		<option name='recursive' value='0'/>
+		<option name='output_file' value='d:\report_10.txt'/>
+		<option name='print_stderr' value='1'/>
+		<option name='dokuwiki_format' value='1'/>
+		<option name='ignore_exitcode_4' value='1'/>
+		<option name='show_memleaks' value='1'/>
+		<option name='show_clipped' value='1'/>
+		<option name='group_data' value='1'/>
+	</report_10>
+	<stdout_file>
+		<option name='xml_folder' value='d:\mess\mrt_output'/>
+		<option name='output_file' value='d:\stdout_file.txt'/>
+		<option name='print_stdout' value='1'/>
+		<option name='ignore_exitcode_4' value='1'/>
+		<option name='group_data' value='1'/>
+	</stdout_file>
+	<stderr_file>
+		<option name='xml_folder' value='d:\mess\mrt_output'/>
+		<option name='output_file' value='d:\stderr_file.txt'/>
+		<option name='print_stderr' value='1'/>
+		<option name='ignore_exitcode_4' value='1'/>
+		<option name='group_data' value='1'/>
+	</stderr_file>
+	<comparison>
+		<option name='report_type' value='1'/>
+		<option name='xml_folder' value='d:\mame\mrt_output.129u3'/>
+		<option name='compare_folder' value='d:\mame\mrt_output.129u5'/>
+		<option name='output_folder' value='d:\mrt_diff'/>
+		<option name='dokuwiki_format' value='1'/>
+		<option name='group_data' value='1'/>
+	</comparison>
+</create_report>

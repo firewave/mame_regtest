@@ -1,0 +1,47 @@
+mame_regtest
+(c) Copyright 2005-2012 by Oliver Stoeneberg
+
+http://www.breaken.de/mame_regtest
+
+notes:
+	- you need libxml2-2.6.27 to compile this
+	- you need zlib 1.2.3 to compile this
+	- if you are using a compiler without dirent.h you need dirent API 1.11 to compile this: http://www.softagalleria.net/dirent.php
+	- if you are using a system with big-endian byte-order you have to comment the LITTLE_ENDIAN and uncomment the BIG_ENDIAN define
+	- XPath tutorial: http://www.zvon.org/xxl/XPathTutorial/General/examples.html
+
+MAME/MESS returncodes:
+          1 - terminated / ???
+          2 - missing roms
+          3 - assertion / fatalerror
+          4 - no image specified (MESS-only)
+          5 - no such game
+          6 - invalid config
+        128 - ???  
+        100 - exception
+-1073741819 - exception (SDLMAME/SDLMESS)
+
+mame_regtest returncodes:
+	0 - OK
+	1 - error
+
+pngcmp:
+	- based on src/tools/regrep.c from MAME distribution
+	- retuncodes:
+		0 - images are identical - no diff written
+		1 - images are identical - diff written
+	   -1 - an error occured
+	
+pngcmp compilation:
+	Needs to be compiled with MAME. Just copy pngcmp.c to the src/tools/ folder of MAME and add the following to src/tools/tools.mak:
+	
+#-------------------------------------------------
+# pngcmp
+#-------------------------------------------------
+
+PNGCMPOBJS = \
+	$(TOOLSOBJ)/pngcmp.o \
+
+pngcmp$(EXE): $(PNGCMPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
