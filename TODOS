@@ -128,6 +128,9 @@ mame_regtest
 		-
 			file:///c:/Emulation/mame_regtest/mrt_output.mess.r19872.plain.v64d/mbc200.xml:3: parser error : Input is not proper UTF-8, indicate encoding ! Bytes: 0xFF 0x26 0x23 0x31
 			<result exitcode="0" stdout="A ff  &#13;&#10;A 00 " stderr="">
+		- how to get rid of empty line when -listsoftware is written?
+		- how to use single entries from each softwarelists?
+		- avoid multiple writing of softwarelists by saving them under the internal name and load them by that?
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
