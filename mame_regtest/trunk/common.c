@@ -249,6 +249,7 @@ void mrt_xmlFree(void* ptr)
 #ifndef WIN32
 #include <termios.h>
 #include <unistd.h>
+#include <pthread.h>
 #endif
 
 /* zlib */
