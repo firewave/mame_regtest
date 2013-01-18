@@ -595,3 +595,4 @@
 	- do not use valgrind for executions without a driver_entry
 	- added missing -lpthread in makefile
 	- added -Wno-unused-variable to build without warnings with clang
+	- corrected default valgrind parameters in source
