@@ -593,3 +593,5 @@
 	- added missing pthread.h include for non-WIN32 code in common.c
 	- fixed valgrind logfile location
 	- do not use valgrind for executions without a driver_entry
+	- added missing -lpthread in makefile
+	- added -Wno-unused-variable to build without warnings with clang
