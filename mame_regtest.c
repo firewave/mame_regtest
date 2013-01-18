@@ -2440,7 +2440,7 @@ int main(int argc, char *argv[])
 		if( config_verbose )
 			printf("valgrind_binary: %s\n", config_valgrind_binary);
 		if( !config_valgrind_parameters || (*config_valgrind_parameters == 0) )
-			append_string(&config_valgrind_parameters, "--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --leak-resolution=med");
+			append_string(&config_valgrind_parameters, "--tool=memcheck --error-limit=no --leak-check=full --num-callers=50 --show-reachable=yes --track-fds=yes --track-origins=yes");
 		if( config_verbose )
 			printf("valgrind_parameters: %s\n", config_valgrind_parameters);
 #else
