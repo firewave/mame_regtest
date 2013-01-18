@@ -591,3 +591,5 @@
 	- fixed various cppcheck warnings
 	- fixed wrong variable being used in non-WIN32 code of wait_for_thread()
 	- added missing pthread.h include for non-WIN32 code in common.c
+	- fixed valgrind logfile location
+	- do not use valgrind for executions without a driver_entry

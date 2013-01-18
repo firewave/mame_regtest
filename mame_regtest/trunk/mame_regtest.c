@@ -361,15 +361,13 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 	(void)callstr;
 #endif
 	
-	if( config_use_valgrind ) {
+	if( config_use_valgrind && de ) {
 #if USE_VALGRIND
 		append_string(sys, config_valgrind_binary);
 		append_string(sys, " ");
 		append_string(sys, config_valgrind_parameters);
 		append_string(sys, " ");
 		append_string(sys, "--log-file=");
-		append_string(sys, config_output_folder);
-		append_string(sys, FILESLASH);
 		if( de ) {
 			append_driver_info(sys, de);
 		}
