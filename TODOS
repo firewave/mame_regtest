@@ -60,7 +60,7 @@ mame_regtest
 		- all bios/ramsize/configuration/dipswitch combinations
 			- call function with array
 			- process the first entry and call itself with a smaller array
-		- add detection of duplicated bios and ramsize entries
+		- add detection of duplicated ramsize entries
 		- try to create append_to_array() based on split_string()
 		- handle multiple software lists in hack
 		- log info about softwarelist entries without matching interface
@@ -129,8 +129,15 @@ mame_regtest
 			file:///c:/Emulation/mame_regtest/mrt_output.mess.r19872.plain.v64d/mbc200.xml:3: parser error : Input is not proper UTF-8, indicate encoding ! Bytes: 0xFF 0x26 0x23 0x31
 			<result exitcode="0" stdout="A ff  &#13;&#10;A 00 " stderr="">
 		- how to get rid of empty line when -listsoftware is written?
-		- how to use single entries from each softwarelists?
 		- avoid multiple writing of softwarelists by saving them under the internal name and load them by that?
+		- get rid of execute_mame() result? only used in one place
+		- how to use single entries from each softwarelists - not just the first?
+			- add an option how many entries from each softlist to process when "use_softwarelist" is set (remove use_softwarelist=2?)
+		- extract MNG frame and do a pngcmp
+		- scan existing result and only run sets/combinations, that caused an error
+		- do not proceed when software list could not be written
+		- change EOL in SVN to native
+		- read the filter to decide which softlist entries to run
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -258,6 +265,9 @@ mame_regtest
 			- stderr
 				- "No stack."
 		- in comparison report show which is which
+		- parse the valgrind.log for
+			- "uninit"
+			- "Invalid"
 			
 	create_image_xml
 		- add more output to create_image_xml
