@@ -596,3 +596,5 @@
 	- added missing -lpthread in makefile
 	- added -Wno-unused-variable to build without warnings with clang
 	- corrected default valgrind parameters in source
+	- added detection of duplicated bios entries
+	- added message when no matching software entry could be found in the -listsoftwarelist output

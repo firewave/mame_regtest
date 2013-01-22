@@ -1528,6 +1528,9 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 			
 			xmlFreeDoc(soft_doc);
 			soft_doc = NULL;
+			
+			if( software_count == 0 )
+				printf("could not find any software entry to use\n");
 		}
 		else {
 			fprintf(stderr, "could not read '%s'\n", driver_softlist_file);
@@ -1995,8 +1998,17 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 			if( config_use_bios ) {
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"biosset") == 0 ) {
 					xmlChar* bios_content = xmlGetProp(game_children, (const xmlChar*)"name");
-					if( bios_content )
+					if( bios_content ) {
 						(*new_driv_inf)->bioses[(*new_driv_inf)->bios_count++] = bios_content;
+						{
+							int i = 0;
+							for(; i < (*new_driv_inf)->bios_count-1; ++i)
+							{
+								if( xmlStrcmp((*new_driv_inf)->bioses[i], bios_content) == 0 )
+									printf("%s - duplicated bios '%s' found\n", (const char*)(*new_driv_inf)->name, (const char*)bios_content);
+							}
+						}
+					}
 
 					xmlChar* bios_default = xmlGetProp(game_children, (const xmlChar*)"default");
 					if( bios_default ) {
@@ -2525,8 +2537,8 @@ int main(int argc, char *argv[])
 		unsigned int i = 0;
 		for(; i < sizeof(frontend_opts) / sizeof(char*); ++i)
 		{
-			// TODO: disable again when frontends write output XMLs
-			//if( config_verbose )
+			/* TODO: disable again when frontends write output XMLs */
+			/*if( config_verbose )*/
 				printf("testing frontend option -%s\n", frontend_opts[i]);
 		
 			char* stdout_str = NULL;
