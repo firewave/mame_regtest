@@ -598,3 +598,4 @@
 	- corrected default valgrind parameters in source
 	- added detection of duplicated bios entries
 	- added message when no matching software entry could be found in the -listsoftwarelist output
+	- renamed valgrind logfile to just valgrind.log

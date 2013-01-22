@@ -367,14 +367,7 @@ static void get_executable(char** sys, struct driver_entry* de, const char* call
 		append_string(sys, " ");
 		append_string(sys, config_valgrind_parameters);
 		append_string(sys, " ");
-		append_string(sys, "--log-file=");
-		if( de ) {
-			append_driver_info(sys, de);
-		}
-		else if( callstr ) {
-			append_string(sys, callstr);
-		}
-		append_string(sys, ".valgrind_%p");
+		append_string(sys, "--log-file=valgrind.log");
 		append_string(sys, " ");
 #endif
 	}
