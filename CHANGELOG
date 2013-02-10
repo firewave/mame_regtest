@@ -601,3 +601,4 @@
 	- renamed valgrind logfile to just valgrind.log
 	- enabled DTD validation when reading -listsoftware output
 	- added filter check to only try to run compatible -listsoftware entries
+	- added detection of duplicated ramsize entries
