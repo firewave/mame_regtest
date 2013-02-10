@@ -111,7 +111,8 @@ struct driver_info {
 	struct dipswitch_info* dipswitches;
 	struct dipswitch_info* configurations;
 	int has_softlist;
-	xmlChar* softwarelist;
+	xmlChar* softwarelist; /* TODO: might not be necessary since -listsoftware will list of images from all lists */
+	xmlChar* softwarelist_filter;
 	struct slot_info* slots;
 	struct driver_info* next;
 };
@@ -119,7 +120,8 @@ struct driver_info {
 struct image_entry {
 	xmlChar* device_briefname;
 	xmlChar* device_file;
-	xmlChar* device_interface;
+	xmlChar* device_interface; /* TODO: do we even need this? */
+	xmlChar* device_filter;
 	struct image_entry* next;
 };
 
@@ -615,6 +617,7 @@ static void free_image_entry(struct image_entry* image)
 	xmlFree(image->device_briefname);
 	xmlFree(image->device_file);
 	xmlFree(image->device_interface);
+	xmlFree(image->device_filter);
 	free(image);
 }
 
@@ -678,6 +681,24 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 		if( soft_child->type == XML_ELEMENT_NODE ) {
 			if( xmlStrcmp(soft_child->name, (const xmlChar*)"part") == 0 ) {
 				image->device_interface = xmlGetProp(soft_child, (const xmlChar*)"interface");
+				
+				xmlNodePtr part_child = soft_child->children;
+				while( part_child ) {
+					if( part_child->type == XML_ELEMENT_NODE ) {
+						if( xmlStrcmp(part_child->name, (const xmlChar*)"feature") == 0 ) {
+							xmlChar* name_key = xmlGetProp(part_child, (const xmlChar*)"name");
+							if( xmlStrcmp(name_key, (const xmlChar*)"compatibility") == 0 )
+								image->device_filter = xmlGetProp(part_child, (const xmlChar*)"value");
+							xmlFree(name_key);
+							name_key = NULL;
+							if( image->device_filter )
+								break;
+						}
+					}
+					
+					part_child = part_child->next;
+				}
+				
 				break;
 			}
 		}
@@ -688,7 +709,9 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 	/* TODO: move this somewhere else? */
 	struct device_info* dev_info = driv_inf->devices;
 	while(dev_info) {
-		if( xmlStrcmp(dev_info->interface, image->device_interface) == 0 ) {
+		/* TODO: do a better match */
+		//if( xmlStrcmp(dev_info->interface, image->device_interface) == 0 ) {
+		if( xmlStrstr(dev_info->interface, image->device_interface) != NULL ) {
 			image->device_briefname = xmlStrdup(dev_info->briefname);
 			break;
 		}
@@ -696,7 +719,8 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 		dev_info = dev_info->next;
 	}
 	
-	if( !image->device_briefname ) {
+	/* TODO: use better match */
+	if( !image->device_briefname || (image->device_filter && driv_inf->softwarelist_filter && xmlStrstr(image->device_filter, driv_inf->softwarelist_filter) == NULL) ) {
 		free_image_entry(image);
 		return 0;
 	}
@@ -1256,7 +1280,9 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 			xmlFree(actual_driv_inf->device_mandatory);
 		if( actual_driv_inf->softwarelist )
 			xmlFree(actual_driv_inf->softwarelist);
-		
+		if( actual_driv_inf->softwarelist_filter )
+			xmlFree(actual_driv_inf->softwarelist_filter);
+			
 		struct device_info* devices = actual_driv_inf->devices;
 		while( devices != NULL ) {
 			struct device_info* next_device = devices->next;
@@ -2088,6 +2114,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					if( (*new_driv_inf)->has_softlist == 0 ) {
 						(*new_driv_inf)->has_softlist = 1;
 						(*new_driv_inf)->softwarelist = xmlGetProp(game_children, (const xmlChar*)"name");
+						(*new_driv_inf)->softwarelist_filter = xmlGetProp(game_children, (const xmlChar*)"filter");
 					}
 					
 					goto next;
