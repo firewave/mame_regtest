@@ -600,3 +600,4 @@
 	- added message when no matching software entry could be found in the -listsoftwarelist output
 	- renamed valgrind logfile to just valgrind.log
 	- enabled DTD validation when reading -listsoftware output
+	- added filter check to only try to run compatible -listsoftware entries
