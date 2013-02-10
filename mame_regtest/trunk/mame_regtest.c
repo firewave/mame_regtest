@@ -2024,7 +2024,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 							for(; i < (*new_driv_inf)->bios_count-1; ++i)
 							{
 								if( xmlStrcmp((*new_driv_inf)->bioses[i], bios_content) == 0 )
-									printf("%s - duplicated bios '%s' found\n", (const char*)(*new_driv_inf)->name, (const char*)bios_content);
+									printf("%s - %s - duplicated bios '%s' found\n", (const char*)(*new_driv_inf)->sourcefile, (const char*)(*new_driv_inf)->name, (const char*)bios_content);
 							}
 						}
 					}
