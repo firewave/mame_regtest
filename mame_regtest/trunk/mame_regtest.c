@@ -2054,6 +2054,14 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					xmlChar* ram_content = xmlNodeGetContent(game_children);
 					if( ram_content ) {
 						(*new_driv_inf)->ramsizes[(*new_driv_inf)->ram_count++] = atoi((const char*)ram_content);
+						{
+							int i = 0;
+							for(; i < (*new_driv_inf)->ram_count-1; ++i)
+							{
+								if( (*new_driv_inf)->ramsizes[i] == (*new_driv_inf)->ramsizes[(*new_driv_inf)->ram_count] )
+									printf("%s - duplicated ramsize '%d' found\n", (const char*)(*new_driv_inf)->name, (*new_driv_inf)->ramsizes[i]);
+							}
+						}
 						xmlFree(ram_content);
 					}
 					xmlChar* ram_default = xmlGetProp(game_children, (const xmlChar*)"default");
