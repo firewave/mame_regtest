@@ -1479,7 +1479,7 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 		append_string(&driver_softlist_file, ".xml");
 	
 		/* process softlist entries */
-		xmlDocPtr soft_doc = xmlReadFile(driver_softlist_file, NULL, 0);
+		xmlDocPtr soft_doc = xmlReadFile(driver_softlist_file, NULL, XML_PARSE_DTDVALID);
 		if( soft_doc ) {
 			xmlNodeSetPtr soft_nodeset = NULL;
 			if( config_hack_softwarelist )
@@ -2157,9 +2157,7 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 
 static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 {
-	int xml_options = XML_PARSE_DTDVALID;
-
-	xmlDocPtr doc = xmlReadFile(filename, NULL, xml_options);
+	xmlDocPtr doc = xmlReadFile(filename, NULL, XML_PARSE_DTDVALID);
 	if( doc ) {
 		xmlNodePtr root = xmlDocGetRootElement(doc);
 		if( root ) {
