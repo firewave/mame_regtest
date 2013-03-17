@@ -465,7 +465,7 @@ static FILE* mrt_fopen(const char* filename, const char* attr)
 static void clear_callback_2(struct parse_callback_data* pcd)
 {
 	/* do not delete the -log or valgrind output */
-	if( pcd->type == ENTRY_FILE && strstr(pcd->entry_name, ".valgrind_") == NULL && strcmp(pcd->entry_name, "error.log") != 0 ) {
+	if( pcd->type == ENTRY_FILE && strstr(pcd->entry_name, "valgrind") == NULL && strcmp(pcd->entry_name, "error.log") != 0 ) {
 		remove(pcd->fullname);
 	}
 	/* do not delete the "snap" folder */
