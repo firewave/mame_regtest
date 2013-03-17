@@ -602,6 +602,7 @@
 	- enabled DTD validation when reading -listsoftware output
 	- added filter check to only try to run compatible -listsoftware entries
 	- added detection of duplicated ramsize entries
+	- do not remove the valgrind output with "store_output" set to 2 (again)
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO
