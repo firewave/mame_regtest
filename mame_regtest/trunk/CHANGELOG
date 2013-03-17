@@ -606,3 +606,4 @@
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO
 	- improved layout of comparison report
+	- removed option "ignore_exitcode_4" and always filter the mandatory device messages

@@ -157,7 +157,6 @@ static char* config_xml_folder = NULL;
 static char* config_output_file = NULL;
 static int config_print_stderr = 0;
 static int config_dokuwiki_format = 0;
-static int config_ignore_exitcode_4 = 0;
 static int config_show_memleaks = 0;
 static int config_show_clipped = 0;
 static int config_group_data = 0;
@@ -173,7 +172,6 @@ struct config_entry report_config[] =
 	{ "output_file", 		CFG_STR_PTR, 	&config_output_file },
 	{ "print_stderr", 		CFG_INT, 		&config_print_stderr },
 	{ "dokuwiki_format", 	CFG_INT, 		&config_dokuwiki_format },
-	{ "ignore_exitcode_4", 	CFG_INT, 		&config_ignore_exitcode_4 },
 	{ "show_memleaks", 		CFG_INT, 		&config_show_memleaks },
 	{ "show_clipped", 		CFG_INT, 		&config_show_clipped },
 	{ "group_data", 		CFG_INT, 		&config_group_data },
@@ -222,7 +220,6 @@ struct report_cb_data
 	FILE* report_fd;
 	int print_stderr;
 	int dokuwiki_format;
-	int ignore_exitcode_4;
 	int show_memleaks;
 	int show_clipped;
 	int report_type;
@@ -399,9 +396,9 @@ static int create_report_from_filename(const char *const filename, struct report
 							xmlChar* stdout_key = xmlGetProp(output_childs, (const xmlChar*)"stdout");
 								
 							int error_found = exitcode_key && (xmlStrcmp(exitcode_key, (const xmlChar*)"0") != 0);
-							int error4_found = xmlStrcmp(exitcode_key, (const xmlChar*)"4") == 0;							
 							int memleak_found = stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"--- memory leak warning ---");
 							int clipped_found = stdout_key && xmlStrstr(stdout_key, (const xmlChar*)"clipped") && (xmlStrstr(stdout_key, (const xmlChar*)" 0% samples clipped") == NULL);
+							int mandatory_found = stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"Driver requires");
 							/* TODO: replace with option */
 							int reset_scope_found = stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"called within reset scope by");
 							
@@ -411,7 +408,7 @@ static int create_report_from_filename(const char *const filename, struct report
 							if(clipped_found)
 								r_cb_data->summary.clipped++;
 
-							int report_error = (error_found && !(r_cb_data->ignore_exitcode_4 && error4_found));
+							int report_error = (error_found && !mandatory_found);
 							int report_memleak = (memleak_found && r_cb_data->show_memleaks);
 							int report_stdout = (r_cb_data->print_stdout && stdout_key && xmlStrlen(stdout_key) > 0);
 							int report_stderr = (r_cb_data->print_stderr && stderr_key && xmlStrlen(stderr_key) > 0);
@@ -766,7 +763,6 @@ static void create_report()
 	struct report_cb_data r_cb_data;
 	r_cb_data.print_stderr = config_print_stderr;
 	r_cb_data.dokuwiki_format = config_dokuwiki_format;
-	r_cb_data.ignore_exitcode_4 = config_ignore_exitcode_4;
 	r_cb_data.show_memleaks = config_show_memleaks;
 	r_cb_data.show_clipped = config_show_clipped;
 	r_cb_data.report_type = config_report_type;
