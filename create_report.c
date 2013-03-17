@@ -248,6 +248,19 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 	return attr_value;
 }
 
+static void convert_br(xmlChar* str)
+{
+	xmlChar* s = NULL;
+	while( (s = BAD_CAST xmlStrstr(str, (const xmlChar*)"&#13;")) != NULL )
+	{
+		*s++ = '<';
+		*s++ = 'b';
+		*s++ = 'r';
+		*s++ = '/';
+		*s++ = '>';
+	}
+}
+
 #define PRINT_INFO(fd) \
 	fprintf(fd, "%s: %s", sourcefile_key, name_key); \
 	if( bios_key ) \
@@ -294,18 +307,24 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 			name = NULL; \
 			xmlFree(srcfile); \
 			srcfile = NULL; \
+			fprintf(r_cb_data->report_fd, "<table border=\"1\">\n"); \
 		} \
-		fprintf(r_cb_data->report_fd, "'%s' differs<br/>\n", attr_name);\
+		fprintf(r_cb_data->report_fd, "<tr>\n"); \
+		\
+		fprintf(r_cb_data->report_fd, "<td>%s</td>\n", attr_name);\
 		\
 		xmlChar* tmp = xmlEncodeEntitiesReentrant(doc_old, attr1); \
-		fprintf(r_cb_data->report_fd, "old: %s<br/>\n", tmp); \
+		convert_br(tmp); \
+		fprintf(r_cb_data->report_fd, "<td valign=\"top\">%s</td>\n", tmp); \
 		xmlFree(tmp); \
 		tmp = NULL; \
 		\
 		tmp = xmlEncodeEntitiesReentrant(doc, attr2); \
-		fprintf(r_cb_data->report_fd, "new: %s<br/>\n", tmp); \
+		convert_br(tmp); \
+		fprintf(r_cb_data->report_fd, "<td valign=\"top\">%s</td>\n", tmp); \
 		xmlFree(tmp); \
 		tmp = NULL; \
+		fprintf(r_cb_data->report_fd, "</tr>\n"); \
 	} \
 	\
 	xmlFree(attr2); \
@@ -510,6 +529,8 @@ static int create_report_from_filename(const char *const filename, struct report
 				COMPARE_ATTRIBUTE("/output/result", "stderr", dummy)
 				COMPARE_ATTRIBUTE("/output/result/dir[@name='snap']//file", "png_crc", png_differs)
 				(void)dummy;
+				if(write_set_data == 0)
+					fprintf(r_cb_data->report_fd, "</table>\n");
 				
 				if( png_differs ) {
 					xmlChar* name = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)"/output", (const xmlChar*)"name");
