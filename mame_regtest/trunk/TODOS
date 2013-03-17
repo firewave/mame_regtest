@@ -5,6 +5,7 @@ mame_regtest
 		- add option for testing of .inp file writing/reading (-record/-playback)
 		- add "start_at" for devices
 		- use transparent crosshair?
+			- MAME needs option to disable crosshair
 		- add "hang"/deadlock detection (-watchdog / usable from 0.136)
 		- multipass XPath (e.g. first select m6502 cpus and then all with autosave from those nodes)
 			- use '&' instead of '|'
@@ -35,7 +36,6 @@ mame_regtest
 			- add memory dumps to the output files for -debug runs?
 			- output the software list only once and only when used
 				- check for existing files
-			- esq(?) outputs some invalid characters - add UTF-8 to header?
 			- use special prefix for non-output XMLs like config, softwarelists, etc. (maybe '_'?)
 			- mark the different autosave calls (load / save)
 			- store both output file states in case of autosave
@@ -52,15 +52,11 @@ mame_regtest
 			- read images from folder with same name as device (look for XML first / specify folder in XML?)
 			- add option with folder for device XMLs?
 		- add XPath support for software lists
-			- add option to only check software, that is supported
-			- use DTD for softlists
-				- how to load software.dtd? must be in same path as executable
 		- measure the real time necessary for the execution to detect slowdowns
-		- add support for disks in softlist
+		- add support for disks in softlist FIXED?
 		- all bios/ramsize/configuration/dipswitch combinations
 			- call function with array
 			- process the first entry and call itself with a smaller array
-		- add detection of duplicated ramsize entries
 		- try to create append_to_array() based on split_string()
 		- handle multiple software lists in hack
 		- log info about softwarelist entries without matching interface
@@ -91,7 +87,6 @@ mame_regtest
 			- PIPE_NOWAIT
 		- properly handle and report -listxml failure
 		- make it easier to perform batch processing by allowing config overrides via "-<key> <value>" command-line option?
-		- add a test, that the time shown at the end doesn't match the -str 10 value?
 		- use_gdb
 			- check if gdb exists when use_gdb is set to 1
 			- gdb --batch hangs on linux since it waits for key input (ubuntu 10.04 x64)
@@ -101,13 +96,11 @@ mame_regtest
 		- add schemas to XMLs
 		- need to quote all usage of "output_path"
 		- mrt_system() sometimes hangs
-		- validate all software lists
 		- errors about devices are written to stderr - how to get them?
 			- also create XMLs for the frontend functions
 		- -verifyroms needs -rp
 		- -verifysamples needs sample path
 		- use -samplepath
-		- MAME needs option to disable crosshair
 		- check if image files exist before trying to load them
 		- how to use one XML with multiple drivers - check parent - child relationship?
 		- mame_regtest takes a lot of CPU after running a command with a lot of output - improve reading of stdout? use move instead of read and write?
@@ -125,11 +118,7 @@ mame_regtest
 		- create testset for mandatory devices, that don't have a softlist
 		- add option to disable "verifysoftware" on older versions
 		- add filename to PNG and MNG parsing errors
-		-
-			file:///c:/Emulation/mame_regtest/mrt_output.mess.r19872.plain.v64d/mbc200.xml:3: parser error : Input is not proper UTF-8, indicate encoding ! Bytes: 0xFF 0x26 0x23 0x31
-			<result exitcode="0" stdout="A ff  &#13;&#10;A 00 " stderr="">
 		- how to get rid of empty line when -listsoftware is written?
-		- avoid multiple writing of softwarelists by saving them under the internal name and load them by that?
 		- get rid of execute_mame() result? only used in one place
 		- how to use single entries from each softwarelists - not just the first?
 			- add an option how many entries from each softlist to process when "use_softwarelist" is set (remove use_softwarelist=2?)
@@ -137,7 +126,26 @@ mame_regtest
 		- scan existing result and only run sets/combinations, that caused an error
 		- do not proceed when software list could not be written
 		- change EOL in SVN to native
-		- read the filter to decide which softlist entries to run
+		- write all -listsoftware entries on start-up so they are verified before the test begins
+			- abort the test when anything fails?
+			- avoid multiple writing of softwarelists by saving them under the internal name and load them by that?
+		- use XPath to more easily filter entries out of softlist
+		-
+			mame_regtest.c:2247:20: warning: declaration of âxmlBufâ shadows a global declaration [-Wshadow]
+In file included from /usr/include/libxml2/libxml/parser.h:16:0,
+                 from mame_regtest.c:46:
+/usr/include/libxml2/libxml/tree.h:88:27: warning: shadowed declaration is here [-Wshadow]
+		- avoid SDLMAME issues
+			export SDL_VIDEODRIVER=dummy
+			export SDLMAME_DESKTOPDIM=1024x768
+		- add core dump handling/enabling
+			- multi custom commands
+		- load -listsofware XML on start-up to check for schema errors
+		- add verification only (no execution just logging)
+		- lookup interface via slots names?
+		- make software fitering optional
+		- remove use_sound and use_throttle
+		- add switch to test softlist entries with and without interface
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -268,6 +276,7 @@ mame_regtest
 		- parse the valgrind.log for
 			- "uninit"
 			- "Invalid"
+			- "Source and destination overlap"
 			
 	create_image_xml
 		- add more output to create_image_xml
@@ -280,23 +289,6 @@ mame_regtest
 	Known Issues:
 		- not everything is properly encoded by xmlEncodeEntitiesReentrant()
 		- using autosave will overwrite the initial valgrind log-file for the driver (well..not really, it adds the pid - still you want to differ them easily)
-
-	Test TODOs:
-		- create testset with images for each device in each driver
-		- nightly test
-			- checkout SVN
-			- get revision number
-			- create config on demand
-			- run test for all 4 flavours for GCC and VS2010
-				- 32bit
-				- 64bit
-				- 32bit debug
-				- 64bit debug
-			- image comparison
-				- compare indiviual test with each other
-					- use 32bit as base
-				- compare against previous revision
-			- upload error report and comparison report to some webspace
 
 	Misc:
 		- create patch to write ui_popup() to -log output
