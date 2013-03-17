@@ -200,6 +200,7 @@ void mrt_xmlFree(void* ptr)
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #endif
 
@@ -827,4 +828,16 @@ void wait_for_thread(void* thread)
 	/* TODO: check result */
 	int ret = pthread_join((pthread_t)thread, &thread_ret);
 #endif
+}
+
+void filter_unprintable(char* str, int len)
+{
+	int i = 0;
+	for(; i < len; ++i)
+	{
+		int c = str[i];
+		if(isspace(c) || isprint(c))
+			continue;
+		str[i] = ' ';
+	}
 }

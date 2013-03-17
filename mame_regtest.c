@@ -1236,6 +1236,7 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 #else
 		if( stdout_str ) {
 #endif
+			filter_unprintable(stdout_str, strlen(stdout_str));
 			xmlNewProp(*result, (const xmlChar*)"stdout", (const xmlChar*)stdout_str);
 			free(stdout_str);
 			stdout_str = NULL;
@@ -1246,6 +1247,7 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 #else
 		if( stderr_str ) {
 #endif
+			filter_unprintable(stderr_str, strlen(stderr_str));
 			xmlNewProp(*result, (const xmlChar*)"stderr", (const xmlChar*)stderr_str);
 			free(stderr_str);
 			stderr_str = NULL;

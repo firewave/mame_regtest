@@ -140,4 +140,6 @@ void libxml2_init();
 void* create_thread();
 void wait_for_thread(void* thread);
 
+void filter_unprintable(char* str, int len);
+
 #endif
