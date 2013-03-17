@@ -248,29 +248,29 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 	return attr_value;
 }
 
-#define PRINT_INFO \
-	fprintf(r_cb_data->report_fd, "%s: %s", sourcefile_key, name_key); \
+#define PRINT_INFO(fd) \
+	fprintf(fd, "%s: %s", sourcefile_key, name_key); \
 	if( bios_key ) \
-		fprintf(r_cb_data->report_fd, " (bios %s)", bios_key); \
+		fprintf(fd, " (bios %s)", bios_key); \
 	if( ramsize_key ) \
-		fprintf(r_cb_data->report_fd, " (ramsize %s)", ramsize_key); \
+		fprintf(fd, " (ramsize %s)", ramsize_key); \
 	if( dipswitch_key && dipvalue_key ) \
-		fprintf(r_cb_data->report_fd, " (dipswitch %s value %s)", dipswitch_key, dipvalue_key); \
+		fprintf(fd, " (dipswitch %s value %s)", dipswitch_key, dipvalue_key); \
 	if( configuration_key && confsetting_key ) \
-		fprintf(r_cb_data->report_fd, " (configuration %s value %s)", configuration_key, confsetting_key); \
+		fprintf(fd, " (configuration %s value %s)", configuration_key, confsetting_key); \
 	if( slot_key && slotoption_key ) \
-		fprintf(r_cb_data->report_fd, " (slot %s option %s)", slot_key, slotoption_key); \
+		fprintf(fd, " (slot %s option %s)", slot_key, slotoption_key); \
 	if( devices_node ) \
 	{ \
 		xmlAttrPtr dev_attrs = devices_node->properties; \
 		while( dev_attrs ) { \
-			fprintf(r_cb_data->report_fd, " (%s %s)", dev_attrs->name, dev_attrs->children->content); \
+			fprintf(fd, " (%s %s)", dev_attrs->name, dev_attrs->children->content); \
 			 \
 			dev_attrs = dev_attrs->next; \
 		} \
 	} \
 	if( autosave_key ) \
-		fprintf(r_cb_data->report_fd, " (autosave)");
+		fprintf(fd, " (autosave)");
 		
 #define COMPARE_ATTRIBUTE(xpath_expr, attr_name, differs) \
 { \
@@ -287,7 +287,7 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 			xmlChar* srcfile = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)"/output", (const xmlChar*)"sourcefile"); \
 			\
 			fprintf(r_cb_data->report_fd, "<p>\n"); \
-			PRINT_INFO \
+			PRINT_INFO(r_cb_data->report_fd) \
 			fprintf(r_cb_data->report_fd, "<br/>\n"); \
 			\
 			xmlFree(name); \
@@ -443,7 +443,7 @@ static int create_report_from_filename(const char *const filename, struct report
 								}
 								else
 								{
-									PRINT_INFO
+									PRINT_INFO(r_cb_data->report_fd)
 									fprintf(r_cb_data->report_fd, " (%s)\n", exitcode_key);
 		
 									if( (report_error || report_stdout || report_clipped) && stdout_key && xmlStrlen(stdout_key) > 0 )
@@ -662,7 +662,7 @@ static int create_report_from_filename(const char *const filename, struct report
 					}
 					}
 					
-					PRINT_INFO
+					PRINT_INFO(r_cb_data->report_fd)
 					fprintf(r_cb_data->report_fd, "|%.2f|%.2f|%.2f|%.2f\n", speed1, speed2, speed2 - speed1, (speed2 / speed1) * 100 - 100);
 				}
 				
