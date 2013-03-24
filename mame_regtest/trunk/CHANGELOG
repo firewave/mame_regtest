@@ -609,6 +609,7 @@
 	- added "noreturn" attribute to cleanup_and_exit() and removed unnecessary hack to silence compiler from main()
 	- added missing static to some global variables
 	- added option "no_execution" to perform testruns without executing the binaries
+	- added device_slot to image_entry and set it in read_softlist_entry()
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO
