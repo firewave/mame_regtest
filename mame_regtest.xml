@@ -18,6 +18,7 @@
 		<option name='use_isbios' value='0'/>
 		<option name='skip_mandatory' value='0'/>
 		<option name='test_softreset' value='0'/>
+		<option name='no_execution' value='0'/>
 		
 		<!-- xpath_expr examples -->
 		<!-- 'start_at' equivalent

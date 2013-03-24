@@ -227,6 +227,7 @@ static int config_use_softwarelist = 0;
 static int config_hack_softwarelist = 0;
 static int config_test_frontend = 1;
 static int config_use_slots = 0;
+static int config_no_execution = 0;
 
 static struct config_entry mrt_config[] =
 {
@@ -274,6 +275,7 @@ static struct config_entry mrt_config[] =
 	{ "hack_softwarelist",		CFG_INT,		&config_hack_softwarelist },
 	{ "test_frontend",			CFG_INT,		&config_test_frontend },
 	{ "use_slots",				CFG_INT,		&config_use_slots },
+	{ "no_execution",			CFG_INT,		&config_no_execution },
 	{ NULL,						CFG_UNK,		NULL }
 };
 
@@ -1152,8 +1154,8 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 		printf(" (autosave)");
 	printf("\n");
 
-	/* DEBUG!!! */
-	/* return 1; */
+	if( config_no_execution && de )
+		return 1;
 
 	char* sys = NULL;
 	
