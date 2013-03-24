@@ -605,6 +605,7 @@
 	- do not remove the valgrind output with "store_output" set to 2 (again)
 	- added filter_unprintable() to common.c/.h
 	- filter unprintable characters before writing to XML
+	- added mrt_array and append_to_array() to common.c/.h
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO

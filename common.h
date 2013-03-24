@@ -142,4 +142,12 @@ void wait_for_thread(void* thread);
 
 void filter_unprintable(char* str, int len);
 
+struct mrt_array
+{
+	void** ptr;
+	int size;
+};
+
+void append_to_array(struct mrt_array* arr, void* to_append);
+
 #endif
