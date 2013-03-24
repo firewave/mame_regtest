@@ -59,6 +59,10 @@
 #define _MAX_PATH PATH_MAX
 #endif
 
+#ifdef __GNUC__
+#define ATTR_NORETURN __attribute__((noreturn))
+#endif
+
 #define VERSION "0.73"
 
 struct device_info {
@@ -276,7 +280,7 @@ struct config_entry mrt_config[] =
 static int get_png_data(const char* png_name, unsigned int *IHDR_width, unsigned int* IHDR_height, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void open_mng_and_skip_sig(const char* mng_name, FILE** mng_fd);
 static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc);
-static void cleanup_and_exit(int exitcode, const char* errstr);
+static void cleanup_and_exit(int exitcode, const char* errstr) ATTR_NORETURN;
 static int get_MHDR_data(FILE* in_fd, unsigned int* MHDR_width, unsigned int* MHDR_height);
 static void cleanup_driver_info_list(struct driver_info* driv_inf);
 
@@ -1115,6 +1119,7 @@ static char* create_commandline(struct driver_entry* de)
 	}
 	append_string(&sys, " -nomouse"); /* disable "mouse" so it doesn't grabs the mouse pointer on window creation */
 	append_string(&sys, " -window"); /* run it in windowed mode */
+
 	if( !config_hack_ftr )
 		append_string(&sys, " -seconds_to_run ");
 	else
@@ -1275,6 +1280,7 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 			xmlFree(actual_driv_inf->sourcefile);
 		if( actual_driv_inf->bios_count ) {
 			int i = 0;
+
 			for( ; i < actual_driv_inf->bios_count; ++i )
 				xmlFree(actual_driv_inf->bioses[i]);
 		}
@@ -2696,7 +2702,4 @@ int main(int argc, char *argv[])
 	printf("\n"); /* for output formating */
 
 	cleanup_and_exit(0, "finished");
-#ifndef _MSC_VER
-	return 0; /* to shut up compiler */
-#endif
 }
