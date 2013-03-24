@@ -173,7 +173,7 @@ static int config_print_stdout = 0;
 static char* config_output_folder = NULL;
 static int config_recursive = 0;
 
-struct config_entry report_config[] =
+static struct config_entry report_config[] =
 {
 	{ "xml_folder", 		CFG_STR_PTR, 	&config_xml_folder },
 	{ "output_file", 		CFG_STR_PTR, 	&config_output_file },
