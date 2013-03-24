@@ -638,6 +638,7 @@ static char** command_to_argv(const char* command)
 			{
 				append_string_n(&temp, parts[i], len-1);
 				in_quote = 0;
+
 				argv = (char**)realloc(argv, sizeof(char*) * (argc+2));
 				argv[argc] = strdup(temp);
 				free(temp);
@@ -840,4 +841,12 @@ void filter_unprintable(char* str, int len)
 			continue;
 		str[i] = ' ';
 	}
+}
+
+void append_to_array(struct mrt_array* arr, void* to_append)
+{
+	arr->ptr = (void**)realloc(arr->ptr, sizeof(void*) * (arr->size+2));
+	arr->ptr[arr->size] = to_append;
+	arr->size = arr->size+1;
+	arr->ptr[arr->size] = NULL;
 }
