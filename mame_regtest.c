@@ -126,6 +126,7 @@ struct image_entry {
 	xmlChar* device_file;
 	xmlChar* device_interface; /* TODO: do we even need this? */
 	xmlChar* device_filter;
+	xmlChar* device_slot;
 	struct image_entry* next;
 };
 
@@ -624,6 +625,7 @@ static void free_image_entry(struct image_entry* image)
 	xmlFree(image->device_file);
 	xmlFree(image->device_interface);
 	xmlFree(image->device_filter);
+	xmlFree(image->device_slot);
 	free(image);
 }
 
@@ -695,9 +697,11 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 							xmlChar* name_key = xmlGetProp(part_child, (const xmlChar*)"name");
 							if( xmlStrcmp(name_key, (const xmlChar*)"compatibility") == 0 )
 								image->device_filter = xmlGetProp(part_child, (const xmlChar*)"value");
+							else if( xmlStrcmp(name_key, (const xmlChar*)"slot") == 0 )
+								image->device_slot = xmlGetProp(part_child, (const xmlChar*)"value");
 							xmlFree(name_key);
 							name_key = NULL;
-							if( image->device_filter )
+							if( image->device_filter && image->device_slot )
 								break;
 						}
 					}
