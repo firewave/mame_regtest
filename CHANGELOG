@@ -607,6 +607,7 @@
 	- filter unprintable characters before writing to XML
 	- added mrt_array and append_to_array() to common.c/.h
 	- added "noreturn" attribute to cleanup_and_exit() and removed unnecessary hack to silence compiler from main()
+	- added missing static to some global variables
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO

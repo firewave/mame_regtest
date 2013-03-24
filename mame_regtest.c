@@ -162,7 +162,7 @@ static char* dummy_root = NULL;
 static char* pause_file = NULL;
 static char pid_str[10] = "";
 static int mameconfig_ver = 10;
-struct driver_info* global_driv_inf = NULL;
+static struct driver_info* global_driv_inf = NULL;
 
 /* constant string variables */
 static const char* const xpath_placeholder = "DRIVER_ROOT";
@@ -228,7 +228,7 @@ static int config_hack_softwarelist = 0;
 static int config_test_frontend = 1;
 static int config_use_slots = 0;
 
-struct config_entry mrt_config[] =
+static struct config_entry mrt_config[] =
 {
 	{ "executable",				CFG_STR_PTR,	&config_mame_exe },
 	{ "str",					CFG_STR_PTR,	&config_str_str },
