@@ -584,6 +584,8 @@ static void cleanup_and_exit(int exitcode, const char* errstr)
 	
 	free(dummy_root);
 	dummy_root = NULL;
+
+	xmlCleanupParser();
 	
 #ifdef LOG_ALLOC
 	print_leaked_pointers();

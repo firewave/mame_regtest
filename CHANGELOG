@@ -610,6 +610,7 @@
 	- added missing static to some global variables
 	- added option "no_execution" to perform testruns without executing the binaries
 	- added device_slot to image_entry and set it in read_softlist_entry()
+	- added missing xmlCleanupParser() call in cleanup_and_exit()
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO
