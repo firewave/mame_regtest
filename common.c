@@ -822,7 +822,7 @@ void* create_thread()
 
 void wait_for_thread(void* thread)
 {
-#if WIN32
+#ifdef WIN32
 	WaitForSingleObject((HANDLE)thread, INFINITE);
 #else
 	void* thread_ret = NULL;
