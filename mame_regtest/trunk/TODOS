@@ -146,6 +146,15 @@ In file included from /usr/include/libxml2/libxml/parser.h:16:0,
 		- make software fitering optional
 		- remove use_sound and use_throttle
 		- add switch to test softlist entries with and without interface
+		- also run softlist entries with empty slot
+		- fix warnings
+		- fix LOG_ALLOC
+		- get fully working with Visual Studio and profile it
+		- implement theexecute one entry per slot as use_softwarelist=3
+		- run with all parts of multi-part disks
+			softwarelistname:softwarename:partname
+		- make running with all parts another mode as well
+		- remove pngcmp from distribution
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
