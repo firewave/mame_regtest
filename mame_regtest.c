@@ -152,7 +152,6 @@ static int is_debug = 0;
 
 static xmlChar* app_ver = NULL;
 static char* debugscript_file = NULL;
-static char* listxml_output = NULL;
 static char* temp_folder = NULL;
 #ifndef USE_MRT_SYSTEM
 static char* stdout_temp_file = NULL;
@@ -556,10 +555,6 @@ static void cleanup_and_exit(int exitcode, const char* errstr)
 		debugscript_file = NULL;
 	}	
 
-	if( listxml_output ) {
-		free(listxml_output);
-		listxml_output = NULL;
-	}
 	config_free(mrt_config);
 
 #ifndef USE_MRT_SYSTEM
@@ -2425,10 +2420,6 @@ int main(int argc, char *argv[])
 			printf("using output folder: %s\n", config_output_folder);
 	}
 
-	append_string(&listxml_output, config_output_folder);
-	append_string(&listxml_output, FILESLASH);
-	append_string(&listxml_output, "listxml.xml");
-
 	if( config_verbose ) {
 		printf("str: %s\n", config_str_str);
 
@@ -2619,7 +2610,9 @@ int main(int argc, char *argv[])
 	printf("\n"); /* for output formating */
 
 	if( !config_gamelist_xml_file || (*config_gamelist_xml_file == 0) ) {
-		append_string(&config_gamelist_xml_file, listxml_output); 
+		append_string(&config_gamelist_xml_file, config_output_folder);
+		append_string(&config_gamelist_xml_file, FILESLASH);
+		append_string(&config_gamelist_xml_file, "listxml.xml");
 
 		/* TODO: merge this with frontend code? */
 		printf("writing -listxml output\n");
