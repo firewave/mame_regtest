@@ -155,6 +155,36 @@ In file included from /usr/include/libxml2/libxml/parser.h:16:0,
 			softwarelistname:softwarename:partname
 		- make running with all parts another mode as well
 		- remove pngcmp from distribution
+		- group execution by sourcefile
+		- magictg.xml
+Entity: line 3: parser error : invalid character in attribute value
+0;Unhandled register: 3fff&#10;Unhandled register: 3fff 1c00&#10;PFLAGS: ea&#10;
+
+                                                                               ^
+
+Entity: line 3: parser error : attributes construct error
+0;Unhandled register: 3fff&#10;Unhandled register: 3fff 1c00&#10;PFLAGS: ea&#10;
+
+                                                                               ^
+
+Entity: line 3: parser error : Couldn't find end of Start Tag result line 3
+0;Unhandled register: 3fff&#10;Unhandled register: 3fff 1c00&#10;PFLAGS: ea&#10;
+
+                                                                               ^
+
+Entity: line 3: parser error : PCDATA invalid Char value 12
+0;Unhandled register: 3fff&#10;Unhandled register: 3fff 1c00&#10;PFLAGS: ea&#10;
+
+                                                                               ^
+
+Entity: line 13: parser error : Opening and ending tag mismatch: output line 2 a
+nd result
+  </result>
+           ^
+Entity: line 14: parser error : Extra content at the end of the document
+</output>
+^
+		- try to store timing information as well
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
