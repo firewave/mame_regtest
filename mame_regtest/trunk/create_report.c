@@ -198,9 +198,7 @@ struct report_summary
 	int crashed;
 	int clipped;
 	int mandatory;
-	int aborted;
 	int missing;
-	int unknown;
 };
 
 static void summary_incr(struct report_summary* summary, const xmlChar* exitcode_key)
@@ -208,18 +206,14 @@ static void summary_incr(struct report_summary* summary, const xmlChar* exitcode
 	if( xmlStrcmp(exitcode_key, (const xmlChar*)"0") == 0 )
 		return;
 
-	if( xmlStrcmp(exitcode_key, (const xmlChar*)"1") == 0 )
-		summary->aborted++;
-	else if( xmlStrcmp(exitcode_key, (const xmlChar*)"2") == 0 )
+	if( xmlStrcmp(exitcode_key, (const xmlChar*)"2") == 0 )
 		summary->missing++;
 	else if( xmlStrcmp(exitcode_key, (const xmlChar*)"3") == 0 )
 		summary->errors++;
 	else if( xmlStrcmp(exitcode_key, (const xmlChar*)"4") == 0 )
 		summary->mandatory++;
-	else if( xmlStrcmp(exitcode_key, (const xmlChar*)"100") == 0 || xmlStrcmp(exitcode_key, (const xmlChar*)"-1073740771") == 0 || xmlStrcmp(exitcode_key, (const xmlChar*)"-1073740940") == 0 || xmlStrcmp(exitcode_key, (const xmlChar*)"-1073741819") == 0 || xmlStrcmp(exitcode_key, (const xmlChar*)"-2147483645") == 0 )
-		summary->crashed++;
 	else
-		summary->unknown++;
+		summary->crashed++; /* TODO: way to differenciate between asserts and crashes? */
 }
 
 struct report_cb_data
@@ -847,7 +841,6 @@ static void create_report()
 		fprintf(report_fd, "  * %d with memory leaks\n", r_cb_data.summary.memleaks);
 		fprintf(report_fd, "  * %d with sound clipping\n", r_cb_data.summary.clipped);
 		fprintf(report_fd, "  * %d with missing mandatory devices\n", r_cb_data.summary.mandatory);
-		fprintf(report_fd, "  * %d unknown\n", r_cb_data.summary.unknown);
 	}
 	
 	if( config_report_type == 1 )
