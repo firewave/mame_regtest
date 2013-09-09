@@ -613,6 +613,7 @@
 	- added missing xmlCleanupParser() call in cleanup_and_exit()
 	- updated WARNINGS in makefile and added clang-specific ones
 	- removed unnecessary global variable listxml_output
+	- moved get_xpath_nodeset() from mame_regtest.c to common.c/.h
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO

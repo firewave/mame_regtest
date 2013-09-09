@@ -191,11 +191,7 @@ void mrt_xmlFree(void* ptr)
 	}
 }
 
-#include "common.h"
-
 #else
-
-#include "common.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -262,7 +258,10 @@ void mrt_xmlFree(void* ptr)
 #define IN_LIBXML
 #endif
 #include "libxml/xmlmemory.h"
+#include "libxml/xpath.h"
 #endif
+
+#include "common.h"
 
 #ifndef WIN32
 int mrt_getch()
@@ -849,4 +848,32 @@ void append_to_array(struct mrt_array* arr, void* to_append)
 	arr->ptr[arr->size] = to_append;
 	arr->size = arr->size+1;
 	arr->ptr[arr->size] = NULL;
+}
+
+/* result must be free'd with xmlXPathFreeNodeSet() */
+xmlNodeSetPtr get_xpath_nodeset(xmlDocPtr doc, const xmlChar* xpath_expr)
+{
+	xmlNodeSetPtr nodeset = NULL;
+	
+	xmlXPathContextPtr xpathCtx = xmlXPathNewContext(doc);
+	if( xpathCtx ) {
+		xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(xpath_expr, xpathCtx);
+		if( xpathObj ) {
+			nodeset = xpathObj->nodesetval;
+
+			xpathObj->nodesetval = NULL;
+
+			xmlXPathFreeObject(xpathObj);
+		}
+		else {
+			fprintf(stderr, "could not evaluate XPath expression\n");
+		}
+
+		xmlXPathFreeContext(xpathCtx);
+	}
+	else {
+		fprintf(stderr, "could not create XPath context\n");
+	}
+	
+	return nodeset;
 }
