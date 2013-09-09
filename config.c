@@ -23,6 +23,7 @@
 #define IN_LIBXML
 #endif
 #include "libxml/parser.h"
+#include "libxml/xpath.h"
 
 #include "common.h"
 

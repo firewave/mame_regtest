@@ -286,34 +286,6 @@ static void cleanup_and_exit(int exitcode, const char* errstr) ATTR_NORETURN;
 static int get_MHDR_data(FILE* in_fd, unsigned int* MHDR_width, unsigned int* MHDR_height);
 static void cleanup_driver_info_list(struct driver_info* driv_inf);
 
-/* result must be free'd with xmlXPathFreeNodeSet() */
-static xmlNodeSetPtr get_xpath_nodeset(xmlDocPtr doc, const xmlChar* xpath_expr)
-{
-	xmlNodeSetPtr nodeset = NULL;
-	
-	xmlXPathContextPtr xpathCtx = xmlXPathNewContext(doc);
-	if( xpathCtx ) {
-		xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(xpath_expr, xpathCtx);
-		if( xpathObj ) {
-			nodeset = xpathObj->nodesetval;
-
-			xpathObj->nodesetval = NULL;
-
-			xmlXPathFreeObject(xpathObj);
-		}
-		else {
-			fprintf(stderr, "could not evaluate XPath expression\n");
-		}
-
-		xmlXPathFreeContext(xpathCtx);
-	}
-	else {
-		fprintf(stderr, "could not create XPath context\n");
-	}
-	
-	return nodeset;
-}
-
 static void append_driver_info(char** str, struct driver_entry* de)
 {
 	append_string(str, de->name);
