@@ -48,7 +48,7 @@ void print_leaked_pointers();
 #endif
 #define mrt_getch getch
 #else
-int mrt_getch();
+int mrt_getch(void);
 #endif
 
 #ifdef WIN32
@@ -135,9 +135,9 @@ void replace_string(const char* input, char** output, const char* old_str, const
 int mrt_system(const char* command, char** stdout_str, char** stderr_str);
 #endif
 
-void libxml2_init();
+void libxml2_init(void);
 
-void* create_thread();
+void* create_thread(void);
 void wait_for_thread(void* thread);
 
 void filter_unprintable(char* str, int len);
