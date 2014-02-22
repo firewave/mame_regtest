@@ -615,6 +615,7 @@
 	- removed unnecessary global variable listxml_output
 	- moved get_xpath_nodeset() from mame_regtest.c to common.c/.h
 	- suppress Linux/Unix-related messages in stdout by using SDL dummy drivers for video and audio
+	- removed pngcmp binary and source since it is not part of official MAME/MESS
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO
