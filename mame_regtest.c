@@ -2536,6 +2536,11 @@ int main(int argc, char *argv[])
 
 	printf("\n"); /* for output formating */
 	
+	/* set SDL dummy drivers to avoid stdout messages on Linux/Unix */
+	setenv("SDL_AUDIODRIVER", "dummy", 1);
+	setenv("SDL_VIDEODRIVER", "dummy", 1);
+	setenv("SDLMAME_DESKTOPDIM", "1024x768", 1);
+	
 	if( config_test_frontend ) {
 		printf("testing frontend options\n");
 		static const char* const frontend_opts[] = { "validate", "listfull", "listclones", "listbrothers", "listcrc", "listroms", "listsamples", "verifyroms", "verifysamples", "verifysoftware", "listdevices", "listslots", "listmedia", "listsoftware", "showusage", "showconfig" };
