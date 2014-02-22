@@ -264,7 +264,7 @@ void mrt_xmlFree(void* ptr)
 #include "common.h"
 
 #ifndef WIN32
-int mrt_getch()
+int mrt_getch(void)
 {
 	struct termios oldt, newt;
 	int ch;
@@ -787,7 +787,7 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 }
 #endif
 
-void libxml2_init()
+void libxml2_init(void)
 {
 	if(!xmlFree)
 		xmlMemGet(&xmlFree, &xmlMalloc, &xmlRealloc, NULL);
@@ -807,7 +807,7 @@ static void* WorkerFuntion(void* data)
 #endif
 }
 
-void* create_thread()
+void* create_thread(void)
 {
 #ifdef WIN32
 	return (void*)_beginthread(WorkerFuntion, 0, NULL);
