@@ -26,22 +26,8 @@ mame_regtest returncodes:
 	1 - error
 
 pngcmp:
-	- based on src/tools/regrep.c from MAME distribution
+	- is built as part of the MAME/MESS "tools" target - please copy it from an existing installation to the mame_regtest folder
 	- retuncodes:
 		0 - images are identical - no diff written
 		1 - images are identical - diff written
 	   -1 - an error occured
-	
-pngcmp compilation:
-	Needs to be compiled with MAME. Just copy pngcmp.c to the src/tools/ folder of MAME and add the following to src/tools/tools.mak:
-	
-#-------------------------------------------------
-# pngcmp
-#-------------------------------------------------
-
-PNGCMPOBJS = \
-	$(TOOLSOBJ)/pngcmp.o \
-
-pngcmp$(EXE): $(PNGCMPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
