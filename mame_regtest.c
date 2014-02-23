@@ -23,8 +23,6 @@
 #define chdir _chdir
 #undef getcwd
 #define getcwd _getcwd
-#undef putenv
-#define putenv _putenv
 #undef getpid
 #define getpid _getpid
 #endif
@@ -2647,9 +2645,9 @@ int main(int argc, char *argv[])
 	printf("\n"); /* for output formating */
 	
 	/* set SDL dummy drivers to avoid stdout messages on Linux/Unix */
-	setenv("SDL_AUDIODRIVER", "dummy", 1);
-	setenv("SDL_VIDEODRIVER", "dummy", 1);
-	setenv("SDLMAME_DESKTOPDIM", "1024x768", 1);
+	mrt_setenv("SDL_AUDIODRIVER", "dummy");
+	mrt_setenv("SDL_VIDEODRIVER", "dummy");
+	mrt_setenv("SDLMAME_DESKTOPDIM", "1024x768");
 	
 	if( config_test_frontend ) {
 		printf("testing frontend options\n");
@@ -2782,8 +2780,8 @@ int main(int argc, char *argv[])
 
 	/* setup OSDPROCESSORS */
 	char osdprocessors_tmp[128];
-	snprintf(osdprocessors_tmp, sizeof(osdprocessors_tmp), "OSDPROCESSORS=%d", config_osdprocessors);
-	putenv(osdprocessors_tmp);
+	snprintf(osdprocessors_tmp, sizeof(osdprocessors_tmp), "%d", config_osdprocessors);
+	mrt_setenv("OSDPROCESSORS", osdprocessors_tmp);
 
 	printf("\n");
 	process_driver_info_list(global_driv_inf);	

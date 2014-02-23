@@ -877,3 +877,12 @@ xmlNodeSetPtr get_xpath_nodeset(xmlDocPtr doc, const xmlChar* xpath_expr)
 	
 	return nodeset;
 }
+
+int mrt_setenv(const char* name, const char* value)
+{
+#ifdef WIN32
+	return _putenv_s(name, value);
+#else
+	return setenv(name, value, 1);
+#endif
+}

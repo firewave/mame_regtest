@@ -153,4 +153,6 @@ void append_to_array(struct mrt_array* arr, void* to_append);
 /* result must be free'd with xmlXPathFreeNodeSet() */
 xmlNodeSetPtr get_xpath_nodeset(xmlDocPtr doc, const xmlChar* xpath_expr);
 
+int mrt_setenv(const char* name, const char* value);
+
 #endif
