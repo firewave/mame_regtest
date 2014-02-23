@@ -1121,7 +1121,7 @@ static char* create_commandline(struct driver_entry* de)
 	return sys;
 }
 
-static int execute_mame(struct driver_entry* de, const char* parameters, int redirect, int change_dir, xmlNodePtr* result, char** cmd_out, char** stdout_out)
+static int execute_mame(struct driver_entry* de, const char* parameters, int redirect, int change_dir, int add_cmd, xmlNodePtr output_node, char** stdout_out)
 {
 	print_driver_info(de, stdout);
 	if( config_use_autosave && de && de->autosave )
@@ -1161,10 +1161,8 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 	if( config_verbose )
 		printf("system call: %s\n", sys);
 		
-	if( cmd_out )
-		*cmd_out = sys;
-
 	int sys_res = -1;
+	xmlNodePtr result = NULL;
 		
 	if( !de || !config_no_execution )
 	{
@@ -1205,38 +1203,43 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 #endif
 
 		/* TODO: delete std* output files */
-		if( result ) {
-			*result = xmlNewNode(NULL, (const xmlChar*)"result");
-			char tmp[128];
-			snprintf(tmp, sizeof(tmp), "%d", sys_res);
-			xmlNewProp(*result, (const xmlChar*)"exitcode", (const xmlChar*)tmp);
+		result = xmlNewNode(NULL, (const xmlChar*)"result");
+		char tmp[128];
+		snprintf(tmp, sizeof(tmp), "%d", sys_res);
+		xmlNewProp(result, (const xmlChar*)"exitcode", (const xmlChar*)tmp);
 #ifndef USE_MRT_SYSTEM
-			char* stdout_str = NULL;
-			if( redirect && read_file(stdout_temp_file, &stdout_str) == 0 ) {
+		char* stdout_str = NULL;
+		if( redirect && read_file(stdout_temp_file, &stdout_str) == 0 ) {
 #else
-			if( stdout_str ) {
+		if( stdout_str ) {
 #endif
-				filter_unprintable(stdout_str, strlen(stdout_str));
-				xmlNewProp(*result, (const xmlChar*)"stdout", (const xmlChar*)stdout_str);
-				free(stdout_str);
-				stdout_str = NULL;
-			}
+			filter_unprintable(stdout_str, strlen(stdout_str));
+			xmlNewProp(result, (const xmlChar*)"stdout", (const xmlChar*)stdout_str);
+			free(stdout_str);
+			stdout_str = NULL;
+		}
 #ifndef USE_MRT_SYSTEM
-			char* stderr_str = NULL;
-			if( redirect && read_file(stderr_temp_file, &stderr_str) == 0 ) {
+		char* stderr_str = NULL;
+		if( redirect && read_file(stderr_temp_file, &stderr_str) == 0 ) {
 #else
-			if( stderr_str ) {
+		if( stderr_str ) {
 #endif
-				filter_unprintable(stderr_str, strlen(stderr_str));
-				xmlNewProp(*result, (const xmlChar*)"stderr", (const xmlChar*)stderr_str);
-				free(stderr_str);
-				stderr_str = NULL;
-			}
+			filter_unprintable(stderr_str, strlen(stderr_str));
+			xmlNewProp(result, (const xmlChar*)"stderr", (const xmlChar*)stderr_str);
+			free(stderr_str);
+			stderr_str = NULL;
 		}
 	}
 	
-	if( !cmd_out )
-		free(sys);
+	if( result ) {
+		xmlAddChild(output_node, result);
+		build_output_xml(dummy_root, result);
+	}
+	
+	if( add_cmd && output_node )
+		xmlNewProp(output_node, (const xmlChar*)"cmd", (const xmlChar*)sys);
+	
+	free(sys);
 	sys = NULL;
 
 	return sys_res == 0 ? 1 : 0;
@@ -1362,9 +1365,6 @@ static void execute_mame2(struct driver_entry* de)
 		printf("\n");
 	}
 
-	xmlNodePtr result1 = NULL;
-	xmlNodePtr result2 = NULL;
-
 	xmlDocPtr output_doc = xmlNewDoc((const xmlChar*)"1.0");
 	xmlNodePtr output_node = xmlNewNode(NULL, (const xmlChar*)"output");
 	xmlDocSetRootElement(output_doc, output_node);
@@ -1410,27 +1410,10 @@ static void execute_mame2(struct driver_entry* de)
 	}
 
 	char* params = create_commandline(de);	
-	char* cmd = NULL;
-	int res = execute_mame(de, params, 1, 1, &result1, &cmd, NULL);
-	
-	if( cmd ) {
-		xmlNewProp(output_node, (const xmlChar*)"cmd", (const xmlChar*)cmd);
-		free(cmd);
-		cmd = NULL;
-	}
-
-	if( result1 ) {
-		xmlAddChild(output_node, result1);
-		build_output_xml(dummy_root, result1);
-	}
+	int res = execute_mame(de, params, 1, 1, 1, output_node, NULL);
 
 	if( res == 1 && config_use_autosave && de->autosave ) {
-		execute_mame(de, params, 1, 1, &result2, NULL, NULL);
-
-		if( result2 ) {
-			xmlAddChild(output_node, result2);
-			build_output_xml(dummy_root, result2);
-		}
+		execute_mame(de, params, 1, 1, 0, output_node, NULL);
 	}
 	
 	free(params);
@@ -1653,7 +1636,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				
 				if( config_verbose )
 					printf("writing -listsoftware %s output\n", (const char*)actual_driv_inf->name);
-				execute_mame(NULL, mame_call, 0, 0, NULL, NULL, &stdout_str);
+				execute_mame(NULL, mame_call, 0, 0, 0, NULL, &stdout_str);
 				
 				free(mame_call);
 				mame_call = NULL;
@@ -2566,7 +2549,7 @@ int main(int argc, char *argv[])
 			append_string(&cmd, "-");
 			append_string(&cmd, frontend_opts[i]);
 
-			execute_mame(NULL, cmd, 0, 0, NULL, NULL, &stdout_str);
+			execute_mame(NULL, cmd, 0, 0, 0, NULL, &stdout_str);
 			
 			free(cmd);
 			cmd = NULL;
@@ -2607,7 +2590,7 @@ int main(int argc, char *argv[])
 		char* mame_call = NULL;
 		append_string(&mame_call, "-listxml");
 
-		int listxml_res = execute_mame(NULL, mame_call, 0, 0, NULL, NULL, &stdout_str);
+		int listxml_res = execute_mame(NULL, mame_call, 0, 0, 0, NULL, &stdout_str);
 
 		free(mame_call);
 		mame_call = NULL;
