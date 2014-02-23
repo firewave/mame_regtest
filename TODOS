@@ -53,7 +53,6 @@ mame_regtest
 			- add option with folder for device XMLs?
 		- add XPath support for software lists
 		- measure the real time necessary for the execution to detect slowdowns
-		- add support for disks in softlist FIXED?
 		- all bios/ramsize/configuration/dipswitch combinations
 			- call function with array
 			- process the first entry and call itself with a smaller array
@@ -135,26 +134,18 @@ mame_regtest
 In file included from /usr/include/libxml2/libxml/parser.h:16:0,
                  from mame_regtest.c:46:
 /usr/include/libxml2/libxml/tree.h:88:27: warning: shadowed declaration is here [-Wshadow]
-		- avoid SDLMAME issues
-			export SDL_VIDEODRIVER=dummy
-			export SDLMAME_DESKTOPDIM=1024x768
 		- add core dump handling/enabling
 			- multi custom commands
 		- load -listsofware XML on start-up to check for schema errors
-		- add verification only (no execution just logging)
 		- lookup interface via slots names?
 		- make software fitering optional
 		- remove use_sound and use_throttle
 		- add switch to test softlist entries with and without interface
-		- also run softlist entries with empty slot
+		- also run a softlist entry with empty slot with use_softwarelist=3
 		- fix warnings
 		- fix LOG_ALLOC
 		- get fully working with Visual Studio and profile it
-		- implement theexecute one entry per slot as use_softwarelist=3
-		- run with all parts of multi-part disks
-			softwarelistname:softwarename:partname
-		- make running with all parts another mode as well
-		- remove pngcmp from distribution
+		- make running with all parts another mode as well?
 		- group execution by sourcefile
 		- magictg.xml
 Entity: line 3: parser error : invalid character in attribute value
@@ -185,6 +176,27 @@ Entity: line 14: parser error : Extra content at the end of the document
 </output>
 ^
 		- try to store timing information as well
+		- ALSA lib seq_hw.c:457:(snd_seq_hw_open) open /dev/snd/seq failed: Permission denied
+			sudo modprobe snd_seq
+		-
+			  <result exitcode="0" stdout="WARNING: font Liberation Sans, is not TrueType or BDF, using MAME default&#10; 250 INITIALIZING...Average speed: 763.79% (1 seconds)&#10;2560 tagmap lookups&#10;" stderr="ALSA lib confmisc.c:768:(parse_card) cannot find card '0'&#10;ALSA lib conf.c:4248:(_snd_config_evaluate) function snd_func_card_driver returned error: No such file or directory&#10;ALSA lib confmisc.c:392:(snd_func_concat) error evaluating strings&#10;ALSA lib conf.c:4248:(_snd_config_evaluate) function snd_func_concat returned error: No such file or directory&#10;ALSA lib confmisc.c:1251:(snd_func_refer) error evaluating name&#10;ALSA lib conf.c:4248:(_snd_config_evaluate) function snd_func_refer returned error: No such file or directory&#10;ALSA lib conf.c:4727:(snd_config_expand) Evaluate error: No such file or directory&#10;ALSA lib pcm.c:2239:(snd_pcm_open_noupdate) Unknown PCM default&#10;">
+			molecula.xml
+			Entity: line 3: parser error : invalid character in attribute value
+																						   ^
+			Entity: line 3: parser error : attributes construct error
+																						   ^
+			Entity: line 3: parser error : Couldn't find end of Start Tag result line 3
+																						   ^
+			Entity: line 3: parser error : PCDATA invalid Char value 12
+																						   ^
+			Entity: line 13: parser error : Opening and ending tag mismatch: output line 2 and result
+			  </result>
+					   ^
+			Entity: line 14: parser error : Extra content at the end of the document
+			</output>
+			^
+		- make the pngcmp path configurable so the file doesn't need to be copied
+		- review the default osdprocessors handling
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -242,7 +254,6 @@ Entity: line 14: parser error : Extra content at the end of the document
 			- #undef htonl might help
 		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER? LSB_FIRST?)
 		- make doesn't work when the additional files already exist and you compile by target (e.g. mame_regtest.exe)
-		- create working x64 version
 		
 	Visual Studio:
 		- move the Microsoft-specific defines into a seperate header
