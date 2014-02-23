@@ -1128,9 +1128,6 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 		printf(" (autosave)");
 	printf("\n");
 
-	if( config_no_execution && de )
-		return 1;
-
 	char* sys = NULL;
 	
 #ifndef USE_MRT_SYSTEM
@@ -1167,75 +1164,80 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 	if( cmd_out )
 		*cmd_out = sys;
 
-	/* TODO: errorhandling */
-	/* TODO: dummy_root needs to be different for each thread */
-	mrt_mkdir(dummy_root);
-	create_cfg(de, 1);
-	create_cfg(de, 2);
-	int ch_res = -1;
-	if( change_dir )
-		ch_res = chdir(dummy_root);
+	int sys_res = -1;
+		
+	if( !de || !config_no_execution )
+	{
+		/* TODO: errorhandling */
+		/* TODO: dummy_root needs to be different for each thread */
+		mrt_mkdir(dummy_root);
+		create_cfg(de, 1);
+		create_cfg(de, 2);
+		int ch_res = -1;
+		if( change_dir )
+			ch_res = chdir(dummy_root);
 #ifndef USE_MRT_SYSTEM
-	int sys_res = system(sys);
+		sys_res = system(sys);
 #ifndef WIN32
-	sys_res = WEXITSTATUS(sys_res);
+		sys_res = WEXITSTATUS(sys_res);
 #endif
 #else
-	char* stdout_str = NULL;
-	char* stderr_str = NULL;
-	int sys_res = -1;
-	if( redirect )
-		sys_res = mrt_system(sys, &stdout_str, &stderr_str);
-	else if( stdout_out )
-		sys_res = mrt_system(sys, stdout_out, NULL);
-	else
-		sys_res = mrt_system(sys, NULL, NULL);
+		char* stdout_str = NULL;
+		char* stderr_str = NULL;
+		int sys_res = -1;
+		if( redirect )
+			sys_res = mrt_system(sys, &stdout_str, &stderr_str);
+		else if( stdout_out )
+			sys_res = mrt_system(sys, stdout_out, NULL);
+		else
+			sys_res = mrt_system(sys, NULL, NULL);
 #endif
-	if( change_dir )
-		ch_res = chdir(current_path);
-	
-	/* TODO: check result */
-	(void)ch_res;
+		if( change_dir )
+			ch_res = chdir(current_path);
+		
+		/* TODO: check result */
+		(void)ch_res;
+		
+#ifndef USE_MRT_SYSTEM
+		/* TODO: errorhandling */
+		if( stdout_out )
+			read_file(stdout_temp_file, stdout_out);
+#endif
+
+		/* TODO: delete std* output files */
+		if( result ) {
+			*result = xmlNewNode(NULL, (const xmlChar*)"result");
+			char tmp[128];
+			snprintf(tmp, sizeof(tmp), "%d", sys_res);
+			xmlNewProp(*result, (const xmlChar*)"exitcode", (const xmlChar*)tmp);
+#ifndef USE_MRT_SYSTEM
+			char* stdout_str = NULL;
+			if( redirect && read_file(stdout_temp_file, &stdout_str) == 0 ) {
+#else
+			if( stdout_str ) {
+#endif
+				filter_unprintable(stdout_str, strlen(stdout_str));
+				xmlNewProp(*result, (const xmlChar*)"stdout", (const xmlChar*)stdout_str);
+				free(stdout_str);
+				stdout_str = NULL;
+			}
+#ifndef USE_MRT_SYSTEM
+			char* stderr_str = NULL;
+			if( redirect && read_file(stderr_temp_file, &stderr_str) == 0 ) {
+#else
+			if( stderr_str ) {
+#endif
+				filter_unprintable(stderr_str, strlen(stderr_str));
+				xmlNewProp(*result, (const xmlChar*)"stderr", (const xmlChar*)stderr_str);
+				free(stderr_str);
+				stderr_str = NULL;
+			}
+		}
+	}
 	
 	if( !cmd_out )
 		free(sys);
 	sys = NULL;
-	
-#ifndef USE_MRT_SYSTEM
-	/* TODO: errorhandling */
-	if( stdout_out )
-		read_file(stdout_temp_file, stdout_out);
-#endif
-
-	/* TODO: delete std* output files */
-	if( result ) {
-		*result = xmlNewNode(NULL, (const xmlChar*)"result");
-		char tmp[128];
-		snprintf(tmp, sizeof(tmp), "%d", sys_res);
-		xmlNewProp(*result, (const xmlChar*)"exitcode", (const xmlChar*)tmp);
-#ifndef USE_MRT_SYSTEM
-		char* stdout_str = NULL;
-		if( redirect && read_file(stdout_temp_file, &stdout_str) == 0 ) {
-#else
-		if( stdout_str ) {
-#endif
-			filter_unprintable(stdout_str, strlen(stdout_str));
-			xmlNewProp(*result, (const xmlChar*)"stdout", (const xmlChar*)stdout_str);
-			free(stdout_str);
-			stdout_str = NULL;
-		}
-#ifndef USE_MRT_SYSTEM
-		char* stderr_str = NULL;
-		if( redirect && read_file(stderr_temp_file, &stderr_str) == 0 ) {
-#else
-		if( stderr_str ) {
-#endif
-			filter_unprintable(stderr_str, strlen(stderr_str));
-			xmlNewProp(*result, (const xmlChar*)"stderr", (const xmlChar*)stderr_str);
-			free(stderr_str);
-			stderr_str = NULL;
-		}
-	}
 
 	return sys_res == 0 ? 1 : 0;
 }
