@@ -620,6 +620,8 @@
 	- part names are now read from softwarelists and used for execution ("part<num>" is not being added to output files and folders)
 	- all parts of a softwarelist entry are now being run with "use_softwarelist" set to 1
 	- added support for running the first softwarelist entry for each available slot when "use_softwarelist" is set to 3
+	- added mrt_setenv() to common.c/.h
+	- replaced putenv calls with mrt_setenv()
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO
