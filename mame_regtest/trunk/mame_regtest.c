@@ -1051,6 +1051,7 @@ static char* create_commandline(struct driver_entry* de)
 			append_string(&sys, " -");
 			append_string(&sys, (const char*)images->device_briefname);
 			append_string(&sys, " ");
+			/* TODO: only append quoted when it contains white spaces */
 			append_quoted_string(&sys, (const char*)images->device_file);
 		}
 		
@@ -1167,6 +1168,7 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 		*cmd_out = sys;
 
 	/* TODO: errorhandling */
+	/* TODO: dummy_root needs to be different for each thread */
 	mrt_mkdir(dummy_root);
 	create_cfg(de, 1);
 	create_cfg(de, 2);
@@ -1205,6 +1207,7 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 		read_file(stdout_temp_file, stdout_out);
 #endif
 
+	/* TODO: delete std* output files */
 	if( result ) {
 		*result = xmlNewNode(NULL, (const xmlChar*)"result");
 		char tmp[128];
@@ -1597,6 +1600,8 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 {
 	if( driv_inf == NULL )
 		return;
+		
+	/* TODO: init thread pool */
 
 	struct driver_info* actual_driv_inf = driv_inf;
 	for(;;)
@@ -1821,6 +1826,8 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 		else
 			break;
 	}
+	
+	/* TODO: wait for threads */
 }
 
 static int parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_info** new_driv_inf, struct dipswitch_info** last_dip_info, int type)
