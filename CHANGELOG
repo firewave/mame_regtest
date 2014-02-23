@@ -616,6 +616,10 @@
 	- moved get_xpath_nodeset() from mame_regtest.c to common.c/.h
 	- suppress Linux/Unix-related messages in stdout by using SDL dummy drivers for video and audio
 	- removed pngcmp binary and source since it is not part of official MAME/MESS
+	- added device_part to image_entry
+	- part names are now read from softwarelists and used for execution ("part<num>" is not being added to output files and folders)
+	- all parts of a softwarelist entry are now being run with "use_softwarelist" set to 1
+	- added support for running the first softwarelist entry for each available slot when "use_softwarelist" is set to 3
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO
