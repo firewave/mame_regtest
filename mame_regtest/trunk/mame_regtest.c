@@ -1417,13 +1417,11 @@ static void execute_mame2(struct driver_entry* de)
 		xmlNodePtr devices_node = xmlNewChild(output_node, NULL, (const xmlChar*)"devices", NULL);
 		
 		struct image_entry* images = de->images;
-		while(images) {
+		if (images) {
 			if( (images->device_briefname && xmlStrlen(images->device_briefname) > 0) &&
 				(images->device_file && xmlStrlen(images->device_file) > 0) ) {
 				xmlNewProp(devices_node, images->device_briefname, images->device_file);
 			}
-
-			images = images->next;
 		}
 	}
 	if( de->slot && de->slot->name && de->slotoption ) {
