@@ -622,6 +622,7 @@
 	- added support for running the first softwarelist entry for each available slot when "use_softwarelist" is set to 3
 	- added mrt_setenv() to common.c/.h
 	- replaced putenv calls with mrt_setenv()
+	- increased size of slot_info.slotoptions to 512 to avoid buffer overflow with internal nes slots in MESS
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO

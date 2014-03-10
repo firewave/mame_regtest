@@ -79,7 +79,7 @@ enum cfg_type {
 struct slot_info {
 	xmlChar* name;
 	int slotoption_count;
-	xmlChar* slotoptions[256];
+	xmlChar* slotoptions[512];
 	struct slot_info* next;
 };
 
