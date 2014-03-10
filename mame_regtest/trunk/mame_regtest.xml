@@ -42,6 +42,7 @@
 		<option name='use_dipswitches' value='0'/>
 		<option name='use_configurations' value='0'/>
 		<option name='use_softwarelist' value='0'/>
+		<option name='use_slots' value='0'/>
 		<option name='write_mng' value='0'/>
 		<option name='write_avi' value='0'/>
 		<option name='write_wav' value='0'/>
