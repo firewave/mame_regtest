@@ -67,6 +67,7 @@ mame_regtest
 		- prepare softwarelists before processing the data and store the path in the driver_info
 			- add append flag to copy_file()
 		- run without XML creation
+			- additional mode for "no_execution"
 		- add option "devicefile_dir" to load the mrt_*.xml from
 			- allow image paths to be absolute or relative to the current folder (no ..)
 		- change the image xml format to include driver subnodes, so you don't need one for each driver
@@ -142,10 +143,8 @@ In file included from /usr/include/libxml2/libxml/parser.h:16:0,
 		- remove use_sound and use_throttle
 		- add switch to test softlist entries with and without interface
 		- also run a softlist entry with empty slot with use_softwarelist=3
-		- fix warnings
-		- fix LOG_ALLOC
-		- get fully working with Visual Studio and profile it
-		- make running with all parts another mode as well?
+		- make running with all parts another mode as well
+			- split up the "use_softwarelist" a bit - it's getting confusing
 		- group execution by sourcefile
 		- magictg.xml
 Entity: line 3: parser error : invalid character in attribute value
@@ -197,6 +196,7 @@ Entity: line 14: parser error : Extra content at the end of the document
 			^
 		- make the pngcmp path configurable so the file doesn't need to be copied
 		- review the default osdprocessors handling
+		- add "validate_only" option
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -220,6 +220,10 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- run test_createconfig in dummy_root to avoid usage of existing mame.ini (and other other command-line option calls)
 		- use macros FREE(), XMLFREE() etc. which includes the setting to NULL
 		- port mrt_system() to non-windows systems
+		- replace the counts in the structures with NULL check instead
+		- fix warnings
+		- fix LOG_ALLOC
+		- get fully working with Visual Studio and profile it
 
 	issues/bugs/errorhandling:
 		- avoid duplicated slashes
@@ -259,7 +263,7 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- move the Microsoft-specific defines into a seperate header
 		
 	create_report:
-		- write comparison tool
+		- write comparison tool - FIXED?
 			- parse dir A and check dir B for missing file
 			- parse dir B and check dir A for new files
 			- show the following
@@ -282,8 +286,7 @@ Entity: line 14: parser error : Extra content at the end of the document
 			- add option for main HTML report folder
 			- make HTML report work in Mozilla ( use /ref and /new links)
 		- extract differing frames (also for HTML report)
-		- show PNG differences (use pngcmp)
-		- color codes based on exitcodes
+		- show PNG differences (use pngcmp) - FIXED?
 		- expose the data (collect the necessary XMLs and add them to a subfolder?)
 		- wiki syntax
 			| row1 | row 2 |
@@ -311,7 +314,7 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- try to detect new/missing sets in comparison separately
 		- note differences about bios or ramsize etc. in results
 		- when merged configuration exists in results folder add information to report
-		- comparison doesn't crate output folder - doesn't complain when it's missing either
+		- comparison doesn't create output folder - doesn't complain when it's missing either
 		- add optional to list OPTIONAL warnings
 		- add option to print negative exitcodes in hex
 		- add reports, that parse -log output for like "unmapped writes" and stuff
@@ -327,6 +330,9 @@ Entity: line 14: parser error : Extra content at the end of the document
 			- "uninit"
 			- "Invalid"
 			- "Source and destination overlap"
+		- add option to create_report to bail out on XML error
+		- add report for drivers running < 100%
+		- check print_stderr - seems to include all drivers in report
 			
 	create_image_xml
 		- add more output to create_image_xml
