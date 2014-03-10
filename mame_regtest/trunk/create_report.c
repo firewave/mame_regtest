@@ -167,7 +167,7 @@ static int config_dokuwiki_format = 0;
 static int config_show_memleaks = 0;
 static int config_show_clipped = 0;
 static int config_group_data = 0;
-static int config_report_type = 0; /* 0 = result report - 1 = comparison report - 2 = speed comparison report */
+static int config_report_type = 0; /* 0 = result report - 1 = comparison report - 2 = speed comparison report - 3 = tagmap report*/
 static char* config_compare_folder = NULL;
 static int config_print_stdout = 0;
 static char* config_output_folder = NULL;
@@ -370,6 +370,21 @@ static void convert_br(xmlChar* str)
 	sourcefile_key = NULL; \
 	xmlFree(name_key); \
 	name_key = NULL;
+	
+static xmlChar const *
+xmlStrrstr (xmlChar const *haystack, xmlChar const *needle)
+{
+	xmlChar const *p = haystack;
+	xmlChar const *last_match = NULL;
+
+	while ((p = xmlStrstr (p, needle)) != NULL)
+	{
+	  last_match = p;
+	  p++;
+	}
+
+	return last_match;
+}
 
 static int create_report_from_filename(const char *const filename, struct report_cb_data* r_cb_data, int write_src_header)
 {
@@ -729,6 +744,68 @@ static int create_report_from_filename(const char *const filename, struct report
 			entry_directory = NULL;
 			free(entry_name);
 			entry_name = NULL;
+		}
+		break;
+		
+		case 3:
+		{
+			xmlDocPtr doc;
+			{
+				char* filecontent = NULL;
+				read_file(filename, &filecontent);
+				filter_unprintable(filecontent, strlen(filecontent));
+				doc = xmlReadMemory(filecontent, strlen(filecontent), NULL, "UTF-8", 0);
+				free(filecontent);
+			}
+			if( doc ) {
+				xmlNodePtr output_node = doc->children;				
+				PREPARE_KEYS(output_node)
+			
+				xmlNodePtr output_childs = output_node->children;
+				while( output_childs ) {
+					if( output_childs->type == XML_ELEMENT_NODE ) {
+						if( xmlStrcmp(output_childs->name, (const xmlChar*)"result") == 0 ) {
+							xmlChar* stdout_key = xmlGetProp(output_childs, (const xmlChar*)"stdout");
+
+							/* TODO: make configurable and optional */
+#ifdef WIN32
+							const char* sep = "\r\n";
+							const int sep_len = 2;
+#else
+							const char* sep = "\n";
+							const int sep_len = 1;
+#endif
+							const xmlChar* last_newline = xmlStrrstr(stdout_key, (const xmlChar*)sep);
+							if( last_newline ) {
+								xmlChar* str = xmlStrndup(stdout_key, xmlStrlen(stdout_key) - sep_len);
+								const xmlChar* prev_newline = xmlStrrstr(str, (const xmlChar*)sep);
+								const char* tagmap_str;
+								if( prev_newline == NULL )
+									tagmap_str = (const char*)str;
+								else
+									tagmap_str = (const char*)prev_newline + sep_len;
+								int tagmap_count = 0;
+								sscanf(tagmap_str, "%d tagmap lookups", &tagmap_count);
+								/* TODO: make values configurable */
+								if( tagmap_count > 100000 ) {
+									PRINT_INFO(stdout)
+									printf(" - %d tagmap lookups\n", tagmap_count);
+								}
+								xmlFree(str);
+							}
+							
+							xmlFree(stdout_key);
+							stdout_key = NULL;
+						}
+					}
+					output_childs = output_childs->next;
+				}
+				
+				FREE_KEYS
+		
+				xmlFreeDoc(doc);
+				doc = NULL;
+			}
 		}
 		break;
 	}
