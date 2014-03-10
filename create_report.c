@@ -407,8 +407,10 @@ static int create_report_from_filename(const char *const filename, struct report
 							int memleak_found = stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"--- memory leak warning ---");
 							int clipped_found = stdout_key && xmlStrstr(stdout_key, (const xmlChar*)"clipped") && (xmlStrstr(stdout_key, (const xmlChar*)" 0% samples clipped") == NULL);
 							int mandatory_found = stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"Driver requires");
-							/* TODO: replace with option */
+							/* TODO: make it optional */
 							int reset_scope_found = stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"called within reset scope by");
+							/* TODO: make it optional */
+							int runtime_error_found = stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"runtime error");
 							
 							summary_incr(&r_cb_data->summary, exitcode_key);
 							if(memleak_found)
@@ -422,7 +424,7 @@ static int create_report_from_filename(const char *const filename, struct report
 							int report_stderr = (r_cb_data->print_stderr && stderr_key && xmlStrlen(stderr_key) > 0);
 							int report_clipped = (r_cb_data->show_clipped && clipped_found);
 							
-							if( report_error || report_memleak || report_stdout || report_stderr || report_clipped || reset_scope_found ) {
+							if( report_error || report_memleak || report_stdout || report_stderr || report_clipped || reset_scope_found || runtime_error_found ) {
 								if( r_cb_data->dokuwiki_format )
 								{
 									if( write_src_header ) {
@@ -457,7 +459,7 @@ static int create_report_from_filename(const char *const filename, struct report
 									if( (report_error || report_stdout || report_clipped) && stdout_key && xmlStrlen(stdout_key) > 0 )
 										fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n", stdout_key);
 			
-									if( (report_error || report_memleak || report_stderr || reset_scope_found) && stderr_key && xmlStrlen(stderr_key) > 0 )
+									if( (report_error || report_memleak || report_stderr || reset_scope_found || runtime_error_found) && stderr_key && xmlStrlen(stderr_key) > 0 )
 										fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n", stderr_key);
 									
 									if( cmd_key )
@@ -473,7 +475,7 @@ static int create_report_from_filename(const char *const filename, struct report
 									if( (report_error || report_stdout || report_clipped) && stdout_key && xmlStrlen(stdout_key) > 0 )
 										fprintf(r_cb_data->report_fd, "%s\n", stdout_key);
 			
-									if( (report_error || report_memleak || report_stderr || reset_scope_found) && stderr_key && xmlStrlen(stderr_key) > 0 )
+									if( (report_error || report_memleak || report_stderr || reset_scope_found || runtime_error_found) && stderr_key && xmlStrlen(stderr_key) > 0 )
 										fprintf(r_cb_data->report_fd, "%s\n", stderr_key);
 										
 									if( cmd_key )
