@@ -15,6 +15,10 @@ endif
 
 CFLAGS = $(WARNINGS) $(INCLUDES)
 
+ifneq (,$(findstring clang,$(CC)))
+CFLAGS += -fsanitize=address,undefined
+endif
+
 ifdef DEBUG
 CFLAGS += -g
 else
