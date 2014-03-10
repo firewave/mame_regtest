@@ -631,3 +631,4 @@
 	- removed option "ignore_exitcode_4" and always filter the mandatory device messages
 	- filter unprintable characters from input XMLs
 	- improved summary a bit
+	- "called within reset scope by" errors did not include stderr
