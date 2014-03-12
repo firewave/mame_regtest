@@ -624,6 +624,8 @@
 	- replaced putenv calls with mrt_setenv()
 	- increased size of slot_info.slotoptions to 512 to avoid buffer overflow with internal nes slots in MESS
 	- enabled AddressSanitizer and UndefinedBehaviorSanitizer with clang always
+	- fixed crash in split_string() when no delimiter is found
+	- fixed crash in free_array() when array is NULL
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO

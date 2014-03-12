@@ -561,7 +561,8 @@ char** split_string(const char* str, const char* delims)
 		i++;
 	}
 
-	strings[i] = NULL;
+	if( strings != NULL )
+		strings[i] = NULL;
 
 	free(cpy);
 
@@ -570,11 +571,11 @@ char** split_string(const char* str, const char* delims)
 
 void free_array(char** arr)
 {
+	if( arr == NULL )
+		return;
 	int i;
-	for(i=0;;++i)
+	for(i=0; arr[i] != NULL;++i)
 	{
-		if(arr[i] == NULL)
-			break;
 		free(arr[i]);
 	}
 	free(arr);
