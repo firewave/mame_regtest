@@ -194,7 +194,6 @@ Entity: line 14: parser error : Extra content at the end of the document
 			Entity: line 14: parser error : Extra content at the end of the document
 			</output>
 			^
-		- make the pngcmp path configurable so the file doesn't need to be copied
 		- review the default osdprocessors handling
 		- add "validate_only" option
 
@@ -331,8 +330,14 @@ Entity: line 14: parser error : Extra content at the end of the document
 			- "Invalid"
 			- "Source and destination overlap"
 		- add option to create_report to bail out on XML error
-		- add report for drivers running < 100%
 		- check print_stderr - seems to include all drivers in report
+		- how to get a sorted filelist on linux?
+		- speed report
+			gp2x.c: gp2x - Average speed: 0.00%
+			hyperscan.c: hs - Average speed: 0.00%
+			octopus.c: octopus - Average speed: 0.00%
+		- make the pngcmp path configurable so the file doesn't need to be copied
+		- add option to ignore missing roms in report
 			
 	create_image_xml
 		- add more output to create_image_xml
