@@ -306,21 +306,12 @@ int read_file(const char* file, char** content)
 {
 	FILE* fd = fopen(file, "rb");
 	if( fd ) {
-		char buf[1024];
-		size_t bufsize = 0;
-		size_t read_bytes;
-		int count = 0;
-		while( (read_bytes = fread(buf, 1, sizeof(buf), fd)) != 0 ) {
-			bufsize = (count * sizeof(buf)) + read_bytes;
-			*content = (char*)realloc(*content, bufsize);
-			memcpy(*content + (count * sizeof(buf)), buf, read_bytes);
-			buf[0] = '\0';
-			++count;
-		}
-
-		/* terminate content */
-		*content = (char*)realloc(*content, bufsize + 1);
-		(*content)[bufsize] = '\0';
+		fseek(fd, 0, SEEK_END);
+		long filesize = ftell(fd);
+		fseek(fd, 0, SEEK_SET);
+		*content = (char*)malloc(filesize + 1);
+		fread(*content, 1, filesize, fd);
+		(*content)[filesize] = '\0';
 
 		fclose(fd);
 		fd = NULL;
