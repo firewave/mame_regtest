@@ -926,8 +926,11 @@ static void create_report()
 	if( config_report_type == 1 )
 		fprintf(report_fd, "</body>\n</html>\n");
 
-	fclose(report_fd);
-	report_fd = NULL;
+	if (report_fd != NULL)
+	{ 
+		fclose(report_fd);
+		report_fd = NULL;
+	}
 }
 
 int main(int argc, char *argv[])
