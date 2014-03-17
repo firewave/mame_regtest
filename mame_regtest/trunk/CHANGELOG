@@ -626,6 +626,7 @@
 	- enabled AddressSanitizer and UndefinedBehaviorSanitizer with clang always
 	- fixed crash in split_string() when no delimiter is found
 	- fixed crash in free_array() when array is NULL
+	- greatly improved the speed of read_file()
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO
