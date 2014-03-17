@@ -195,7 +195,6 @@ struct report_summary
 	int executed;
 	int errors;
 	int memleaks;
-	int crashed;
 	int clipped;
 	int mandatory;
 	int missing;
@@ -208,12 +207,10 @@ static void summary_incr(struct report_summary* summary, const xmlChar* exitcode
 
 	if( xmlStrcmp(exitcode_key, (const xmlChar*)"2") == 0 )
 		summary->missing++;
-	else if( xmlStrcmp(exitcode_key, (const xmlChar*)"3") == 0 )
-		summary->errors++;
 	else if( xmlStrcmp(exitcode_key, (const xmlChar*)"4") == 0 )
 		summary->mandatory++;
 	else
-		summary->crashed++; /* TODO: way to differenciate between asserts and crashes? */
+		summary->errors++;
 }
 
 struct report_cb_data
@@ -976,7 +973,6 @@ static void create_report()
 	if( config_dokuwiki_format && config_report_type == 0 ) {
 		fprintf(report_fd, "===== Summary =====\n");
 		fprintf(report_fd, "  * %d executed\n", r_cb_data.summary.executed);
-		fprintf(report_fd, "  * %d crashed\n", r_cb_data.summary.crashed);
 		fprintf(report_fd, "  * %d with errors\n", r_cb_data.summary.errors);
 		fprintf(report_fd, "  * %d with missing roms\n", r_cb_data.summary.missing);
 		fprintf(report_fd, "  * %d with memory leaks\n", r_cb_data.summary.memleaks);
