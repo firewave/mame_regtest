@@ -758,7 +758,8 @@ static int create_report_from_filename(const char *const filename, struct report
 				free(filecontent);
 			}
 			if( doc ) {
-				xmlNodePtr output_node = doc->children;				
+				xmlNodePtr output_node = doc->children;
+				xmlNodePtr devices_node = NULL; // TODO				
 				PREPARE_KEYS(output_node)
 			
 				xmlNodePtr output_childs = output_node->children;
