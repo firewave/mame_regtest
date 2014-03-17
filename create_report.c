@@ -809,6 +809,67 @@ static int create_report_from_filename(const char *const filename, struct report
 			}
 		}
 		break;
+		
+		case 4:
+		{
+			xmlDocPtr doc;
+			{
+				char* filecontent = NULL;
+				read_file(filename, &filecontent);
+				filter_unprintable(filecontent, strlen(filecontent));
+				doc = xmlReadMemory(filecontent, strlen(filecontent), NULL, "UTF-8", 0);
+				free(filecontent);
+			}
+			if( doc ) {
+				xmlNodePtr output_node = doc->children;
+				xmlNodePtr devices_node = NULL; // TODO				
+				PREPARE_KEYS(output_node)
+			
+				xmlNodePtr output_childs = output_node->children;
+				while( output_childs ) {
+					if( output_childs->type == XML_ELEMENT_NODE ) {
+						if( xmlStrcmp(output_childs->name, (const xmlChar*)"result") == 0 ) {
+							xmlChar* stdout_key = xmlGetProp(output_childs, (const xmlChar*)"stdout");
+
+							/* TODO: use this code in speed comparison */
+#ifdef WIN32
+							const char* sep = "\r\n";
+							const int sep_len = 2;
+#else
+							const char* sep = "\n";
+							const int sep_len = 1;
+#endif
+							char** lines = split_string((const char*)stdout_key, sep);
+							int i = 0;
+							for( ; lines != NULL && lines[i] != NULL; ++i )
+							{
+								if( strstr(lines[i], "Average speed:") == NULL )
+									continue;
+								float speed = 0;
+								int seconds = 0;
+								sscanf(lines[i], "Average speed: %f%% (%d seconds)", &speed, &seconds);
+								/* TODO: make values configurable */
+								if( speed < 100.0 ) {
+									PRINT_INFO(stdout)
+									printf(" - Average speed: %.2f%%\n", speed);
+								}
+							}
+							free_array(lines);
+							
+							xmlFree(stdout_key);
+							stdout_key = NULL;
+						}
+					}
+					output_childs = output_childs->next;
+				}
+				
+				FREE_KEYS
+		
+				xmlFreeDoc(doc);
+				doc = NULL;
+			}
+		}
+		break;
 	}
 	
 	return data_written;
