@@ -505,6 +505,7 @@ static int create_report_from_filename(const char *const filename, struct report
 							xmlFree(exitcode_key);
 							exitcode_key = NULL;
 						}
+						// TODO: set this up differently
 						else if( xmlStrcmp(output_childs->name, (const xmlChar*)"devices") == 0 )
 						{
 							devices_node = output_childs;
@@ -795,6 +796,11 @@ static int create_report_from_filename(const char *const filename, struct report
 							xmlFree(stdout_key);
 							stdout_key = NULL;
 						}
+						// TODO: set this up differently
+						else if( xmlStrcmp(output_childs->name, (const xmlChar*)"devices") == 0 )
+						{
+							devices_node = output_childs;
+						}
 					}
 					output_childs = output_childs->next;
 				}
@@ -855,6 +861,11 @@ static int create_report_from_filename(const char *const filename, struct report
 							
 							xmlFree(stdout_key);
 							stdout_key = NULL;
+						}
+						// TODO: set this up differently
+						else if( xmlStrcmp(output_childs->name, (const xmlChar*)"devices") == 0 )
+						{
+							devices_node = output_childs;
 						}
 					}
 					output_childs = output_childs->next;
