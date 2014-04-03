@@ -2649,7 +2649,7 @@ int main(int argc, char *argv[])
 	
 	if( config_test_frontend ) {
 		printf("testing frontend options\n");
-		static const char* const frontend_opts[] = { "validate", "listfull", "listclones", "listbrothers", "listcrc", "listroms", "listsamples", "verifyroms", "verifysamples", "verifysoftware", "listdevices", "listslots", "listmedia", "listsoftware", "showusage", "showconfig" };
+		static const char* const frontend_opts[] = { "validate", "listfull", "listsource", "listclones", "listbrothers", "listcrc", "listroms", "listsamples", "verifyroms", "verifysamples", "listdevices", "listslots", "listmedia", "listsoftware", "verifysoftware", "listmidi", "showconfig", "showusage" };
 		unsigned int i = 0;
 		for(; i < sizeof(frontend_opts) / sizeof(char*); ++i)
 		{
