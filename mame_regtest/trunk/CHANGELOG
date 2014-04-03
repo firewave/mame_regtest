@@ -628,6 +628,8 @@
 	- fixed crash in free_array() when array is NULL
 	- greatly improved the speed of read_file()
 	- added -listsource and -listmidi to "test_frontend"
+	- always include debug information in the binaries
+	- treat compiler warnings as errors
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO

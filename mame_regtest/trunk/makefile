@@ -13,12 +13,10 @@ else
 WARNINGS = -Wall -Wextra -Wformat=2 -Wshadow -Wcast-qual -Wwrite-strings -Wunreachable-code -Wno-shadow -Wno-unused-variable -Wno-cast-qual
 endif
 
-CFLAGS = $(WARNINGS) $(INCLUDES)
+CFLAGS = $(WARNINGS) $(INCLUDES) -g -Werror
 
-ifdef DEBUG
-CFLAGS += -g
-else
-CFLAGS += -O3 -s
+ifndef DEBUG
+CFLAGS += -O3
 endif
 
 ifdef LOG_ALLOC
