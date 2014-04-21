@@ -197,6 +197,7 @@ void mrt_xmlFree(void* ptr)
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
 
 #endif
 
@@ -304,24 +305,48 @@ void append_quoted_string(char** str, const char* str_to_append)
 
 int read_file(const char* file, char** content)
 {
+	int res = -1;
+
 	FILE* fd = fopen(file, "rb");
 	if( fd ) {
-		fseek(fd, 0, SEEK_END);
-		long filesize = ftell(fd);
-		fseek(fd, 0, SEEK_SET);
-		*content = (char*)malloc(filesize + 1);
-		fread(*content, 1, filesize, fd);
-		(*content)[filesize] = '\0';
+		if( fseek(fd, 0, SEEK_END) == 0 )
+		{
+			long filesize = ftell(fd);
+			if( filesize != -1 )
+			{
+				if( fseek(fd, 0, SEEK_SET) == 0)
+				{
+					*content = (char*)malloc(filesize + 1);
+					int num_read = fread(*content, 1, filesize, fd);
+					if( num_read == filesize )
+					{
+						(*content)[filesize] = '\0';
+						res = 0;
+					}
+				}
+				else
+					goto error;
+			}
+			else
+				goto error;
+		}
+	
+		if( res != 0 )
+		{
+			free(*content);
+			*content = NULL;
+		}
 
 		fclose(fd);
 		fd = NULL;
-
-		return 0;
 	}
+	else
+		goto error;
 
-	printf("read_file() - could not open file: %s\n", file);
+	return res;
 
-	return -1;
+error:
+	return errno;
 }
 
 int copy_file(const char* source, const char* dest)

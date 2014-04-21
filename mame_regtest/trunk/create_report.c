@@ -60,13 +60,20 @@ static void build_group_cb(struct parse_callback_data* pcd)
 		if( strstr(pcd->entry_name, ".xml") && strstr(pcd->entry_name, "listxml.xml") == NULL && strstr(pcd->entry_name, "_listsoftware.xml") == NULL )
 		{
 			printf("%s\n", pcd->entry_name);
-			xmlDocPtr doc;
+			xmlDocPtr doc = NULL;
 			{
 				char* filecontent = NULL;
-				read_file(pcd->fullname, &filecontent);
-				filter_unprintable(filecontent, strlen(filecontent));
-				doc = xmlReadMemory(filecontent, strlen(filecontent), NULL, "UTF-8", 0);
-				free(filecontent);
+				int read_res = read_file(pcd->fullname, &filecontent);
+				if( read_res == 0 )
+				{
+					filter_unprintable(filecontent, strlen(filecontent));
+					doc = xmlReadMemory(filecontent, strlen(filecontent), NULL, "UTF-8", 0);
+					free(filecontent);
+				}
+				else
+				{
+					printf("could not read file '%s' (%s)\n", pcd->fullname, strerror(read_res));
+				}
 			}
 			if( doc ) {
 				struct build_group_cb_data* bg_cb_data = (struct build_group_cb_data*)pcd->user_data;
@@ -392,13 +399,20 @@ static int create_report_from_filename(const char *const filename, struct report
 		default:
 		case 0:
 		{
-			xmlDocPtr doc;
+			xmlDocPtr doc = NULL;
 			{
 				char* filecontent = NULL;
-				read_file(filename, &filecontent);
-				filter_unprintable(filecontent, strlen(filecontent));
-				doc = xmlReadMemory(filecontent, strlen(filecontent), NULL, "UTF-8", 0);
-				free(filecontent);
+				int read_res = read_file(filename, &filecontent);
+				if( read_res == 0 )
+				{
+					filter_unprintable(filecontent, strlen(filecontent));
+					doc = xmlReadMemory(filecontent, strlen(filecontent), NULL, "UTF-8", 0);
+					free(filecontent);
+				}
+				else
+				{
+					printf("could not read file '%s' (%s)\n", filename, strerror(read_res));
+				}
 			}
 			if( doc ) {
 				xmlNodePtr output_node = doc->children;				
@@ -747,13 +761,21 @@ static int create_report_from_filename(const char *const filename, struct report
 		
 		case 3:
 		{
-			xmlDocPtr doc;
+			xmlDocPtr doc = NULL;
 			{
 				char* filecontent = NULL;
-				read_file(filename, &filecontent);
-				filter_unprintable(filecontent, strlen(filecontent));
-				doc = xmlReadMemory(filecontent, strlen(filecontent), NULL, "UTF-8", 0);
-				free(filecontent);
+				int read_res = read_file(filename, &filecontent);
+				if( read_res == 0 )
+				{
+					filter_unprintable(filecontent, strlen(filecontent));
+					doc = xmlReadMemory(filecontent, strlen(filecontent), NULL, "UTF-8", 0);
+					free(filecontent);
+				}
+				else
+				{
+					printf("could not read file '%s' (%s)\n", filename, strerror(read_res));
+				}
+
 			}
 			if( doc ) {
 				xmlNodePtr output_node = doc->children;
@@ -815,13 +837,21 @@ static int create_report_from_filename(const char *const filename, struct report
 		
 		case 4:
 		{
-			xmlDocPtr doc;
+			xmlDocPtr doc = NULL;
 			{
 				char* filecontent = NULL;
-				read_file(filename, &filecontent);
-				filter_unprintable(filecontent, strlen(filecontent));
-				doc = xmlReadMemory(filecontent, strlen(filecontent), NULL, "UTF-8", 0);
-				free(filecontent);
+				int read_res = read_file(filename, &filecontent);
+				if( read_res == 0 )
+				{
+					filter_unprintable(filecontent, strlen(filecontent));
+					doc = xmlReadMemory(filecontent, strlen(filecontent), NULL, "UTF-8", 0);
+					free(filecontent);
+				}
+				else
+				{
+					printf("could not read file '%s' (%s)\n", filename, strerror(read_res));
+				}
+
 			}
 			if( doc ) {
 				xmlNodePtr output_node = doc->children;

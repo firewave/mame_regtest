@@ -630,6 +630,7 @@
 	- added -listsource and -listmidi to "test_frontend"
 	- always include debug information in the binaries
 	- treat compiler warnings as errors
+	- moved error reporting and handling out of read_file() - returns errno in error case now
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO

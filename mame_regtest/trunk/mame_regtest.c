@@ -1221,7 +1221,11 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 #ifndef USE_MRT_SYSTEM
 		/* TODO: errorhandling */
 		if( stdout_out )
-			read_file(stdout_temp_file, stdout_out);
+		{
+			int read_res = read_file(stdout_temp_file, stdout_out);
+			if( read_res != 0 )
+				printf("could not read file '%s' (%s)\n", stdout_temp_file, strerror(read_res));
+		}
 #endif
 
 		/* TODO: delete std* output files */
@@ -1231,6 +1235,7 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 		xmlNewProp(result, (const xmlChar*)"exitcode", (const xmlChar*)tmp);
 #ifndef USE_MRT_SYSTEM
 		char* stdout_str = NULL;
+		/* TODO: check read_file() result and report error */
 		if( redirect && read_file(stdout_temp_file, &stdout_str) == 0 ) {
 #else
 		if( stdout_str ) {
@@ -1242,6 +1247,7 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 		}
 #ifndef USE_MRT_SYSTEM
 		char* stderr_str = NULL;
+		/* TODO: check read_file() result and report error */
 		if( redirect && read_file(stderr_temp_file, &stderr_str) == 0 ) {
 #else
 		if( stderr_str ) {
