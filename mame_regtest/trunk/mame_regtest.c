@@ -441,13 +441,17 @@ static FILE* mrt_fopen(const char* filename, const char* attr)
 
 static void clear_callback_2(struct parse_callback_data* pcd)
 {
-	/* do not delete the -log or valgrind output */
-	if( pcd->type == ENTRY_FILE && strstr(pcd->entry_name, "valgrind") == NULL && strcmp(pcd->entry_name, "error.log") != 0 ) {
+	/* do not delete the -log, valgrind or snapshot output */
+	if( pcd->type == ENTRY_FILE && strstr(pcd->entry_name, "valgrind") == NULL && strcmp(pcd->entry_name, "error.log") != 0 && strcmp(pcd->entry_name, "final.png") != 0 ) {
 		remove(pcd->fullname);
 	}
 	/* do not delete the "snap" folder */
-	else if( (pcd->type == ENTRY_DIR_END) && (strcmp(pcd->entry_name, "snap") != 0) ) {
-		int delete_root = 1;
+	else if( pcd->type == ENTRY_DIR_END ) {
+		int delete_root;
+		if( strcmp(pcd->entry_name, "snap") != 0 )
+			delete_root = 1;
+		else
+			delete_root = 0;
 		parse_directory(pcd->fullname, 0, clear_callback_2, (void*)&delete_root);
 	}
 	else if( pcd->type == ENTRY_END ) {
