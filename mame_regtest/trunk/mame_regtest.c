@@ -2216,7 +2216,8 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					goto next;
 				}
 				/* TODO: add support for multiple softwarelists */
-				if( xmlStrcmp(game_children->name, (const xmlChar*)"softwarelist") == 0 ) {
+				/* TODO: add support for status="compatible" software lists */
+				if( xmlStrcmp(game_children->name, (const xmlChar*)"softwarelist") == 0 && xmlStrcmp(xmlGetProp(game_children, (const xmlChar*)"status"), (const xmlChar*)"original") == 0 ) {
 					/* TODO: hack to avoid memory leaks */
 					if( (*new_driv_inf)->has_softlist == 0 ) {
 						(*new_driv_inf)->has_softlist = 1;

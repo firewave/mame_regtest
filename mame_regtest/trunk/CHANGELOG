@@ -633,6 +633,7 @@
 	- moved error reporting and handling out of read_file() - returns errno in error case now
 	- updated copyright year in README
 	- only keep final.png when "store_output" is set to 2
+	- only call -listsoftware for sets with "original" softwarelist hooked up
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO
