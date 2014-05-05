@@ -122,7 +122,7 @@ struct driver_info {
 struct image_entry {
 	xmlChar* device_briefname;
 	xmlChar* device_file;
-	xmlChar* device_interface; /* TODO: do we even need this? */
+	xmlChar* device_interface;
 	xmlChar* device_filter;
 	xmlChar* device_slot;
 	xmlChar* device_part;
@@ -134,6 +134,7 @@ struct driver_entry {
 	const char* sourcefile;
 	int ramsize;
 	const char* bios;
+	/* TODO: re-add support for multiple images */
 	struct image_entry* images;
 	char postfix[1024];
 	int autosave;
@@ -1426,6 +1427,7 @@ static void execute_mame2(struct driver_entry* de)
 	if( de->images ) {
 		xmlNodePtr devices_node = xmlNewChild(output_node, NULL, (const xmlChar*)"devices", NULL);
 		
+		/* TODO: add part */
 		struct image_entry* images = de->images;
 		if (images) {
 			if( (images->device_briefname && xmlStrlen(images->device_briefname) > 0) &&
@@ -1494,6 +1496,7 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 	if( !(config_skip_mandatory && de->device_mandatory) )
 		execute_mame2(de);
 	
+	int software_processed = 0;
 	int software_count = 0;
 
 	/* process softlist output */
@@ -1513,128 +1516,106 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 			if( !config_hack_softwarelist )
 				append_string(&softwarelist_xpath, "/softwarelists");
 			append_string(&softwarelist_xpath, "/softwarelist/software");
+			soft_nodeset = get_xpath_nodeset(soft_doc, (const xmlChar*)softwarelist_xpath);
 			
-			// TODO: merge with code below
-			if( config_use_softwarelist == 3 )
+			if( soft_nodeset )
 			{
 				struct mrt_array slots_arr;
 				memset(&slots_arr, 0, sizeof(slots_arr));
 				
-				char* softwarelist_slot_xpath = NULL;
-				append_string(&softwarelist_slot_xpath, softwarelist_xpath);
-				append_string(&softwarelist_slot_xpath, "/part/feature[@name='slot']/parent::*/parent::*"); // TODO: optimize this
+				int empty_slot_processed = 0;
 				
-				soft_nodeset = get_xpath_nodeset(soft_doc, (const xmlChar*)softwarelist_slot_xpath);
-				
-				if( soft_nodeset )
+				char initial_postfix[1024];
+				snprintf(initial_postfix, sizeof(initial_postfix), "%s", de->postfix);
+			
+				int i = 0;
+				for( ; i < soft_nodeset->nodeNr; ++i )
 				{
-					char initial_postfix[1024];
-					snprintf(initial_postfix, sizeof(initial_postfix), "%s", de->postfix);
-				
-					int i = 0;
-					for( ; i < soft_nodeset->nodeNr; ++i )
-					{
-						struct image_entry* images = NULL;
-						if( read_softlist_entry(soft_nodeset->nodeTab[i], &images, actual_driv_inf) == 0 )
-							continue;
-						
-						int part_count = 0;
-						while(images) {
-							if( images->device_slot == NULL ) {
-								images = images->next;
-								continue;
-							}
-								
-							int j = 0;
-							for(; slots_arr.ptr && slots_arr.ptr[j]; ++j)
-							{
-								if(xmlStrcmp((const xmlChar*)slots_arr.ptr[j], images->device_slot) == 0)
-									break;
-							}
+					struct image_entry* images = NULL;
+					if( read_softlist_entry(soft_nodeset->nodeTab[i], &images, actual_driv_inf) == 0 )
+						continue;
+					
+					/* TODO: execution of all pars is broken now */
+					/* TODO: make execution of all parts optional */
+					int part_count = 0;
+					while(images) {
+						if( xmlStrcmp(images->device_slot, (const xmlChar*)"") == 0 )
+							printf("empty slot attribute encountered\n");
 							
-							if( slots_arr.ptr && slots_arr.ptr[j] ) {
-								images = images->next;
-								continue;
-							}
-							
-							append_to_array(&slots_arr, xmlStrdup(images->device_slot));
-						
-							de->images = images;
-							snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05dpart%05d", initial_postfix, software_count, part_count);
-
-							execute_mame2(de);
-							
-							part_count++;
-							images = images->next;
+						if( config_use_softwarelist == 2)
+						{
+							if (software_processed == 1)
+								break;
 						}
+						else if (config_use_softwarelist == 3)
+						{
+							if (images->device_slot == NULL)
+							{
+								if (empty_slot_processed)
+									break;
+								empty_slot_processed = 1;									
+							}						
+							else
+							{
+								/* TODO: move to helper function */
+								if (slots_arr.ptr)
+								{
+									int j = 0;
+									for(; slots_arr.ptr[j]; ++j)
+									{
+										if(xmlStrcmp((const xmlChar*)slots_arr.ptr[j], images->device_slot) == 0)
+											break;
+									}
+									
+									if( slots_arr.ptr[j] ) {
+										images = images->next;
+										continue;
+									}
+								}
+								
+								append_to_array(&slots_arr, xmlStrdup(images->device_slot));
+							}
+							
+							if (config_verbose)
+								printf("found new slot '%s'\n", images->device_slot);
+						}
+					
+						de->images = images;
+						snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05dpart%05d", initial_postfix, software_count, part_count);
 
-						de->images = NULL;
-						free_image_entries(images);
+						execute_mame2(de);
 						
-						snprintf(de->postfix, sizeof(de->postfix), "%s", initial_postfix);
-						
-						software_count++;
+						part_count++;
+						images = images->next;
 					}
 					
-					xmlXPathFreeNodeSet(soft_nodeset);
-					soft_nodeset = NULL;
+					de->images = NULL;
+					free_image_entries(images);
+					
+					snprintf(de->postfix, sizeof(de->postfix), "%s", initial_postfix);
+					
+					if (part_count != 0)
+						software_processed++;
+
+					/* TODO: store the software entry processed so even with only the slot executed it will match the order of a full run? */
+					software_count++;
 				}
-				
-				free(softwarelist_slot_xpath);
-				softwarelist_slot_xpath = NULL;
-				
+					
 				// TODO: move to helper function
-				int j = 0;
-				for(; slots_arr.ptr && slots_arr.ptr[j]; ++j)
+				if (slots_arr.ptr)
 				{
-					xmlFree(slots_arr.ptr[j]);
-					slots_arr.ptr[j] = NULL;
-				}
-				if(slots_arr.ptr) {
+					int j = 0;
+					for(; slots_arr.ptr[j]; ++j)
+					{
+						xmlFree(slots_arr.ptr[j]);
+						slots_arr.ptr[j] = NULL;
+					}
 					free(slots_arr.ptr);
 					slots_arr.ptr = NULL;
 				}
-			}
-			if( software_count == 0 )
-			{
-				soft_nodeset = get_xpath_nodeset(soft_doc, (const xmlChar*)softwarelist_xpath);
-				if( soft_nodeset )
-				{
-					char initial_postfix[1024];
-					snprintf(initial_postfix, sizeof(initial_postfix), "%s", de->postfix);
-
-					int i = 0;
-					for( ; i < soft_nodeset->nodeNr; ++i )
-					{
-						if( config_use_softwarelist >= 2 && software_count == 1 )
-							break;
-					
-						struct image_entry* images = NULL;
-						if( read_softlist_entry(soft_nodeset->nodeTab[i], &images, actual_driv_inf) == 0 )
-							continue;
-							
-						int part_count = 0;
-						while(images) {
-							de->images = images;
-							snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05dpart%05d", initial_postfix, software_count, part_count);
-
-							execute_mame2(de);
-							
-							part_count++;
-							images = images->next;
-						}
-
-						free_image_entries(images);
-						de->images = NULL;
-						
-						snprintf(de->postfix, sizeof(de->postfix), "%s", initial_postfix);
-						
-						software_count++;
-					}
-					
-					xmlXPathFreeNodeSet(soft_nodeset);
-					soft_nodeset = NULL;
-				}
+				
+				xmlXPathFreeNodeSet(soft_nodeset);
+				soft_nodeset = NULL;
 			}
 
 			free(softwarelist_xpath);
@@ -1643,7 +1624,7 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 			xmlFreeDoc(soft_doc);
 			soft_doc = NULL;
 			
-			if( software_count == 0 )
+			if( software_processed == 0 )
 				printf("could not find any software entry to use\n");
 		}
 		else {
