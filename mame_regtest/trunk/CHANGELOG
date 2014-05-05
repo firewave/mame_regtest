@@ -637,6 +637,7 @@
 	- also run a software list entry without any slot when "use_softwarelist" is set to 3
 	- no softwarelist entries might have been used at all when "use_softwarelist" is set to 3 because of bogus counting of processed entries
 	- the number of the softwarelist entry in the result will now always match the place in the software list
+	- added support for running one entry for each interface found in the softwarelist by setting "use_softwarelist" 4
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO

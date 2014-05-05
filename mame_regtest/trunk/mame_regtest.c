@@ -1579,6 +1579,29 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 							if (config_verbose)
 								printf("found new slot '%s'\n", images->device_slot);
 						}
+						else if (config_use_softwarelist == 4)
+						{
+							/* TODO: move to helper function */
+							if (slots_arr.ptr)
+							{
+								int j = 0;
+								for(; slots_arr.ptr[j]; ++j)
+								{
+									if(xmlStrcmp((const xmlChar*)slots_arr.ptr[j], images->device_interface) == 0)
+										break;
+								}
+								
+								if( slots_arr.ptr[j] ) {
+									images = images->next;
+									continue;
+								}
+							}
+							
+							append_to_array(&slots_arr, xmlStrdup(images->device_interface));
+							
+							if (config_verbose)
+								printf("found new interface '%s'\n", images->device_interface);
+						}
 					
 						de->images = images;
 						snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05dpart%05d", initial_postfix, software_count, part_count);
