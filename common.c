@@ -346,6 +346,11 @@ int read_file(const char* file, char** content)
 	return res;
 
 error:
+	if( fd != NULL )
+	{
+		fclose(fd);
+		fd = NULL;		
+	}
 	return errno;
 }
 
