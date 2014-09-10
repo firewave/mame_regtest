@@ -179,6 +179,8 @@ static char* config_compare_folder = NULL;
 static int config_print_stdout = 0;
 static char* config_output_folder = NULL;
 static int config_recursive = 0;
+static int config_tagmap_threshold = 0;
+static int config_speed_threshold = 0;
 
 static struct config_entry report_config[] =
 {
@@ -194,6 +196,8 @@ static struct config_entry report_config[] =
 	{ "print_stdout", 		CFG_INT, 		&config_print_stdout },
 	{ "output_folder", 		CFG_STR_PTR, 	&config_output_folder }, /* comparison report specific */
 	{ "recursive", 			CFG_INT, 		&config_recursive },
+	{ "tagmap_threshold", 	CFG_INT, 		&config_tagmap_threshold },
+	{ "speed_threshold", 	CFG_INT, 		&config_speed_threshold },
 	{ NULL, 				CFG_UNK, 		NULL }
 };
 
@@ -233,6 +237,8 @@ struct report_cb_data
 	struct report_summary summary;
 	const char* output_folder;
 	int recursive;
+	int tagmap_threshold;
+	int speed_threshold;
 };
 
 /* TODO - handle multiple occurances */
@@ -788,7 +794,7 @@ static int create_report_from_filename(const char *const filename, struct report
 						if( xmlStrcmp(output_childs->name, (const xmlChar*)"result") == 0 ) {
 							xmlChar* stdout_key = xmlGetProp(output_childs, (const xmlChar*)"stdout");
 
-							/* TODO: make configurable and optional */
+							/* TODO: use the loop from speed report */
 #ifdef WIN32
 							const char* sep = "\r\n";
 							const int sep_len = 2;
@@ -807,8 +813,7 @@ static int create_report_from_filename(const char *const filename, struct report
 									tagmap_str = (const char*)prev_newline + sep_len;
 								int tagmap_count = 0;
 								sscanf(tagmap_str, "%d tagmap lookups", &tagmap_count);
-								/* TODO: make values configurable */
-								if( tagmap_count > 100000 ) {
+								if( tagmap_count > r_cb_data->tagmap_threshold ) {
 									PRINT_INFO(stdout)
 									printf(" - %d tagmap lookups\n", tagmap_count);
 								}
@@ -881,8 +886,7 @@ static int create_report_from_filename(const char *const filename, struct report
 								float speed = 0;
 								int seconds = 0;
 								sscanf(lines[i], "Average speed: %f%% (%d seconds)", &speed, &seconds);
-								/* TODO: make values configurable */
-								if( speed < 100.0 ) {
+								if( speed < r_cb_data->speed_threshold ) {
 									PRINT_INFO(stdout)
 									printf(" - Average speed: %.2f%%\n", speed);
 								}
@@ -957,6 +961,8 @@ static void create_report()
 	r_cb_data.print_stdout = config_print_stdout;
 	r_cb_data.output_folder = config_output_folder;
 	r_cb_data.recursive = config_recursive;
+	r_cb_data.tagmap_threshold = config_tagmap_threshold;
+	r_cb_data.speed_threshold = config_speed_threshold;
 	memset(&r_cb_data.summary, 0x00, sizeof(struct report_summary));
 
 	if( config_report_type == 0 ) {
