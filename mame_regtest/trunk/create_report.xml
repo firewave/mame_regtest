@@ -36,12 +36,14 @@
 	</comparison>
 	<tagmap>
 		<option name='report_type' value='3'/>
-		<option name='xml_folder' value='mrt_output.mess.r28338.plain.slots.clang34.ubsan.x64.part2'/>
+		<option name='xml_folder' value='d:\mess\mrt_output'/>
+		<option name='tagmap_threshold' value='10000'/>
 		<option name='group_data' value='1'/>
 	</tagmap>
 	<speed>
 		<option name='report_type' value='4'/>
-		<option name='xml_folder' value='mrt_output.mess.r28338.plain.slots.clang34.ubsan.x64.part2'/>
+		<option name='xml_folder' value='d:\mess\mrt_output'/>
+		<option name='speed_threshold' value='100'/>
 		<option name='group_data' value='1'/>
 	</speed>
 </create_report>
