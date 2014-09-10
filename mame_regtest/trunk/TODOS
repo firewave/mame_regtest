@@ -197,7 +197,20 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- review the default osdprocessors handling
 		- add "validate_only" option
 		- part not in wiki report
-
+		- error code 4 has no impact in statistics
+		- try "runtime errors" found as errors in statistics
+		- add "quiet" mode to report generation
+		- do not just check the interface on which device slot to run the sotware list entry, but also the extension (see aim65)
+		- add option to skip unsupported softlist entries
+		- use -debugger internal
+		- add a flag to the debugger to not break at all (prevent internal breakpoint hangs)
+		- store timing information and generate reports on how much time in a testrun is spent on which drivers/sets
+		- generate a report in the format I would send to the list
+		- add option to use grouped execution
+		- test differently sized software entries?
+		- do not show stdout in report entries, that don't need it (e.g. fatalerror)
+		- runtime errors are not counted
+		
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
 		- make pointers const (or const * const)
