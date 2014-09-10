@@ -269,6 +269,7 @@ static void convert_br(xmlChar* str)
 	}
 }
 
+/* TODO: read part if available */
 #define PRINT_INFO(fd) \
 	fprintf(fd, "%s: %s", sourcefile_key, name_key); \
 	if( bios_key ) \
