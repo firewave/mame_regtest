@@ -228,6 +228,7 @@ static int config_hack_softwarelist = 0;
 static int config_test_frontend = 1;
 static int config_use_slots = 0;
 static int config_no_execution = 0;
+static int config_hack_nosound = 0;
 
 static struct config_entry mrt_config[] =
 {
@@ -276,6 +277,7 @@ static struct config_entry mrt_config[] =
 	{ "test_frontend",			CFG_INT,		&config_test_frontend },
 	{ "use_slots",				CFG_INT,		&config_use_slots },
 	{ "no_execution",			CFG_INT,		&config_no_execution },
+	{ "hack_nosound",			CFG_INT,		&config_hack_nosound },
 	{ NULL,						CFG_UNK,		NULL }
 };
 
@@ -1109,7 +1111,12 @@ static char* create_commandline(struct driver_entry* de)
 	
 	append_string(&sys, " -video none"); /* disable video output */
 	if( !config_use_sound )
-		append_string(&sys, " -nosound"); /* disable sound output */
+	{
+		if( config_hack_nosound)
+			append_string(&sys, " -nosound"); /* disable sound output */
+		else
+			append_string(&sys, " -sound none"); /* disable sound output */
+	}
 	if( !config_use_throttle )
 		append_string(&sys, " -nothrottle"); /* disable throttle */
 	if( !config_use_debug )
@@ -2586,6 +2593,7 @@ int main(int argc, char *argv[])
 #endif
 	}
 
+	/* TODO: make this a loop on the config structure */
 	if( config_verbose ) {
 		if( config_rompath_folder && (*config_rompath_folder != 0) )
 			printf("using rompath folder: %s\n", config_rompath_folder);
@@ -2625,6 +2633,7 @@ int main(int argc, char *argv[])
 		printf("hack_mngwrite: %d\n", config_hack_mngwrite);
 		printf("hack_pinmame: %d\n", config_hack_pinmame);
 		printf("hack_softwarelist: %d\n", config_hack_softwarelist);
+		printf("hack_nosound: %d\n", config_hack_nosound);
 
 		printf("\n"); /* for output formating */
 	}

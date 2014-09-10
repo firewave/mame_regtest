@@ -638,6 +638,8 @@
 	- no softwarelist entries might have been used at all when "use_softwarelist" is set to 3 because of bogus counting of processed entries
 	- the number of the softwarelist entry in the result will now always match the place in the software list
 	- added support for running one entry for each interface found in the softwarelist by setting "use_softwarelist" 4
+	- use new option "-sound none" when "use_sound" is set to 0
+	- added option "hack_nosound" to support version with old option -nosound
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO
