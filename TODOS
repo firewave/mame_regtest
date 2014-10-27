@@ -198,7 +198,6 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- add "validate_only" option
 		- part not in wiki report
 		- error code 4 has no impact in statistics
-		- try "runtime errors" found as errors in statistics
 		- add "quiet" mode to report generation
 		- do not just check the interface on which device slot to run the sotware list entry, but also the extension (see aim65)
 		- add option to skip unsupported softlist entries
@@ -209,7 +208,6 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- add option to use grouped execution
 		- test differently sized software entries?
 		- do not show stdout in report entries, that don't need it (e.g. fatalerror)
-		- runtime errors are not counted?
 		- merge "use_softwarelist" modes 3 and 4?
 		- "ignore_exitcode_4" no longer working?
 		- always call softlist entries with softlist name prefix
