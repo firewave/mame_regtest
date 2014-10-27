@@ -641,6 +641,7 @@
 	- use new option "-sound none" when "use_sound" is set to 0
 	- added option "hack_nosound" to support version with old option -nosound
 	- fixed handle leak in read_file() when it encountered an error during reading
+	- explicitly use "-debugger internal" when "use_debug" is set to 1
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO
