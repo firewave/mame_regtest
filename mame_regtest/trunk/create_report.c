@@ -205,6 +205,7 @@ struct report_summary
 {
 	int executed;
 	int errors;
+	int runtime_errors;
 	int memleaks;
 	int clipped;
 	int mandatory;
@@ -452,6 +453,8 @@ static int create_report_from_filename(const char *const filename, struct report
 								r_cb_data->summary.memleaks++;
 							if(clipped_found)
 								r_cb_data->summary.clipped++;
+							if(runtime_error_found)
+								r_cb_data->summary.runtime_errors++;
 
 							int report_error = (error_found && !mandatory_found);
 							int report_memleak = (memleak_found && r_cb_data->show_memleaks);
@@ -1056,6 +1059,7 @@ static void create_report()
 			fprintf(report_fd, "## Summary\n");
 		fprintf(report_fd, "  * %d executed\n", r_cb_data.summary.executed);
 		fprintf(report_fd, "  * %d with errors\n", r_cb_data.summary.errors);
+		fprintf(report_fd, "  * %d with runtime errors\n", r_cb_data.summary.runtime_errors);
 		fprintf(report_fd, "  * %d with missing roms\n", r_cb_data.summary.missing);
 		fprintf(report_fd, "  * %d with memory leaks\n", r_cb_data.summary.memleaks);
 		fprintf(report_fd, "  * %d with sound clipping\n", r_cb_data.summary.clipped);
