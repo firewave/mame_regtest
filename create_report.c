@@ -1049,8 +1049,11 @@ static void create_report()
 
 	free_array(folders);
 
-	if( config_wiki_format == 1 && config_report_type == 0 ) {
-		fprintf(report_fd, "===== Summary =====\n");
+	if( config_wiki_format && config_report_type == 0 ) {
+		if( config_wiki_format == 1 )
+			fprintf(report_fd, "===== Summary =====\n");
+		else if( config_wiki_format == 2 )
+			fprintf(report_fd, "## Summary\n");
 		fprintf(report_fd, "  * %d executed\n", r_cb_data.summary.executed);
 		fprintf(report_fd, "  * %d with errors\n", r_cb_data.summary.errors);
 		fprintf(report_fd, "  * %d with missing roms\n", r_cb_data.summary.missing);
