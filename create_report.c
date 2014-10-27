@@ -170,7 +170,7 @@ static void free_group_data(struct group_data* gd)
 static char* config_xml_folder = NULL;
 static char* config_output_file = NULL;
 static int config_print_stderr = 0;
-static int config_dokuwiki_format = 0;
+static int config_wiki_format = 0;
 static int config_show_memleaks = 0;
 static int config_show_clipped = 0;
 static int config_group_data = 0;
@@ -187,7 +187,7 @@ static struct config_entry report_config[] =
 	{ "xml_folder", 		CFG_STR_PTR, 	&config_xml_folder },
 	{ "output_file", 		CFG_STR_PTR, 	&config_output_file },
 	{ "print_stderr", 		CFG_INT, 		&config_print_stderr },
-	{ "dokuwiki_format", 	CFG_INT, 		&config_dokuwiki_format },
+	{ "wiki_format", 		CFG_INT, 		&config_wiki_format },
 	{ "show_memleaks", 		CFG_INT, 		&config_show_memleaks },
 	{ "show_clipped", 		CFG_INT, 		&config_show_clipped },
 	{ "group_data", 		CFG_INT, 		&config_group_data },
@@ -228,7 +228,7 @@ struct report_cb_data
 {
 	FILE* report_fd;
 	int print_stderr;
-	int dokuwiki_format;
+	int wiki_format;
 	int show_memleaks;
 	int show_clipped;
 	int report_type;
@@ -458,14 +458,20 @@ static int create_report_from_filename(const char *const filename, struct report
 							int report_clipped = (r_cb_data->show_clipped && clipped_found);
 							
 							if( report_error || report_memleak || report_stdout || report_stderr || report_clipped || reset_scope_found || runtime_error_found ) {
-								if( r_cb_data->dokuwiki_format )
+								if( r_cb_data->wiki_format )
 								{
 									if( write_src_header ) {
-										fprintf(r_cb_data->report_fd, "===== %s =====\n", sourcefile_key);
+										if( r_cb_data->wiki_format == 1 )
+											fprintf(r_cb_data->report_fd, "===== %s =====\n", sourcefile_key);
+										else if( r_cb_data->wiki_format == 2 )
+											fprintf(r_cb_data->report_fd, "## %s\n", sourcefile_key);
 										/* disable so the header is only written once */
 										write_src_header = 0;
 									}
-									fprintf(r_cb_data->report_fd, "==== %s ====\n", name_key);
+									if( r_cb_data->wiki_format == 1 )
+										fprintf(r_cb_data->report_fd, "==== %s ====\n", name_key);
+									else if( r_cb_data->wiki_format == 2 )
+										fprintf(r_cb_data->report_fd, "### %s\n", name_key);
 									if( bios_key )
 										fprintf(r_cb_data->report_fd, "  * BIOS: ''%s''\n", bios_key);
 									if( ramsize_key )
@@ -490,13 +496,28 @@ static int create_report_from_filename(const char *const filename, struct report
 									fprintf(r_cb_data->report_fd, "  * Error code: ''%s''\n", exitcode_key);
 		
 									if( (report_error || report_stdout || report_clipped) && stdout_key && xmlStrlen(stdout_key) > 0 )
-										fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n", stdout_key);
+									{
+										if( r_cb_data->wiki_format == 1 )
+											fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n", stdout_key);
+										else if( r_cb_data->wiki_format == 2 )
+											fprintf(r_cb_data->report_fd, "\n```%s```\n", stdout_key);
+									}
 			
 									if( (report_error || report_memleak || report_stderr || reset_scope_found || runtime_error_found) && stderr_key && xmlStrlen(stderr_key) > 0 )
-										fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n", stderr_key);
+									{
+										if( r_cb_data->wiki_format == 1 )
+											fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n", stderr_key);
+										else if( r_cb_data->wiki_format == 2 )
+											fprintf(r_cb_data->report_fd, "\n```%s```\n", stderr_key);
+									}
 									
 									if( cmd_key )
-										fprintf(r_cb_data->report_fd, "  * Command-Line: <code>%s</code>\n", cmd_key);
+									{
+										if( r_cb_data->wiki_format == 1 )
+											fprintf(r_cb_data->report_fd, "  * Command-Line: <code>%s</code>\n", cmd_key);
+										else if( r_cb_data->wiki_format == 2 )
+											fprintf(r_cb_data->report_fd, "  * Command-Line: ```%s```\n", cmd_key);
+									}
 									
 									fprintf(r_cb_data->report_fd, "\n");
 								}
@@ -954,7 +975,7 @@ static void create_report()
 
 	struct report_cb_data r_cb_data;
 	r_cb_data.print_stderr = config_print_stderr;
-	r_cb_data.dokuwiki_format = config_dokuwiki_format;
+	r_cb_data.wiki_format = config_wiki_format;
 	r_cb_data.show_memleaks = config_show_memleaks;
 	r_cb_data.show_clipped = config_show_clipped;
 	r_cb_data.report_type = config_report_type;
@@ -968,8 +989,10 @@ static void create_report()
 
 	if( config_report_type == 0 ) {
 		report_fd = fopen(config_output_file, "wb");
-		if( config_dokuwiki_format )
+		if( config_wiki_format == 1 )
 			fprintf(report_fd, "====== mame_regtest result ======\n");
+		else if( config_wiki_format == 2 )
+			fprintf(report_fd, "# mame_regtest result\n");
 	}
 	else if( config_report_type == 1 ) {
 		char* outputfile = NULL;
@@ -1018,7 +1041,7 @@ static void create_report()
 
 	free_array(folders);
 
-	if( config_dokuwiki_format && config_report_type == 0 ) {
+	if( config_wiki_format == 1 && config_report_type == 0 ) {
 		fprintf(report_fd, "===== Summary =====\n");
 		fprintf(report_fd, "  * %d executed\n", r_cb_data.summary.executed);
 		fprintf(report_fd, "  * %d with errors\n", r_cb_data.summary.errors);
