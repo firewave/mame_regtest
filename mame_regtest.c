@@ -1122,7 +1122,7 @@ static char* create_commandline(struct driver_entry* de)
 	if( !config_use_debug )
 		append_string(&sys, " -nodebug"); /* disable debug window */
 	else {
-		append_string(&sys, " -debug"); /* enable debug window */
+		append_string(&sys, " -debugger internal -debug"); /* enable debug window */
 		/* pass debugscript, so so debugger won't block the execution */
 		append_string(&sys, " -debugscript ");
 		append_quoted_string(&sys, debugscript_file);
