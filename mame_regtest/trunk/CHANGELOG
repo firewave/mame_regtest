@@ -654,3 +654,5 @@
 	- added speed report (report_type 4)
 	- added option "tagmap_threshold" for report_type 3
 	- added option "speed_threshold" for report_type 4
+	- renamed option "dokuwiki_format" to "wiki_format"
+	- use GitHub "Markup" format when "wiki_format" is set to 2
