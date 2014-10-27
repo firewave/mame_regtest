@@ -382,6 +382,7 @@ static void convert_br(xmlChar* str)
 	xmlFree(name_key); \
 	name_key = NULL;
 	
+#if 0
 static xmlChar const *
 xmlStrrstr (xmlChar const *haystack, xmlChar const *needle)
 {
@@ -396,6 +397,7 @@ xmlStrrstr (xmlChar const *haystack, xmlChar const *needle)
 
 	return last_match;
 }
+#endif
 
 static int create_report_from_filename(const char *const filename, struct report_cb_data* r_cb_data, int write_src_header)
 {
@@ -816,7 +818,7 @@ static int create_report_from_filename(const char *const filename, struct report
 						if( xmlStrcmp(output_childs->name, (const xmlChar*)"result") == 0 ) {
 							xmlChar* stdout_key = xmlGetProp(output_childs, (const xmlChar*)"stdout");
 
-							/* TODO: use the loop from speed report */
+							/* TODO: make this generic for the reports and merge with speed code */
 #ifdef WIN32
 							const char* sep = "\r\n";
 							const int sep_len = 2;
@@ -824,23 +826,24 @@ static int create_report_from_filename(const char *const filename, struct report
 							const char* sep = "\n";
 							const int sep_len = 1;
 #endif
-							const xmlChar* last_newline = xmlStrrstr(stdout_key, (const xmlChar*)sep);
-							if( last_newline ) {
-								xmlChar* str = xmlStrndup(stdout_key, xmlStrlen(stdout_key) - sep_len);
-								const xmlChar* prev_newline = xmlStrrstr(str, (const xmlChar*)sep);
-								const char* tagmap_str;
-								if( prev_newline == NULL )
-									tagmap_str = (const char*)str;
-								else
-									tagmap_str = (const char*)prev_newline + sep_len;
+							char** lines = split_string((const char*)stdout_key, sep);
+							int i = 0;
+							for( ; lines != NULL && lines[i] != NULL; ++i )
+							{
+								if( strstr(lines[i], "tagmap lookups") == NULL )
+									continue;
 								int tagmap_count = 0;
-								sscanf(tagmap_str, "%d tagmap lookups", &tagmap_count);
-								if( tagmap_count > r_cb_data->tagmap_threshold ) {
+								int sscanf_res = sscanf(lines[i], "%d tagmap lookups", &tagmap_count);
+								if( sscanf_res != 1 ) {
+									PRINT_INFO(stdout)
+									printf(" - ERROR\n");
+								}
+								if( tagmap_count > 0 && tagmap_count > r_cb_data->tagmap_threshold ) {
 									PRINT_INFO(stdout)
 									printf(" - %d tagmap lookups\n", tagmap_count);
 								}
-								xmlFree(str);
 							}
+							free_array(lines);
 							
 							xmlFree(stdout_key);
 							stdout_key = NULL;
@@ -892,6 +895,7 @@ static int create_report_from_filename(const char *const filename, struct report
 							xmlChar* stdout_key = xmlGetProp(output_childs, (const xmlChar*)"stdout");
 
 							/* TODO: use this code in speed comparison */
+							/* TODO: make this generic for the reports and merge with tagmap code */
 #ifdef WIN32
 							const char* sep = "\r\n";
 							const int sep_len = 2;
@@ -907,7 +911,11 @@ static int create_report_from_filename(const char *const filename, struct report
 									continue;
 								float speed = 0;
 								int seconds = 0;
-								sscanf(lines[i], "Average speed: %f%% (%d seconds)", &speed, &seconds);
+								int sscanf_res = sscanf(lines[i], "Average speed: %f%% (%d seconds)", &speed, &seconds);
+								if( sscanf_res != 2 ) {
+									PRINT_INFO(stdout)
+									printf(" - ERROR\n");
+								}
 								if( speed < r_cb_data->speed_threshold ) {
 									PRINT_INFO(stdout)
 									printf(" - Average speed: %.2f%%\n", speed);
