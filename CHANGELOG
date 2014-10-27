@@ -642,6 +642,7 @@
 	- added option "hack_nosound" to support version with old option -nosound
 	- fixed handle leak in read_file() when it encountered an error during reading
 	- explicitly use "-debugger internal" when "use_debug" is set to 1
+	- only process software list entries, that doen't have "supported" set to "no"
 	
 	create_report
 	- pass the file descriptor as parameter to PRINT_INFO

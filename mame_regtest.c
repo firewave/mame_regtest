@@ -122,6 +122,7 @@ struct driver_info {
 struct image_entry {
 	xmlChar* device_briefname;
 	xmlChar* device_file;
+	xmlChar* supported;
 	xmlChar* device_interface;
 	xmlChar* device_filter;
 	xmlChar* device_slot;
@@ -597,6 +598,7 @@ static void free_image_entry(struct image_entry* image)
 {
 	xmlFree(image->device_briefname);
 	xmlFree(image->device_file);
+	xmlFree(image->supported);
 	xmlFree(image->device_interface);
 	xmlFree(image->device_filter);
 	xmlFree(image->device_slot);
@@ -653,6 +655,7 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 	*images = NULL;
 	
 	xmlChar* entry_name = xmlGetProp(node, (const xmlChar*)"name");
+	xmlChar* supported = xmlGetProp(node, (const xmlChar*)"supported");
 	
 	struct image_entry* last_entry = NULL;
 	
@@ -671,6 +674,10 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 	
 				memset(image, 0x00, sizeof(struct image_entry));
 				image->device_file = xmlStrdup(entry_name);
+				if (supported)
+					image->supported = xmlStrdup(supported);
+				else
+					image->supported = NULL;
 				image->device_part = xmlGetProp(soft_child, (const xmlChar*)"name");
 				image->device_interface = xmlGetProp(soft_child, (const xmlChar*)"interface");
 				
@@ -727,6 +734,9 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 		
 		soft_child = soft_child->next;
 	}
+
+	xmlFree(supported);
+	supported = NULL;
 	
 	xmlFree(entry_name);
 	entry_name = NULL;
@@ -1542,6 +1552,13 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 					if( read_softlist_entry(soft_nodeset->nodeTab[i], &images, actual_driv_inf) == 0 )
 						continue;
 					
+					/* TODO: make this optional and implement properly */
+					if( images && images->supported && xmlStrcmp(images->supported, (const xmlChar*)"no") == 0 )
+					{
+						free_image_entries(images);
+						continue;
+					}
+
 					/* TODO: execution of all pars is broken now */
 					/* TODO: make execution of all parts optional */
 					int part_count = 0;
