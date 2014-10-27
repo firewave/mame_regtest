@@ -113,7 +113,7 @@ struct driver_info {
 	struct dipswitch_info* dipswitches;
 	struct dipswitch_info* configurations;
 	int has_softlist;
-	xmlChar* softwarelist; /* TODO: might not be necessary since -listsoftware will list of images from all lists */
+	xmlChar* softwarelist; /* TODO: might not be necessary since -listsoftware will list images from all lists */ /* necessary for hack_softwarelist? */
 	xmlChar* softwarelist_filter;
 	struct slot_info* slots;
 	struct driver_info* next;
@@ -665,6 +665,8 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 			if( xmlStrcmp(soft_child->name, (const xmlChar*)"part") == 0 ) {
 				struct image_entry* image = (struct image_entry*)malloc(sizeof(struct image_entry));
 				if( !image ) {
+					xmlFree(supported);
+					supported = NULL;
 					xmlFree(entry_name);
 					entry_name = NULL;
 					free_image_entries(*images);
@@ -1559,7 +1561,9 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 						continue;
 					}
 
-					/* TODO: execution of all pars is broken now */
+					struct image_entry* images_start = images;
+
+					/* TODO: execution of all parts is broken now */
 					/* TODO: make execution of all parts optional */
 					int part_count = 0;
 					while(images) {
@@ -1637,7 +1641,7 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 					}
 					
 					de->images = NULL;
-					free_image_entries(images);
+					free_image_entries(images_start);
 					
 					snprintf(de->postfix, sizeof(de->postfix), "%s", initial_postfix);
 					
@@ -1671,6 +1675,9 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 			xmlFreeDoc(soft_doc);
 			soft_doc = NULL;
 			
+			if( config_verbose )
+				printf("software_processed: %d\n", software_processed);
+
 			if( software_processed == 0 )
 				printf("could not find any software entry to use\n");
 		}
@@ -2243,10 +2250,10 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					
 					goto next;
 				}
-				/* TODO: add support for multiple softwarelists */
-				/* TODO: add support for status="compatible" software lists */
-				if( xmlStrcmp(game_children->name, (const xmlChar*)"softwarelist") == 0 && xmlStrcmp(xmlGetProp(game_children, (const xmlChar*)"status"), (const xmlChar*)"original") == 0 ) {
-					/* TODO: hack to avoid memory leaks */
+				/* TODO: add support for multiple softwarelist filters */
+				/* TODO: make the check for "original" a hack */
+				if( xmlStrcmp(game_children->name, (const xmlChar*)"softwarelist") == 0 /*&& xmlStrcmp(xmlGetProp(game_children, (const xmlChar*)"status"), (const xmlChar*)"original") == 0*/ ) {
+					/* TODO: hack to avoid memory leaks with multiple software lists */
 					if( (*new_driv_inf)->has_softlist == 0 ) {
 						(*new_driv_inf)->has_softlist = 1;
 						(*new_driv_inf)->softwarelist = xmlGetProp(game_children, (const xmlChar*)"name");
