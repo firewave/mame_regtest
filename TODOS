@@ -209,7 +209,18 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- add option to use grouped execution
 		- test differently sized software entries?
 		- do not show stdout in report entries, that don't need it (e.g. fatalerror)
-		- runtime errors are not counted
+		- runtime errors are not counted?
+		- merge "use_softwarelist" modes 3 and 4?
+		- "ignore_exitcode_4" no longer working?
+		- always call softlist entries with softlist name prefix
+		- process entries from each softlist
+		- make the compatible softlist handling a hack for older versions?
+		- ignore nodump roms in software lists - amiga_workbench
+		- add wav/avi/png/mng valiation
+			- ffmpeg -v error -i file.avi -f null - 2>error.log
+			- avconv
+		- add -listnetwork
+		- add sanity checks before adding attributes to avoid invalid XMLs being created
 		
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
