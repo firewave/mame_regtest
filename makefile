@@ -1,4 +1,3 @@
-CC = gcc
 BIN_EXT = .exe
 
 INCLUDES = -I./iconv/include -I./libxml2/include -I./zlib/include
