@@ -22,6 +22,10 @@ ifdef LOG_ALLOC
 CFLAGS += -DLOG_ALLOC
 endif
 
+ifdef SANITIZE
+CFLAGS += -fsanitize=$(SANITIZE)
+endif
+
 all: mame_regtest$(BIN_EXT) create_image_xml$(BIN_EXT) create_report$(BIN_EXT)
 
 clean:
