@@ -662,3 +662,4 @@
 
 0.74
 	- removed CC definition from makefile
+	- updated warnings for Clang 5.0
