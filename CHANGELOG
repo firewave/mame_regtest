@@ -659,3 +659,5 @@
 	- renamed option "dokuwiki_format" to "wiki_format"
 	- use GitHub "Markdown" format when "wiki_format" is set to 2
 	- added separate entry in summary for runtime errors
+
+0.74

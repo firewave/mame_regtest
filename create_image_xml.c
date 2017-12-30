@@ -7,7 +7,7 @@
 
 #include "common.h"
 
-#define VERSION "0.73"
+#define VERSION "0.74"
 
 struct image_file_data
 {
