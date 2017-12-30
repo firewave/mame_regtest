@@ -9,7 +9,7 @@ LIBS = ./libxml2/lib/libxml2.lib ./zlib/lib/zdll.lib
 ifneq (,$(findstring clang,$(CC)))
 WARNINGS = -Weverything -Wno-padded -Wno-disabled-macro-expansion -Wno-sign-conversion -Wno-shorten-64-to-32 -Wno-documentation-unknown-command -Wno-documentation -Wno-unused-variable -Wno-reserved-id-macro -Wno-cast-qual -Wno-double-promotion
 else
-WARNINGS = -Wall -Wextra -Wformat=2 -Wshadow -Wcast-qual -Wwrite-strings -Wunreachable-code -Wno-shadow -Wno-unused-variable -Wno-cast-qual
+WARNINGS = -Wall -Wextra -Wformat=2 -Wshadow -Wcast-qual -Wwrite-strings -Wunreachable-code -Wpedantic -Wno-shadow -Wno-unused-variable -Wno-cast-qual -Wno-array-bounds
 endif
 
 CFLAGS = $(WARNINGS) $(INCLUDES) -g -Werror
