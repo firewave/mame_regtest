@@ -25,10 +25,10 @@ endif
 all: mame_regtest$(BIN_EXT) create_image_xml$(BIN_EXT) create_report$(BIN_EXT)
 
 clean:
-	rm -f *.o
-	rm -f mame_regtest$(BIN_EXT)
-	rm -f create_image_xml$(BIN_EXT)
-	rm -f create_report$(BIN_EXT)
+	$(RM) -f *.o
+	$(RM) -f mame_regtest$(BIN_EXT)
+	$(RM) -f create_image_xml$(BIN_EXT)
+	$(RM) -f create_report$(BIN_EXT)
 	
 create_image_xml$(BIN_EXT): create_image_xml.c common.c
 	$(CC) $(CFLAGS) $? $(LIBS) -o $@

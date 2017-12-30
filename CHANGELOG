@@ -664,3 +664,4 @@
 	- removed CC definition from makefile
 	- updated warnings for Clang 5.0
 	- updated warnings for GCC 5.4 (ubuntu 16.04)
+	- use $(RM) in makefile
