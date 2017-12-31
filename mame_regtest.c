@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef NO_ASSERT
+#include <assert.h>
+
+#define ARRAY_LENGTH(x) (int) (sizeof(x) / sizeof(x[0]))
+#endif
 
 #ifdef __GNUC__
 #include <unistd.h>
@@ -79,7 +84,7 @@ enum cfg_type {
 struct slot_info {
 	xmlChar* name;
 	int slotoption_count;
-	xmlChar* slotoptions[512];
+	xmlChar* slotoptions[512]; /* TODO: allocate dynamically */
 	struct slot_info* next;
 };
 
@@ -103,10 +108,10 @@ struct driver_info {
 	xmlChar* sourcefile;
 	int savestate;
 	int ram_count;
-	int ramsizes[16];
+	int ramsizes[16]; /* TODO: allocate dynamically */
 	int ram_default;
 	int bios_count;
-	xmlChar* bioses[32];
+	xmlChar* bioses[64]; /* TODO: allocate dynamically */
 	int bios_default;
 	struct device_info* devices;
 	xmlChar* device_mandatory;
@@ -2152,6 +2157,9 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 				if( xmlStrcmp(game_children->name, (const xmlChar*)"biosset") == 0 ) {
 					xmlChar* bios_content = xmlGetProp(game_children, (const xmlChar*)"name");
 					if( bios_content ) {
+#ifndef NO_ASSERT
+						assert((*new_driv_inf)->bios_count < ARRAY_LENGTH((*new_driv_inf)->bioses));
+#endif
 						(*new_driv_inf)->bioses[(*new_driv_inf)->bios_count++] = bios_content;
 						{
 							int i = 0;
@@ -2187,6 +2195,9 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 				if( config_use_ramsize && (xmlStrcmp(game_children->name, (const xmlChar*)"ramoption") == 0) ) {
 					xmlChar* ram_content = xmlNodeGetContent(game_children);
 					if( ram_content ) {
+#ifndef NO_ASSERT
+						assert((*new_driv_inf)->ram_count < ARRAY_LENGTH((*new_driv_inf)->ramsizes));
+#endif
 						(*new_driv_inf)->ramsizes[(*new_driv_inf)->ram_count++] = atoi((const char*)ram_content);
 						{
 							int i = 0;
@@ -2295,6 +2306,9 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 						if( slotoption_name )
 						{
 							//printf("slotoption_name: %s\n", (const char*)slotoption_name);
+#ifndef NO_ASSERT
+							assert(new_slot_info->slotoption_count < ARRAY_LENGTH(new_slot_info->slotoptions));
+#endif
 							new_slot_info->slotoptions[new_slot_info->slotoption_count++] = slotoption_name;
 						}
 					

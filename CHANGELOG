@@ -677,3 +677,5 @@
 	- added missing IN_LIBXML define in create_image_xml.c
 	- changed libmxl2 includes to angle-brackets
 	- removed unnecessary bundled iconv
+	- increased size of driver_info.bioses
+	- added assertions to insertions into fixed sized arrays - disabled when SANITIZE is set
