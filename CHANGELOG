@@ -671,3 +671,6 @@
 	- updated bundled libxml2 to 2.9.3 and use 64-bit version to fix linking on Windows with latest MinGW
 	- updated bundled zlib to 1.2.8 and use 64-bit version to fix linking on Windows with latest MinGW
 	- adjusted makefile for Windows linking - no longer requires library files to be specified explicitly
+	- updated copyright
+	- removed references to specific library versions from README
+	- adjusted author name

@@ -1,11 +1,10 @@
 mame_regtest
-(c) Copyright 2005-2014 by Oliver Stoeneberg
+(c) Copyright 2005-2017 by Oliver Stöneberg
 
 http://www.breaken.de/mame_regtest
 
 notes:
-	- you need libxml2-2.6.27 to compile this
-	- you need zlib 1.2.3 to compile this
+	- you need libxml2 and zlib to compile this
 	- if you are using a compiler without dirent.h you need dirent API 1.11 to compile this: http://www.softagalleria.net/dirent.php
 	- if you are using a system with big-endian byte-order you have to comment the LITTLE_ENDIAN and uncomment the BIG_ENDIAN define
 	- XPath tutorial: http://www.zvon.org/xxl/XPathTutorial/General/examples.html
