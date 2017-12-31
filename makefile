@@ -5,7 +5,7 @@ BIN_EXT =
 endif
 
 ifeq ($(OS),Windows_NT)
-INCLUDES = -I./iconv/include -I./libxml2/include/libxml2 -I./zlib/include
+INCLUDES = -I./libxml2/include/libxml2 -I./zlib/include
 else
 INCLUDES = -I/usr/include/libxml2
 endif

@@ -676,3 +676,4 @@
 	- adjusted author name
 	- added missing IN_LIBXML define in create_image_xml.c
 	- changed libmxl2 includes to angle-brackets
+	- removed unnecessary bundled iconv
