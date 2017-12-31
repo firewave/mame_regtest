@@ -13,7 +13,7 @@ endif
 ifeq ($(OS),Windows_NT)
 LIBS = -L./libxml2/lib -L./zlib/lib
 endif
-LIBS += -lz -lxml2 -lpthread
+LIBS += -lz -lxml2
 ifneq ($(OS),Windows_NT)
 LIBS += -lpthread
 endif
