@@ -5,15 +5,17 @@ BIN_EXT =
 endif
 
 ifeq ($(OS),Windows_NT)
-INCLUDES = -I./iconv/include -I./libxml2/include -I./zlib/include
+INCLUDES = -I./iconv/include -I./libxml2/include/libxml2 -I./zlib/include
 else
 INCLUDES = -I/usr/include/libxml2
 endif
 
 ifeq ($(OS),Windows_NT)
-LIBS = ./libxml2/lib/libxml2.lib ./zlib/lib/zdll.lib
-else
-LIBS = -lz -lxml2 -lpthread
+LIBS = -L./libxml2/lib -L./zlib/lib
+endif
+LIBS += -lz -lxml2 -lpthread
+ifneq ($(OS),Windows_NT)
+LIBS += -lpthread
 endif
 
 ifneq (,$(findstring clang,$(CC)))

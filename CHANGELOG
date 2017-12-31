@@ -668,3 +668,6 @@
 	- added SANITIZE makefile option to specify sanitzer(s)
 	- added detection of operating system to makefile
 	- fixed warning in mrt_system() on Windows by checking against proper value
+	- updated bundled libxml2 to 2.9.3 and use 64-bit version to fix linking on Windows with latest MinGW
+	- updated bundled zlib to 1.2.8 and use 64-bit version to fix linking on Windows with latest MinGW
+	- adjusted makefile for Windows linking - no longer requires library files to be specified explicitly
