@@ -667,3 +667,4 @@
 	- use $(RM) in makefile
 	- added SANITIZE makefile option to specify sanitzer(s)
 	- added detection of operating system to makefile
+	- fixed warning in mrt_system() on Windows by checking against proper value

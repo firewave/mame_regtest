@@ -767,7 +767,7 @@ int mrt_system(const char* command, char** stdout_str, char** stderr_str)
 		close(out);
 	}
 
-	if((int)hProcess != -1)
+	if(hProcess != INVALID_HANDLE_VALUE)
 	{
 		char szBuffer[512];
 		int nExitCode = STILL_ACTIVE;
