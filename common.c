@@ -118,8 +118,8 @@ void mrt_free(void *ptr)
 #ifdef __MINGW32__
 #define IN_LIBXML
 #endif
-#include "libxml/parser.h"
-#include "libxml/xmlmemory.h"
+#include <libxml/parser.h>
+#include <libxml/xmlmemory.h>
 
 xmlDocPtr mrt_xmlNewDoc(const xmlChar* version)
 {
@@ -258,8 +258,8 @@ void mrt_xmlFree(void* ptr)
 #ifdef __MINGW32__
 #define IN_LIBXML
 #endif
-#include "libxml/xmlmemory.h"
-#include "libxml/xpath.h"
+#include <libxml/xmlmemory.h>
+#include <libxml/xpath.h>
 #endif
 
 #include "common.h"

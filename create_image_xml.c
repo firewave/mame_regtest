@@ -2,8 +2,11 @@
 #include <stdlib.h>
 
 /* libxml2 */
-#include "libxml/parser.h"
-#include "libxml/xpath.h"
+#ifdef __MINGW32__
+#define IN_LIBXML
+#endif
+#include <libxml/parser.h>
+#include <libxml/xpath.h>
 
 #include "common.h"
 

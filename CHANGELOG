@@ -674,3 +674,5 @@
 	- updated copyright
 	- removed references to specific library versions from README
 	- adjusted author name
+	- added missing IN_LIBXML define in create_image_xml.c
+	- changed libmxl2 includes to angle-brackets
