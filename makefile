@@ -1,10 +1,20 @@
+ifeq ($(OS),Windows_NT)
 BIN_EXT = .exe
+else
+BIN_EXT =
+endif
 
+ifeq ($(OS),Windows_NT)
 INCLUDES = -I./iconv/include -I./libxml2/include -I./zlib/include
-#INCLUDES = -I/usr/include/libxml2
+else
+INCLUDES = -I/usr/include/libxml2
+endif
 
+ifeq ($(OS),Windows_NT)
 LIBS = ./libxml2/lib/libxml2.lib ./zlib/lib/zdll.lib
-#LIBS = -lz -lxml2 -lpthread
+else
+LIBS = -lz -lxml2 -lpthread
+endif
 
 ifneq (,$(findstring clang,$(CC)))
 WARNINGS = -Weverything -Wno-padded -Wno-disabled-macro-expansion -Wno-sign-conversion -Wno-shorten-64-to-32 -Wno-documentation-unknown-command -Wno-documentation -Wno-unused-variable -Wno-reserved-id-macro -Wno-cast-qual -Wno-double-promotion

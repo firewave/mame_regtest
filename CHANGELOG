@@ -666,3 +666,4 @@
 	- updated warnings for GCC 5.4 (ubuntu 16.04)
 	- use $(RM) in makefile
 	- added SANITIZE makefile option to specify sanitzer(s)
+	- added detection of operating system to makefile
