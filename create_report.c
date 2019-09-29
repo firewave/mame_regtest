@@ -28,7 +28,7 @@
 #include "common.h"
 #include "config.h"
 
-#define VERSION "0.74"
+#define VERSION "0.75"
 
 /*
 	TODO:

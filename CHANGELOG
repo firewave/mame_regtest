@@ -679,3 +679,5 @@
 	- removed unnecessary bundled iconv
 	- increased size of driver_info.bioses
 	- added assertions to insertions into fixed sized arrays - disabled when SANITIZE is set
+
+0.75

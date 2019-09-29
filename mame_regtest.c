@@ -66,7 +66,7 @@
 #define ATTR_NORETURN __attribute__((noreturn))
 #endif
 
-#define VERSION "0.74"
+#define VERSION "0.75"
 
 struct device_info {
 	xmlChar* name;
