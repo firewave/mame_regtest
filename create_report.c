@@ -97,7 +97,7 @@ static void build_group_cb(struct parse_callback_data* pcd)
 						break;
 					}
 					gd_entry = gd_entry->next;
-				};
+				}
 				
 				if( !found_srcfile ) {
 					struct group_data* new_gd_entry = (struct group_data*)malloc(sizeof(struct group_data));
@@ -119,7 +119,7 @@ static void build_group_cb(struct parse_callback_data* pcd)
 					while( dd_entry != NULL ) {
 						last_dd_entry = dd_entry;
 						dd_entry = dd_entry->next;
-					};
+					}
 				
 					if( !last_gd_entry->drivers )
 						last_gd_entry->drivers = new_dd;
@@ -155,7 +155,7 @@ static void free_group_data(struct group_data* gd)
 			tmp_dd_entry->filename = NULL;
 			free(tmp_dd_entry);
 			tmp_dd_entry = NULL;
-		};
+		}
 		
 		struct group_data* tmp_gd_entry = gd_entry;
 		gd_entry = gd_entry->next;
@@ -164,7 +164,7 @@ static void free_group_data(struct group_data* gd)
 		tmp_gd_entry->srcfile = NULL;
 		free(tmp_gd_entry);
 		tmp_gd_entry = NULL;
-	};
+	}
 }
 
 static char* config_xml_folder = NULL;
@@ -827,7 +827,6 @@ static int create_report_from_filename(const char *const filename, struct report
 							const int sep_len = 2;
 #else
 							const char* sep = "\n";
-							const int sep_len = 1;
 #endif
 							char** lines = split_string((const char*)stdout_key, sep);
 							int i = 0;
@@ -904,7 +903,6 @@ static int create_report_from_filename(const char *const filename, struct report
 							const int sep_len = 2;
 #else
 							const char* sep = "\n";
-							const int sep_len = 1;
 #endif
 							char** lines = split_string((const char*)stdout_key, sep);
 							int i = 0;
@@ -962,9 +960,9 @@ static void create_report_from_group_data(struct group_data* gd, struct report_c
 			if( data_written )
 				write_src_header = 0;
 			dd_entry = dd_entry->next;
-		};
+		}
 		gd_entry = gd_entry->next;
-	};
+	}
 }
 
 static void create_report_cb(struct parse_callback_data* pcd)

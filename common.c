@@ -452,7 +452,7 @@ void parse_directory(const char* dirname,
 				free(tmp_de);
 			}
 			de = readdir(d);
-		};
+		}
 
 		closedir(d);
 
@@ -836,7 +836,7 @@ void* create_thread(void)
 #else
 	pthread_t thread;
 	/* TODO: check result */
-	int ret = pthread_create(&thread, NULL, WorkerFuntion, NULL);
+	/*int ret = */pthread_create(&thread, NULL, WorkerFuntion, NULL);
 	return (void*)thread;
 #endif
 }
@@ -848,7 +848,7 @@ void wait_for_thread(void* thread)
 #else
 	void* thread_ret = NULL;
 	/* TODO: check result */
-	int ret = pthread_join((pthread_t)thread, &thread_ret);
+	/*int ret = */pthread_join((pthread_t)thread, &thread_ret);
 #endif
 }
 

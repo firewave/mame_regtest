@@ -681,3 +681,4 @@
 	- added assertions to insertions into fixed sized arrays - disabled when SANITIZE is set
 
 0.75
+    - fixed some Clang warnings

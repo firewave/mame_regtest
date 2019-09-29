@@ -1351,12 +1351,12 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 				struct dipvalue_info* next_dipvalue = dipvalue->next;
 				free(dipvalue);
 				dipvalue = next_dipvalue;
-			};
+			}
 			
 			struct dipswitch_info* next_dipswitch = dipswitch->next;
 			free(dipswitch);				
 			dipswitch = next_dipswitch;
-		};
+		}
 
 		struct dipswitch_info* configuration = actual_driv_inf->configurations;
 		while( configuration != NULL ) {
@@ -1368,12 +1368,12 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 				struct dipvalue_info* next_confsetting = confsetting->next;
 				free(confsetting);
 				confsetting = next_confsetting;
-			};
+			}
 			
 			struct dipswitch_info* next_configuration = configuration->next;
 			free(configuration);				
 			configuration = next_configuration;
-		};
+		}
 		
 		struct slot_info* slot = actual_driv_inf->slots;
 		while( slot != NULL ) {
@@ -1388,7 +1388,7 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf)
 			struct slot_info* next_slot = slot->next;
 			free(slot);
 			slot = next_slot;
-		};
+		}
 
 		if( actual_driv_inf->next ) {
 			struct driver_info* tmp_driv_inf = actual_driv_inf;
@@ -1883,10 +1883,10 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 					execute_mame3(&de, actual_driv_inf);
 					
 					dipvalue = dipvalue->next;
-				};
+				}
 
 				dipswitch = dipswitch->next;
-			};
+			}
 			
 			de.dipswitch = NULL;
 			de.dipvalue = NULL;
@@ -1911,10 +1911,10 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 					execute_mame3(&de, actual_driv_inf);
 					
 					confsetting = confsetting->next;
-				};
+				}
 
 				configuration = configuration->next;
-			};
+			}
 			
 			de.configuration = NULL;
 			de.confsetting = NULL;
@@ -1964,7 +1964,7 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				}
 
 				slot = slot->next;
-			};
+			}
 			
 			de.slot = NULL;
 			de.slotoption = NULL;
