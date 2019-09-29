@@ -219,7 +219,22 @@ Entity: line 14: parser error : Extra content at the end of the document
 			- avconv
 		- add -listnetwork
 		- add sanity checks before adding attributes to avoid invalid XMLs being created
-		- remove memory leak checking code in favor of LeakSanitizer?
+		- remove memory leak checking code in favor of LeakSanitizer? no available for Windows yet
+		- release package lacks the DLLs
+		- Value internal not supported for option debugger - falling back to auto
+		- make SDL_VIDEODRIVER=dummy work again
+		- support debugger rewind
+		- add use_softwarelist mode which only uses supported entries
+		- add use_softwarelist mode which doesn't run the set without software
+		- speed up parsing of software lists (use xpath?)
+		- make use_softwarelist boolean and split up the modes into multiple settings so they can be combined
+			- per interface
+			- all entries
+			- one entry per softlist (not possible since the information is missing)
+			- only software supported by region
+			- run the set without software
+		- are completey unsupported software lists properly handled by -listsoftware? (support="no" on top level)
+		- add DrMemory support
 		
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -362,6 +377,7 @@ Entity: line 14: parser error : Extra content at the end of the document
 			octopus.c: octopus - Average speed: 0.00%
 		- make the pngcmp path configurable so the file doesn't need to be copied
 		- add option to ignore missing roms in report
+		- support an output file for the speed etc. report
 			
 	create_image_xml
 		- add more output to create_image_xml
@@ -379,3 +395,7 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- create patch to write ui_popup() to -log output
 		- MAME patches
 			- add "exit"/"run-and-hide" command to debugger
+		- move documentation from mess.redump to GitHub
+		- link breaken.de and mess.redump pages to GitHub
+		http://mess.redump.net/tools:mame_regtest:config
+		http://mess.redump.net/tools:mame_regtest
