@@ -682,3 +682,5 @@
 
 0.75
     - fixed some Clang warnings
+    - added CMake support
+    - added .gitignore
