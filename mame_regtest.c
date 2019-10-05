@@ -731,7 +731,6 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 					last_entry->next = image;
 				}
 				else {
-					last_entry = image;
 					*images = image;
 				}
 				
@@ -844,7 +843,6 @@ static int get_IHDR_data(FILE* in_fd, unsigned int* IHDR_width, unsigned int* IH
 static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc)
 {
 	unsigned int chunk_size = 0;
-    uint32_t reversed_chunk_size = 0;
 	unsigned char chunk_name[4] = "";
 
 	for( ; ; ) {
@@ -853,7 +851,7 @@ static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, uns
 			return 0;
 		}
 
-		reversed_chunk_size = htonl(chunk_size);
+		uint32_t reversed_chunk_size = htonl(chunk_size);
 		
 		if( fread(chunk_name, sizeof(unsigned char), 4, in_fd) != 4 ) {
 			fprintf(stderr, "could not read IDAT chunk name\n");
@@ -1038,11 +1036,11 @@ static int create_cfg(struct driver_entry* de, int type)
 		xmlNodePtr port_node = xmlNewChild(input_node, NULL, (const xmlChar*)"port", NULL);
 		xmlNewProp(port_node, (const xmlChar*)"tag", (const xmlChar*)inp_name->tag);
 		xmlNewProp(port_node, (const xmlChar*)"type", (const xmlChar*)type_str);
-		snprintf(tmp, sizeof(tmp), "%d", inp_name->mask);
+		snprintf(tmp, sizeof(tmp), "%u", inp_name->mask);
 		xmlNewProp(port_node, (const xmlChar*)"mask", (const xmlChar*)tmp);
-		snprintf(tmp, sizeof(tmp), "%d", inp_name->defvalue);
+		snprintf(tmp, sizeof(tmp), "%u", inp_name->defvalue);
 		xmlNewProp(port_node, (const xmlChar*)"defvalue", (const xmlChar*)tmp);
-		snprintf(tmp, sizeof(tmp), "%d", inp_value->value);
+		snprintf(tmp, sizeof(tmp), "%u", inp_value->value);
 		xmlNewProp(port_node, (const xmlChar*)"value", (const xmlChar*)tmp);
 		
 		res = 1;
@@ -1232,7 +1230,6 @@ static int execute_mame(struct driver_entry* de, const char* parameters, int red
 #else
 		char* stdout_str = NULL;
 		char* stderr_str = NULL;
-		int sys_res = -1;
 		if( redirect )
 			sys_res = mrt_system(sys, &stdout_str, &stderr_str);
 		else if( stdout_out )
@@ -1519,7 +1516,6 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 	if( !(config_skip_mandatory && de->device_mandatory) )
 		execute_mame2(de);
 	
-	int software_processed = 0;
 	int software_count = 0;
 
 	/* process softlist output */
@@ -1534,6 +1530,7 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 		/* process softlist entries */
 		xmlDocPtr soft_doc = xmlReadFile(driver_softlist_file, NULL, XML_PARSE_DTDVALID);
 		if( soft_doc ) {
+			int software_processed = 0;
 			xmlNodeSetPtr soft_nodeset = NULL;
 			char* softwarelist_xpath = NULL;
 			if( !config_hack_softwarelist )

@@ -686,6 +686,8 @@
     - added .gitignore
     - added .clang-tidy
     - fixed some clang-tidy warnings
+    - fixed Cppcheck warnings
 
     create_report
     - fixed some clang-tidy warnings
+    - fixed Cppcheck warnings

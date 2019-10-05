@@ -79,7 +79,7 @@ void* mrt_malloc(size_t size)
 	init_pointer_array();
 
 	void* ptr = malloc(size);
-	printf("%d - malloc - %u - %p\n", ++m, size, ptr);
+	printf("%d - malloc - %zu - %p\n", ++m, size, ptr);
 	add_pointer(ptr);
 	return ptr;
 }
@@ -99,7 +99,7 @@ void* mrt_realloc(void* ptr, size_t size)
 	init_pointer_array();
 
 	void* ptr2 = realloc(ptr, size);
-	printf("%d - realloc - %p - %u - %p\n", (ptr == NULL) ? ++m : -1, ptr, size, ptr2);
+	printf("%d - realloc - %p - %zu - %p\n", (ptr == NULL) ? ++m : -1, ptr, size, ptr2);
 	replace_pointer(ptr, ptr2);
 	return ptr2;
 }
@@ -376,9 +376,8 @@ int copy_file(const char* source, const char* dest)
 
 	char buf[1024];
 	size_t read_bytes;
-	size_t written_bytes;
 	while( (read_bytes = fread(buf, 1, sizeof(buf), in_fd)) != 0 ) {
-		written_bytes = fwrite(buf, 1, read_bytes, out_fd);
+        size_t written_bytes = fwrite(buf, 1, read_bytes, out_fd);
 		if( written_bytes != read_bytes ) {
 			printf("copy_file() - could not write to: %s\n", dest);
 			result = -1;

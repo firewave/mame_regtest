@@ -704,8 +704,6 @@ static int create_report_from_filename(const char *const filename, struct report
 			append_string(&old_path, FILESLASH);
 			append_string(&old_path, entry_name);
 			if( access(old_path, F_OK) == 0 ) {
-				int write_set_data = 1;
-
 				xmlDocPtr doc_old = xmlReadFile(old_path, NULL, 0);
 				xmlDocPtr doc = xmlReadFile(filename, NULL, 0);
 
@@ -778,9 +776,6 @@ static int create_report_from_filename(const char *const filename, struct report
 				doc = NULL;
 				xmlFreeDoc(doc_old);
 				doc = NULL;
-				
-				if( write_set_data == 0 )
-					fprintf(r_cb_data->report_fd, "</p>\n");
 			}
 			else {
 				fprintf(r_cb_data->report_fd, "%s - new\n", entry_name);
