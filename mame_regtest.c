@@ -331,12 +331,10 @@ static void strip_sampleof_pinmame(const char* listxml_in, const char* listxml_o
 
 	if( out_fd ) {
 		fclose(out_fd);
-		out_fd = NULL;
 	}
 	
 	if( in_fd ) {
 		fclose(in_fd);
-		in_fd = NULL;
 	}
 }
 
@@ -693,12 +691,13 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 					if( part_child->type == XML_ELEMENT_NODE ) {
 						if( xmlStrcmp(part_child->name, (const xmlChar*)"feature") == 0 ) {
 							xmlChar* name_key = xmlGetProp(part_child, (const xmlChar*)"name");
-							if( xmlStrcmp(name_key, (const xmlChar*)"compatibility") == 0 )
-								image->device_filter = xmlGetProp(part_child, (const xmlChar*)"value");
-							else if( xmlStrcmp(name_key, (const xmlChar*)"slot") == 0 )
-								image->device_slot = xmlGetProp(part_child, (const xmlChar*)"value");
-							xmlFree(name_key);
-							name_key = NULL;
+							if (name_key) {
+								if (xmlStrcmp(name_key, (const xmlChar *) "compatibility") == 0)
+									image->device_filter = xmlGetProp(part_child, (const xmlChar *) "value");
+								else if (xmlStrcmp(name_key, (const xmlChar *) "slot") == 0)
+									image->device_slot = xmlGetProp(part_child, (const xmlChar *) "value");
+								xmlFree(name_key);
+							}
 							if( image->device_filter && image->device_slot )
 								break;
 						}
@@ -742,11 +741,8 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 	}
 
 	xmlFree(supported);
-	supported = NULL;
-	
 	xmlFree(entry_name);
-	entry_name = NULL;
-	
+
 	return 1;
 }
 
@@ -1053,7 +1049,6 @@ static int create_cfg(struct driver_entry* de, int type)
 		xmlSaveFormatFileEnc(cfgfile, cfg_doc, "UTF-8", 1);
 	
 	xmlFreeDoc(cfg_doc);
-	cfg_doc = NULL;
 
 	free(cfgfile);
 	cfgfile = NULL;
@@ -1469,7 +1464,6 @@ static void execute_mame2(struct driver_entry* de)
 	}
 	
 	free(params);
-	params = NULL;
 
 	if( (config_store_output > 0) && (access(dummy_root, F_OK) == 0) ) {
 		char* outputdir = NULL;
@@ -1507,7 +1501,6 @@ static void execute_mame2(struct driver_entry* de)
 
 	if( output_doc ) {
 		xmlFreeDoc(output_doc);
-		output_doc = NULL;
 	}
 }
 
@@ -1531,12 +1524,11 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 		xmlDocPtr soft_doc = xmlReadFile(driver_softlist_file, NULL, XML_PARSE_DTDVALID);
 		if( soft_doc ) {
 			int software_processed = 0;
-			xmlNodeSetPtr soft_nodeset = NULL;
 			char* softwarelist_xpath = NULL;
 			if( !config_hack_softwarelist )
 				append_string(&softwarelist_xpath, "/softwarelists");
 			append_string(&softwarelist_xpath, "/softwarelist/software");
-			soft_nodeset = get_xpath_nodeset(soft_doc, (const xmlChar*)softwarelist_xpath);
+			xmlNodeSetPtr soft_nodeset = get_xpath_nodeset(soft_doc, (const xmlChar*)softwarelist_xpath);
 			
 			if( soft_nodeset )
 			{
@@ -1667,15 +1659,13 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 				}
 				
 				xmlXPathFreeNodeSet(soft_nodeset);
-				soft_nodeset = NULL;
 			}
 
 			free(softwarelist_xpath);
 			softwarelist_xpath = NULL;
 			
 			xmlFreeDoc(soft_doc);
-			soft_doc = NULL;
-			
+
 			if( config_verbose )
 				printf("software_processed: %d\n", software_processed);
 
@@ -1732,7 +1722,6 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 				}
 
 				xmlFreeDoc(device_doc);
-				device_doc = NULL;
 			}
 		}
 
@@ -1812,7 +1801,6 @@ static void process_driver_info_list(struct driver_info* driv_inf)
 				if( f ) {
 					fwrite(stdout_str, 1, strlen(stdout_str), f);
 					fclose(f);
-					f = NULL;
 				}
 				
 				free(out_file);
@@ -2034,7 +2022,6 @@ static int parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_inf
 						last_dipvalue = new_dipvalue;
 						
 						xmlFree(dipvalue_value);
-						dipvalue_value = NULL;
 					}
 					
 					xmlFree(dipvalue_default);
@@ -2059,8 +2046,7 @@ static int parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_inf
 		*last_dip_info = new_dip_info;
 		
 		xmlFree(dip_mask);
-		dip_mask = NULL;
-		
+
 		return 1;
 	}
 	
@@ -2350,20 +2336,21 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 
 			if( app_type != APP_UNKNOWN ) {
 				xmlChar* debug_attr = xmlGetProp(root, (const xmlChar*)"debug");
-				if( xmlStrcmp(debug_attr, (const xmlChar*)"yes") == 0 )
-					is_debug = 1;
-				xmlFree(debug_attr);
-				debug_attr = NULL;
+				if ( debug_attr ) {
+					if (xmlStrcmp(debug_attr, (const xmlChar *) "yes") == 0)
+						is_debug = 1;
+					xmlFree(debug_attr);
+				}
 
 				app_ver = xmlGetProp(root, (const xmlChar*)"build");
 				if( app_ver )
 					printf("build: %s%s\n", app_ver, is_debug ? " (debug)" : "");
 
 				xmlChar* mameconfig_attr = xmlGetProp(root, (const xmlChar*)"mameconfig");
-				if( mameconfig_attr )
-					mameconfig_ver = atoi((const char*)mameconfig_attr);
-				xmlFree(mameconfig_attr);
-				mameconfig_attr = NULL;
+				if( mameconfig_attr ) {
+					mameconfig_ver = atoi((const char *) mameconfig_attr);
+					xmlFree(mameconfig_attr);
+				}
 
 				if( config_xpath_expr && (*config_xpath_expr != 0) ) {
 					if( strstr(config_xpath_expr, xpath_placeholder) == NULL )
@@ -2421,14 +2408,11 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 							xmlBufferDump(xpath_result_fd, xmlBuf);
 							fprintf(xpath_result_fd, "</xpath_result>\n");
 							fclose(xpath_result_fd);
-							xpath_result_fd = NULL;
 
 							xmlBufferFree(xmlBuf);
-							xmlBuf = NULL;
 						}
 						
 						xmlXPathFreeNodeSet(nodeset);
-						nodeset = NULL;
 					}
 
 					free(real_xpath_expr);
@@ -2737,7 +2721,6 @@ int main(int argc, char *argv[])
 			if( f ) {
 				fwrite(stdout_str, 1, strlen(stdout_str), f);
 				fclose(f);
-				f = NULL;
 			}
 			
 			free(out_file);
@@ -2772,7 +2755,6 @@ int main(int argc, char *argv[])
 		if( f ) {
 			fwrite(stdout_str, 1, strlen(stdout_str), f);
 			fclose(f);
-			f = NULL;
 		}
 
 		free(stdout_str);
@@ -2827,7 +2809,6 @@ int main(int argc, char *argv[])
 			fprintf(debugscript_fd, "softreset\n");
 		fprintf(debugscript_fd, "go\n");
 		fclose(debugscript_fd);
-		debugscript_fd = NULL;
 	}
 	else {
 		if( config_test_softreset )

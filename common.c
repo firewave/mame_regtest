@@ -349,7 +349,6 @@ error:
 	if( fd != NULL )
 	{
 		fclose(fd);
-		fd = NULL;		
 	}
 	return errno;
 }
@@ -367,8 +366,7 @@ int copy_file(const char* source, const char* dest)
 		printf("copy_file() - could not create file: %s\n", dest);
 		
 		fclose(in_fd);
-		in_fd = NULL;
-		
+
 		return -1;
 	}
 	
@@ -386,11 +384,8 @@ int copy_file(const char* source, const char* dest)
 	}
 
 	fclose(out_fd);
-	out_fd = NULL;
-
 	fclose(in_fd);
-	in_fd = NULL;
-	
+
 	if( result == -1 )
 		remove(dest);
 	
@@ -562,7 +557,6 @@ void calc_crc32(const char* file, unsigned long* crc)
 	}
 
 	fclose(fd);
-	fd = NULL;
 }
 
 char** split_string(const char* str, const char* delims)
@@ -634,7 +628,6 @@ void replace_string(const char* input, char** output, const char* old_str, const
 	}
 	
 	free(str_copy);
-	str_copy = NULL;
 }
 
 #if defined (_MSC_VER) || defined (__MINGW32__)

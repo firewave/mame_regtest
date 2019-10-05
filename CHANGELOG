@@ -687,7 +687,13 @@
     - added .clang-tidy
     - fixed some clang-tidy warnings
     - fixed Cppcheck warnings
+    - removed several unnecessary NULL assignments after free
+    - added some missing pointer checks
 
     create_report
     - fixed some clang-tidy warnings
     - fixed Cppcheck warnings
+    - removed several unnecessary NULL assignments after free
+
+    create_image_xml
+    - removed several unnecessary NULL assignments after free

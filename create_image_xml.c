@@ -53,7 +53,6 @@ int main(int argc, char *argv[])
 	xmlSaveFormatFileEnc(argv[2], images_doc, "UTF-8", 1);
 	
 	xmlFreeDoc(images_doc);
-	images_doc = NULL;	
 
 	return 0;
 }

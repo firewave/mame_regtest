@@ -129,7 +129,6 @@ static void build_group_cb(struct parse_callback_data* pcd)
 				}
 				
 				xmlFreeDoc(doc);
-				doc = NULL;
 			}
 		}
 	}	
@@ -155,7 +154,6 @@ static void free_group_data(struct group_data* gd)
 			free(tmp_dd_entry->filename);
 			tmp_dd_entry->filename = NULL;
 			free(tmp_dd_entry);
-			tmp_dd_entry = NULL;
 		}
 		
 		struct group_data* tmp_gd_entry = gd_entry;
@@ -164,7 +162,6 @@ static void free_group_data(struct group_data* gd)
 		xmlFree(tmp_gd_entry->srcfile);
 		tmp_gd_entry->srcfile = NULL;
 		free(tmp_gd_entry);
-		tmp_gd_entry = NULL;
 	}
 }
 
@@ -546,13 +543,8 @@ static int create_report_from_filename(const char *const filename, struct report
 								data_written = 1;
 							}
 							xmlFree(stdout_key);
-							stdout_key = NULL;
-		
 							xmlFree(stderr_key);
-							stderr_key = NULL;
-		
 							xmlFree(exitcode_key);
-							exitcode_key = NULL;
 						}
 						// TODO: set this up differently
 						else if( xmlStrcmp(output_childs->name, (const xmlChar*)"devices") == 0 )
@@ -566,7 +558,6 @@ static int create_report_from_filename(const char *const filename, struct report
 				FREE_KEYS
 		
 				xmlFreeDoc(doc);
-				doc = NULL;
 			}
 		}
 		break;
@@ -645,7 +636,6 @@ static int create_report_from_filename(const char *const filename, struct report
 						char* outfile = get_filename(outpath);
 						fprintf(r_cb_data->report_fd, "<img src=\"%s\" alt=\"%s\"/>\n", outfile, outfile);
 						free(outfile);
-						outfile = NULL;
 					}
 					
 					free(pngcmp_cmd);
@@ -657,15 +647,11 @@ static int create_report_from_filename(const char *const filename, struct report
 					free(path1);
 					path1 = NULL;
 					free(entry_name_base);
-					entry_name_base = NULL;
 					free(png_path);
 					png_path = NULL;
 					
 					xmlFree(srcfile);
-					srcfile = NULL;
-					
 					xmlFree(name);
-					name = NULL;
 				}
 				
 				FREE_KEYS
@@ -676,10 +662,8 @@ static int create_report_from_filename(const char *const filename, struct report
 					xmlXPathFreeContext(xpathCtx1);
 
 				xmlFreeDoc(doc);
-				doc = NULL;
 				xmlFreeDoc(doc_old);
-				doc = NULL;
-				
+
 				if( write_set_data == 0 )
 					fprintf(r_cb_data->report_fd, "</p>\n");
 			}
@@ -689,9 +673,7 @@ static int create_report_from_filename(const char *const filename, struct report
 			free(old_path);
 			old_path = NULL;
 			free(entry_directory);
-			entry_directory = NULL;
 			free(entry_name);
-			entry_name = NULL;
 		}
 		break;
 		
@@ -757,12 +739,10 @@ static int create_report_from_filename(const char *const filename, struct report
 				if( attr2 )
 				{
 					xmlFree(attr2);
-					attr2 = NULL;
 				}
 				if( attr1 )
 				{
 					xmlFree(attr1);
-					attr1 = NULL;
 				}
 				
 				FREE_KEYS
@@ -773,9 +753,7 @@ static int create_report_from_filename(const char *const filename, struct report
 					xmlXPathFreeContext(xpathCtx1);
 
 				xmlFreeDoc(doc);
-				doc = NULL;
 				xmlFreeDoc(doc_old);
-				doc = NULL;
 			}
 			else {
 				fprintf(r_cb_data->report_fd, "%s - new\n", entry_name);
@@ -783,9 +761,7 @@ static int create_report_from_filename(const char *const filename, struct report
 			free(old_path);
 			old_path = NULL;
 			free(entry_directory);
-			entry_directory = NULL;
 			free(entry_name);
-			entry_name = NULL;
 		}
 		break;
 		
@@ -846,7 +822,6 @@ static int create_report_from_filename(const char *const filename, struct report
 							free_array(lines);
 							
 							xmlFree(stdout_key);
-							stdout_key = NULL;
 						}
 						// TODO: set this up differently
 						else if( xmlStrcmp(output_childs->name, (const xmlChar*)"devices") == 0 )
@@ -860,7 +835,6 @@ static int create_report_from_filename(const char *const filename, struct report
 				FREE_KEYS
 		
 				xmlFreeDoc(doc);
-				doc = NULL;
 			}
 		}
 		break;
@@ -924,7 +898,6 @@ static int create_report_from_filename(const char *const filename, struct report
 							free_array(lines);
 							
 							xmlFree(stdout_key);
-							stdout_key = NULL;
 						}
 						// TODO: set this up differently
 						else if( xmlStrcmp(output_childs->name, (const xmlChar*)"devices") == 0 )
@@ -938,7 +911,6 @@ static int create_report_from_filename(const char *const filename, struct report
 				FREE_KEYS
 		
 				xmlFreeDoc(doc);
-				doc = NULL;
 			}
 		}
 		break;
@@ -1069,7 +1041,6 @@ static void create_report()
 	if (report_fd != NULL)
 	{ 
 		fclose(report_fd);
-		report_fd = NULL;
 	}
 }
 
