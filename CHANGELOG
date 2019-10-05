@@ -684,3 +684,8 @@
     - fixed some Clang warnings
     - added CMake support
     - added .gitignore
+    - added .clang-tidy
+    - fixed some clang-tidy warnings
+
+    create_report
+    - fixed some clang-tidy warnings

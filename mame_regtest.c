@@ -416,11 +416,11 @@ static int parse_mng(const char* file, xmlNodePtr filenode)
 			internal_get_next_IDAT_data(mng_fd, &IDAT_size, &IDAT_crc);
 			continue;
 		}
-		else if( res == 2 ) {
+		if( res == 2 ) {
 			/* end of file reached - do nothing - exit loop */
 			break;
 		}
-		else if( res == 0 ) {
+		if( res == 0 ) {
 			fprintf(stderr, "unexpected error parsing MNG '%s'\n", file);
 			break;
 		}
@@ -488,9 +488,9 @@ static void parse_callback(struct parse_callback_data* pcd)
 		snprintf(tmp, sizeof(tmp), "%ld", pcd->s->st_size);
 		xmlNewProp(filenode, (const xmlChar*)"size", (const xmlChar*)tmp);
 
-		unsigned int crc = 0;
+        unsigned long crc = 0;
 		calc_crc32(pcd->fullname, &crc);
-		snprintf(tmp, sizeof(tmp), "%x", crc);
+		snprintf(tmp, sizeof(tmp), "%lx", crc);
 		xmlNewProp(filenode, (const xmlChar*)"crc", (const xmlChar*)tmp);
 
 		if( strstr(pcd->entry_name, ".png") ) {
@@ -844,7 +844,7 @@ static int get_IHDR_data(FILE* in_fd, unsigned int* IHDR_width, unsigned int* IH
 static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc)
 {
 	unsigned int chunk_size = 0;
-	unsigned int reversed_chunk_size = 0;
+    uint32_t reversed_chunk_size = 0;
 	unsigned char chunk_name[4] = "";
 
 	for( ; ; ) {
@@ -868,11 +868,10 @@ static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, uns
 				fprintf(stderr, "could not read IDAT chunk CRC\n");
 				return 0;
 			}
-			else {
-				*IDAT_size = reversed_chunk_size;
-				*IDAT_crc = chunk_crc;
-				return 1;
-			}
+
+			*IDAT_size = reversed_chunk_size;
+			*IDAT_crc = chunk_crc;
+			return 1;
 		}
 
 		if( memcmp(IEND_name, chunk_name, 4) == 0 ) {

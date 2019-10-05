@@ -119,7 +119,7 @@ char* get_filename_base(const char* filepath);
 
 void clear_directory(const char* dirname, int delete_root);
 
-void calc_crc32(const char* file, unsigned int* crc);
+void calc_crc32(const char* file, unsigned long* crc);
 
 /* you have to free the result with free_array() */
 char** split_string(const char* str, const char* delims);
@@ -140,7 +140,7 @@ void libxml2_init(void);
 void* create_thread(void);
 void wait_for_thread(void* thread);
 
-void filter_unprintable(char* str, int len);
+void filter_unprintable(char* str, size_t len);
 
 struct mrt_array
 {

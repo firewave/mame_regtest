@@ -66,8 +66,9 @@ static void build_group_cb(struct parse_callback_data* pcd)
 				int read_res = read_file(pcd->fullname, &filecontent);
 				if( read_res == 0 )
 				{
-					filter_unprintable(filecontent, strlen(filecontent));
-					doc = xmlReadMemory(filecontent, strlen(filecontent), NULL, "UTF-8", 0);
+					const size_t len = strlen(filecontent);
+					filter_unprintable(filecontent, len);
+					doc = xmlReadMemory(filecontent, len, NULL, "UTF-8", 0);
 					free(filecontent);
 				}
 				else
@@ -415,8 +416,9 @@ static int create_report_from_filename(const char *const filename, struct report
 				int read_res = read_file(filename, &filecontent);
 				if( read_res == 0 )
 				{
-					filter_unprintable(filecontent, strlen(filecontent));
-					doc = xmlReadMemory(filecontent, strlen(filecontent), NULL, "UTF-8", 0);
+					const size_t len = strlen(filecontent);
+					filter_unprintable(filecontent, len);
+					doc = xmlReadMemory(filecontent, len, NULL, "UTF-8", 0);
 					free(filecontent);
 				}
 				else
@@ -800,8 +802,9 @@ static int create_report_from_filename(const char *const filename, struct report
 				int read_res = read_file(filename, &filecontent);
 				if( read_res == 0 )
 				{
-					filter_unprintable(filecontent, strlen(filecontent));
-					doc = xmlReadMemory(filecontent, strlen(filecontent), NULL, "UTF-8", 0);
+					const size_t len = strlen(filecontent);
+					filter_unprintable(filecontent, len);
+					doc = xmlReadMemory(filecontent, len, NULL, "UTF-8", 0);
 					free(filecontent);
 				}
 				else
@@ -875,8 +878,9 @@ static int create_report_from_filename(const char *const filename, struct report
 				int read_res = read_file(filename, &filecontent);
 				if( read_res == 0 )
 				{
-					filter_unprintable(filecontent, strlen(filecontent));
-					doc = xmlReadMemory(filecontent, strlen(filecontent), NULL, "UTF-8", 0);
+					const size_t len = strlen(filecontent);
+					filter_unprintable(filecontent, len);
+					doc = xmlReadMemory(filecontent, len, NULL, "UTF-8", 0);
 					free(filecontent);
 				}
 				else

@@ -468,7 +468,7 @@ void parse_directory(const char* dirname,
 
 int is_absolute_path(const char* path)
 {
-	int len = strlen(path);
+	const size_t len = strlen(path);
 
 #ifdef WIN32
 	if(len >= 3 && path[1] == ':' && path[2] == '\\')
@@ -549,7 +549,7 @@ void clear_directory(const char* dirname, int delete_root)
 		rmdir(dirname);
 }
 
-void calc_crc32(const char* file, unsigned int* crc)
+void calc_crc32(const char* file, unsigned long* crc)
 {
 	char buffer[1024];
 	FILE* fd = fopen(file, "rb");
@@ -852,9 +852,9 @@ void wait_for_thread(void* thread)
 #endif
 }
 
-void filter_unprintable(char* str, int len)
+void filter_unprintable(char* str, size_t len)
 {
-	int i = 0;
+	size_t i = 0;
 	for(; i < len; ++i)
 	{
 		int c = str[i];
