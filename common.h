@@ -39,6 +39,8 @@ void print_leaked_pointers();
 
 #include <sys/stat.h>
 
+#include <libxml/xpath.h>
+
 /* getch */
 #ifdef WIN32
 #include <conio.h>

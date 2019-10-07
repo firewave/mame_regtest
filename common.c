@@ -338,7 +338,6 @@ int read_file(const char* file, char** content)
 		}
 
 		fclose(fd);
-		fd = NULL;
 	}
 	else
 		goto error;

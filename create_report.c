@@ -113,8 +113,7 @@ static void build_group_cb(struct parse_callback_data* pcd)
 				}
 				else {
 					xmlFree(sourcefile_key);
-					sourcefile_key = NULL;
-					
+
 					struct driver_data* dd_entry = last_gd_entry->drivers;
 					struct driver_data* last_dd_entry = NULL;
 					while( dd_entry != NULL ) {

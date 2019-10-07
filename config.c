@@ -23,9 +23,6 @@
 #define IN_LIBXML
 #endif
 #include <libxml/parser.h>
-#include <libxml/xpath.h>
-
-#include "common.h"
 
 static xmlDocPtr global_config_doc = NULL;
 static xmlNodePtr global_config_root = NULL;

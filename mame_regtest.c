@@ -669,9 +669,7 @@ static int read_softlist_entry(const xmlNodePtr node, struct image_entry** image
 				struct image_entry* image = (struct image_entry*)malloc(sizeof(struct image_entry));
 				if( !image ) {
 					xmlFree(supported);
-					supported = NULL;
 					xmlFree(entry_name);
-					entry_name = NULL;
 					free_image_entries(*images);
 					*images = NULL;
 					return 0;
@@ -2300,7 +2298,6 @@ static void parse_listxml_element(const xmlNodePtr game_child, struct driver_inf
 					if( new_slot_info->slotoptions[0] == NULL ) {
 						//printf("no non-default slotoptions\n");
 						free(new_slot_info);
-						new_slot_info = NULL;
 						goto next;
 					}
 					
