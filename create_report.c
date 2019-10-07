@@ -264,7 +264,7 @@ static void convert_br(xmlChar* str)
 		*s++ = 'b';
 		*s++ = 'r';
 		*s++ = '/';
-		*s++ = '>';
+		*s = '>';
 	}
 }
 
