@@ -55,7 +55,7 @@ int config_init(const char* config_xml, const char* root_node)
 	return 1;
 }
 
-static int config_read_option(const xmlNodePtr config_node, const char* name, xmlChar** option)
+static int config_read_option(const xmlNode* config_node, const char* name, xmlChar** option)
 {
 	int result = 0;
 
@@ -92,7 +92,7 @@ static int config_read_option(const xmlNodePtr config_node, const char* name, xm
 	return result;
 }
 
-static void config_read_option_int(const xmlNodePtr config_node, const char* opt_name, int* value)
+static void config_read_option_int(const xmlNode* config_node, const char* opt_name, int* value)
 {
 	xmlChar* opt = NULL;
 	if( config_read_option(config_node, opt_name, &opt) ) {
@@ -103,7 +103,7 @@ static void config_read_option_int(const xmlNodePtr config_node, const char* opt
 	xmlFree(opt);
 }
 
-static void config_read_option_str_ptr(const xmlNodePtr config_node, const char* opt_name, char** value)
+static void config_read_option_str_ptr(const xmlNode* config_node, const char* opt_name, char** value)
 {
 	xmlChar* opt = NULL;
 	if( config_read_option(config_node, opt_name, &opt) ) {

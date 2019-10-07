@@ -618,7 +618,7 @@ static void free_image_entries(struct image_entry* images)
 	}
 }
 
-static int read_image_entries(const xmlNodePtr node, struct image_entry** images)
+static int read_image_entries(const xmlNode* node, struct image_entry** images)
 {
 	*images = NULL;
 
@@ -653,7 +653,7 @@ static int read_image_entries(const xmlNodePtr node, struct image_entry** images
 
 /* reads data from a "software" element node */
 /* TODO: what about the return value? */
-static int read_softlist_entry(const xmlNodePtr node, struct image_entry** images, struct driver_info* driv_inf)
+static int read_softlist_entry(const xmlNode* node, struct image_entry** images, struct driver_info* driv_inf)
 {
 	*images = NULL;
 	
@@ -2051,7 +2051,7 @@ static int parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_inf
 	return 0;
 }
 
-static void parse_listxml_element(const xmlNodePtr game_child, struct driver_info** new_driv_inf)
+static void parse_listxml_element(const xmlNode* game_child, struct driver_info** new_driv_inf)
 {
 	/* "game" in MAME and "machine" in MESS */
 	if( ((app_type == APP_MAME) && (xmlStrcmp(game_child->name, (const xmlChar*)"game") == 0)) ||
