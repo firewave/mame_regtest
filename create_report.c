@@ -68,7 +68,7 @@ static void build_group_cb(struct parse_callback_data* pcd)
 				{
 					const size_t len = strlen(filecontent);
 					filter_unprintable(filecontent, len);
-					doc = xmlReadMemory(filecontent, len, NULL, "UTF-8", 0);
+					doc = xmlReadMemory(filecontent, (int)len, NULL, "UTF-8", 0);
 					free(filecontent);
 				}
 				else
@@ -415,7 +415,7 @@ static int create_report_from_filename(const char *const filename, struct report
 				{
 					const size_t len = strlen(filecontent);
 					filter_unprintable(filecontent, len);
-					doc = xmlReadMemory(filecontent, len, NULL, "UTF-8", 0);
+					doc = xmlReadMemory(filecontent, (int)len, NULL, "UTF-8", 0);
 					free(filecontent);
 				}
 				else
@@ -712,7 +712,7 @@ static int create_report_from_filename(const char *const filename, struct report
 					{
 						pos1 += 14;
 						char* temp = NULL;
-						append_string_n(&temp, pos1, pos2-pos1);
+						append_string_n(&temp, pos1, (size_t)(pos2-pos1));
 						speed1 = atof(temp);
 						free(temp);
 						temp = NULL;
@@ -725,7 +725,7 @@ static int create_report_from_filename(const char *const filename, struct report
 					{
 						pos1 += 14;
 						char* temp = NULL;
-						append_string_n(&temp, pos1, pos2-pos1);
+						append_string_n(&temp, pos1, (size_t)(pos2-pos1));
 						speed2 = atof(temp);
 						free(temp);
 						temp = NULL;
@@ -775,7 +775,7 @@ static int create_report_from_filename(const char *const filename, struct report
 				{
 					const size_t len = strlen(filecontent);
 					filter_unprintable(filecontent, len);
-					doc = xmlReadMemory(filecontent, len, NULL, "UTF-8", 0);
+					doc = xmlReadMemory(filecontent, (int)len, NULL, "UTF-8", 0);
 					free(filecontent);
 				}
 				else
@@ -849,7 +849,7 @@ static int create_report_from_filename(const char *const filename, struct report
 				{
 					const size_t len = strlen(filecontent);
 					filter_unprintable(filecontent, len);
-					doc = xmlReadMemory(filecontent, len, NULL, "UTF-8", 0);
+					doc = xmlReadMemory(filecontent, (int)len, NULL, "UTF-8", 0);
 					free(filecontent);
 				}
 				else

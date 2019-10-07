@@ -145,7 +145,7 @@ void filter_unprintable(char* str, size_t len);
 struct mrt_array
 {
 	void** ptr;
-	int size;
+	size_t size;
 };
 
 void append_to_array(struct mrt_array* arr, void* to_append);

@@ -316,9 +316,9 @@ int read_file(const char* file, char** content)
 			{
 				if( fseek(fd, 0, SEEK_SET) == 0)
 				{
-					*content = (char*)malloc(filesize + 1);
-					int num_read = fread(*content, 1, filesize, fd);
-					if( num_read == filesize )
+					*content = (char*)malloc((size_t)filesize + 1);
+					size_t num_read = fread(*content, 1, (size_t)filesize, fd);
+					if( num_read == (size_t)filesize )
 					{
 						(*content)[filesize] = '\0';
 						res = 0;
@@ -507,10 +507,10 @@ char* get_filename_base(const char* filepath)
 	const char* pos2 = strrchr(filepath, '.');
 	if( pos2 == NULL )
 		pos2 = filepath + strlen(filepath);
-		
-	int len = pos2 - pos1;
-	result = (char*)malloc(len+1);
-	strncpy(result, pos1, len);
+
+    const ptrdiff_t len = pos2 - pos1;
+	result = (char*)malloc((size_t)len+1);
+	strncpy(result, pos1, (size_t)len);
 	result[len] = '\0';
 
 	return result;
@@ -553,7 +553,7 @@ void calc_crc32(const char* file, unsigned long* crc)
 	size_t bytesread;
 	*crc = crc32(0L, Z_NULL, 0);
 	while( (bytesread = fread(buffer, 1, 1024, fd)) != 0 ) {
-		*crc = crc32(*crc, (const Bytef*)buffer, bytesread);
+		*crc = crc32(*crc, (const Bytef*)buffer, (uInt)bytesread);
 	}
 
 	fclose(fd);
@@ -562,7 +562,7 @@ void calc_crc32(const char* file, unsigned long* crc)
 char** split_string(const char* str, const char* delims)
 {
 	char** strings = NULL;
-	int i = 0;
+	size_t i = 0;
 
 	char* cpy = strdup(str);
 	
@@ -601,9 +601,9 @@ char* get_directory(const char* filepath)
 	
 	const char* pos = strrchr(filepath, FILESLASH[0]);
 	if( pos ) {
-		int len = pos - filepath;
-		result = (char*)malloc(len+1);
-		strncpy(result, filepath, len);
+		const ptrdiff_t len = pos - filepath;
+		result = (char*)malloc((size_t)len+1);
+		strncpy(result, filepath, (size_t)len);
 		result[len] = '\0';
 	}
 

@@ -1988,7 +1988,7 @@ static int parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_inf
 		
 		if( dip_name ) new_dip_info->name = dip_name;
 		if( dip_tag ) new_dip_info->tag = dip_tag;
-		if( dip_mask ) new_dip_info->mask = atoi((const char*)dip_mask);
+		if( dip_mask ) new_dip_info->mask = (unsigned int)atoi((const char*)dip_mask);
 
 		struct dipvalue_info* last_dipvalue = NULL;
 
@@ -1999,7 +1999,7 @@ static int parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_inf
 				if( dipvalue_default ) {
 					if( xmlStrcmp(dipvalue_default, (const xmlChar*)"yes") == 0 ) {
 						xmlChar* dipvalue_value = xmlGetProp(dipswitch_children, (const xmlChar*)"value");
-						if( dipvalue_value ) new_dip_info->defvalue = atoi((const char*)dipvalue_value);
+						if( dipvalue_value ) new_dip_info->defvalue = (unsigned int)atoi((const char*)dipvalue_value);
 						xmlFree(dipvalue_value);
 					}
 					else
@@ -2012,7 +2012,7 @@ static int parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_inf
 						memset(new_dipvalue, 0x00, sizeof(struct dipvalue_info));
 
 						if( dipvalue_name ) new_dipvalue->name = dipvalue_name;
-						if( dipvalue_value ) new_dipvalue->value = atoi((const char*)dipvalue_value);
+						if( dipvalue_value ) new_dipvalue->value = (unsigned int)atoi((const char*)dipvalue_value);
 						
 						if( new_dip_info->values == NULL )
 							new_dip_info->values = new_dipvalue;
