@@ -64,6 +64,8 @@
 
 #ifdef __GNUC__
 #define ATTR_NORETURN __attribute__((noreturn))
+#else
+#define ATTR_NORETURN
 #endif
 
 #define VERSION "0.75"
@@ -845,7 +847,7 @@ static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, uns
 			return 0;
 		}
 
-		uint32_t reversed_chunk_size = htonl(chunk_size);
+		unsigned int reversed_chunk_size = htonl(chunk_size);
 		
 		if( fread(chunk_name, sizeof(unsigned char), 4, in_fd) != 4 ) {
 			fprintf(stderr, "could not read IDAT chunk name\n");

@@ -689,6 +689,7 @@
     - fixed Cppcheck warnings
     - fixed some CLion inspection warnings
     - added some missing pointer checks
+    - fixed some Visual Studio compilation issues
 
     create_report
     - fixed some clang-tidy warnings
