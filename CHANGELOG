@@ -689,7 +689,7 @@
     - fixed Cppcheck warnings
     - fixed some CLion inspection warnings
     - added some missing pointer checks
-    - fixed some Visual Studio compilation issues
+    - fixed Visual Studio compilation issues
     - added README.md and CONFIG.md (based on the MESS Wiki documentation)
     - temporarily re-added iconv files to allow Visual Studio compilation
     - fixed MinGW compilation
