@@ -137,7 +137,7 @@ In file included from /usr/include/libxml2/libxml/parser.h:16:0,
 /usr/include/libxml2/libxml/tree.h:88:27: warning: shadowed declaration is here [-Wshadow]
 		- add core dump handling/enabling
 			- multi custom commands
-		- load -listsofware XML on start-up to check for schema errors
+		- load -listsoftware XML on start-up to check for schema errors
 		- lookup interface via slots names?
 		- make software fitering optional
 		- remove use_sound and use_throttle
@@ -289,13 +289,14 @@ Entity: line 14: parser error : Extra content at the end of the document
 			- verify the version number for software lists
 			- add link to configuration on main mame_regtest page
 		- document upper limit of dipswitches/devices/etc. of 100000
-		- put all the wiki documentation up on breaken.de
 
 	compilation:
 		- fix compilation on systems, that already have a htonl() function
 			- #undef htonl might help
 		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER? LSB_FIRST?)
 		- make doesn't work when the additional files already exist and you compile by target (e.g. mame_regtest.exe)
+		- removed the external libraries from the repository and fetch them from somewhere for the Windows builds
+		- support MinGW compilation
 		
 	Visual Studio:
 		- move the Microsoft-specific defines into a seperate header
@@ -384,7 +385,7 @@ Entity: line 14: parser error : Extra content at the end of the document
 		
 	pngcmp:
 		- how to speed up writing of diff?
-		- try to optimize it, but comparing and writing in the same loop and just don't write the final bitmap when they differ
+		- try to optimize it by comparing and writing in the same loop and just don't write the final bitmap when they differ
 		- package optimized mingw binary instead of Visual Studio one
 
 	Known Issues:
@@ -395,7 +396,6 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- create patch to write ui_popup() to -log output
 		- MAME patches
 			- add "exit"/"run-and-hide" command to debugger
-		- move documentation from mess.redump to GitHub
-		- link breaken.de and mess.redump pages to GitHub
-		http://mess.redump.net/tools:mame_regtest:config
+		- link mess.redump pages to GitHub
 		http://mess.redump.net/tools:mame_regtest
+		- rename existing configurations to .sample/.example
