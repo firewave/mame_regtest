@@ -691,6 +691,7 @@
     - added some missing pointer checks
     - fixed some Visual Studio compilation issues
     - added README.md and CONFIG.md (based on the MESS Wiki documentation)
+    - temporarily re-added iconv files to allow Visual Studio compilation
 
     create_report
     - fixed some clang-tidy warnings
