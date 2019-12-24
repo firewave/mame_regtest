@@ -797,7 +797,6 @@ static int create_report_from_filename(const char *const filename, struct report
 							/* TODO: make this generic for the reports and merge with speed code */
 #ifdef WIN32
 							const char* sep = "\r\n";
-							const int sep_len = 2;
 #else
 							const char* sep = "\n";
 #endif
@@ -872,7 +871,6 @@ static int create_report_from_filename(const char *const filename, struct report
 							/* TODO: make this generic for the reports and merge with tagmap code */
 #ifdef WIN32
 							const char* sep = "\r\n";
-							const int sep_len = 2;
 #else
 							const char* sep = "\n";
 #endif
