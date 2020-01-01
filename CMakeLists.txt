@@ -26,6 +26,7 @@ endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    add_compile_options(/W4 /WX)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
