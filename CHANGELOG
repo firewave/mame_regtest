@@ -694,6 +694,8 @@
     - temporarily re-added iconv files to allow Visual Studio compilation
     - fixed MinGW compilation
     - removed obsolete create_release.bat and kzip.exe
+    - removed dirent.h from distribution and fetch it in Visual Studio CMake build instead
+    - updated dirent.h to 1.23.2
 
     create_report
     - fixed some clang-tidy warnings

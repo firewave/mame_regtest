@@ -19,6 +19,12 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    file(DOWNLOAD https://github.com/tronkko/dirent/raw/1.23.2/include/dirent.h ${CMAKE_BINARY_DIR}/include/dirent.h
+            EXPECTED_HASH SHA256=ce4cc82a7e1b1a2d9df607c893fc95b03847783d271bce86bb97ee5f2c42b82f
+            TLS_VERIFY ON)
+endif()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
@@ -29,6 +35,9 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 endif()
 
 add_library(common-static STATIC common.c)
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    target_include_directories(common-static PRIVATE SYSTEM ${CMAKE_BINARY_DIR}/include)
+endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(common-static PRIVATE -Wno-sign-conversion -Wno-padded)
 endif()
