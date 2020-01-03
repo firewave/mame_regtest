@@ -251,7 +251,7 @@ void mrt_xmlFree(void* ptr)
 #endif
 
 /* zlib */
-#include "zlib.h"
+#include <zlib.h>
 
 #ifndef LOG_ALLOC
 /* libxml2 */

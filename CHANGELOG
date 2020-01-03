@@ -698,6 +698,13 @@
     - updated dirent.h to 1.23.2
     - updated copyright year
     - removed Visual Studio files as they can be generated via CMake
+    - use conan for external dependencies on Windows
+    - removed external libraries from distribution
+    - add CMake option "USE_CONAN" to specify if conan should be used for external dependencies (defaults to ON on Windows and OFF on all other platforms)
+    - properly include external includes
+    - use static libraries on Windows
+    - adjusted library dependencies
+    - updated libxml2 to 2.9.9 (conan only)
 
     create_report
     - fixed some clang-tidy warnings

@@ -1,0 +1,6 @@
+[requires]
+libxml2/2.9.9
+zlib/1.2.11
+
+[options]
+libxml2:iconv=False
