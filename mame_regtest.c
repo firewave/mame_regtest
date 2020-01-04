@@ -2520,7 +2520,7 @@ int main(int argc, char *argv[])
 		cleanup_and_exit(1, "aborting");
 	}
 
-	if( access(config_mame_exe, F_OK ) == -1 ) {
+	if( !config_no_execution && access(config_mame_exe, F_OK ) == -1 ) {
 		fprintf(stderr, "'%s' does not exist\n", config_mame_exe);
 		cleanup_and_exit(1, "aborting");
 	}
@@ -2696,7 +2696,7 @@ int main(int argc, char *argv[])
 	mrt_setenv("SDL_VIDEODRIVER", "dummy");
 	mrt_setenv("SDLMAME_DESKTOPDIM", "1024x768");
 	
-	if( config_test_frontend ) {
+	if( config_test_frontend && !config_no_execution ) {
 		printf("testing frontend options\n");
 		static const char* const frontend_opts[] = { "validate", "listfull", "listsource", "listclones", "listbrothers", "listcrc", "listroms", "listsamples", "verifyroms", "verifysamples", "listdevices", "listslots", "listmedia", "listsoftware", "verifysoftware", "listmidi", "showconfig", "showusage" };
 		unsigned int i = 0;
