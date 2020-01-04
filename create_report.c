@@ -865,36 +865,50 @@ static int create_report_from_filename(const char *const filename, struct report
 				while( output_childs ) {
 					if( output_childs->type == XML_ELEMENT_NODE ) {
 						if( xmlStrcmp(output_childs->name, (const xmlChar*)"result") == 0 ) {
-							xmlChar* stdout_key = xmlGetProp(output_childs, (const xmlChar*)"stdout");
+							xmlChar* exitcode_key = xmlGetProp(output_childs, (const xmlChar*)"exitcode");
+							if (xmlStrcmp(exitcode_key, (const xmlChar*)"0") == 0) {
+								xmlChar* stdout_key = xmlGetProp(output_childs, (const xmlChar*)"stdout");
 
-							/* TODO: use this code in speed comparison */
-							/* TODO: make this generic for the reports and merge with tagmap code */
-#ifdef WIN32
-							const char* sep = "\r\n";
-#else
-							const char* sep = "\n";
-#endif
-							char** lines = split_string((const char*)stdout_key, sep);
-							int i = 0;
-							for( ; lines != NULL && lines[i] != NULL; ++i )
-							{
-								if( strstr(lines[i], "Average speed:") == NULL )
-									continue;
-								float speed = 0;
-								int seconds = 0;
-								int sscanf_res = sscanf(lines[i], "Average speed: %f%% (%d seconds)", &speed, &seconds);
-								if( sscanf_res != 2 ) {
-									PRINT_INFO(stdout)
-									printf(" - ERROR\n");
+								int found_speed = 0;
+								/* TODO: use this code in speed comparison */
+								/* TODO: make this generic for the reports and merge with tagmap code */
+	#ifdef WIN32
+								const char* sep = "\r\n";
+	#else
+								const char* sep = "\n";
+	#endif
+								char** lines = split_string((const char*)stdout_key, sep);
+								int i = 0;
+								for( ; lines != NULL && lines[i] != NULL; ++i )
+								{
+									if( strstr(lines[i], "Average speed:") == NULL ) {
+										continue;
+									}
+									found_speed = 1;
+									float speed = 0;
+									int seconds = 0;
+									int sscanf_res = sscanf(lines[i], "Average speed: %f%% (%d seconds)", &speed, &seconds);
+									if( sscanf_res != 2 ) {
+										PRINT_INFO(stdout)
+										printf(" - ERROR parsing '%s'\n", lines[i]);
+										continue;
+									}
+									if( speed < r_cb_data->speed_threshold ) {
+										PRINT_INFO(stdout)
+										printf(" - Average speed: %.2f%%\n", speed);
+									}
 								}
-								if( speed < r_cb_data->speed_threshold ) {
+
+								if (!found_speed) {
 									PRINT_INFO(stdout)
-									printf(" - Average speed: %.2f%%\n", speed);
+									printf(" - ERROR missing\n");
 								}
+
+								free_array(lines);
+
+								xmlFree(stdout_key);
 							}
-							free_array(lines);
-							
-							xmlFree(stdout_key);
+							xmlFree(exitcode_key);
 						}
 						// TODO: set this up differently
 						else if( xmlStrcmp(output_childs->name, (const xmlChar*)"devices") == 0 )

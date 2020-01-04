@@ -715,6 +715,7 @@
     - fixed some clang-tidy warnings
     - fixed Cppcheck warnings
     - fixed some CLion inspection warnings
+    - improved error reporting of report type 4 (speed)
 
     create_image_xml
     - fixed some CLion inspection warnings
