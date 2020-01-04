@@ -4,7 +4,9 @@
 #ifndef NO_ASSERT
 #include <assert.h>
 
-#define ARRAY_LENGTH(x) (int) (sizeof(x) / sizeof(x[0]))
+#ifndef NDEBUG
+	#define ARRAY_LENGTH(x) (int) (sizeof(x) / sizeof(x[0]))
+#endif
 #endif
 
 #ifdef __GNUC__
