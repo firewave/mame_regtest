@@ -237,6 +237,7 @@ static int config_test_frontend = 1;
 static int config_use_slots = 0;
 static int config_no_execution = 0;
 static int config_hack_nosound = 0;
+static int config_hack_driver_root = 0;
 
 static struct config_entry mrt_config[] =
 {
@@ -286,6 +287,7 @@ static struct config_entry mrt_config[] =
 	{ "use_slots",				CFG_INT,		&config_use_slots },
 	{ "no_execution",			CFG_INT,		&config_no_execution },
 	{ "hack_nosound",			CFG_INT,		&config_hack_nosound },
+	{ "hack_driver_root",		CFG_INT,		&config_hack_driver_root },
 	{ NULL,						CFG_UNK,		NULL }
 };
 
@@ -2056,7 +2058,8 @@ static int parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_inf
 static void parse_listxml_element(const xmlNode* game_child, struct driver_info** new_driv_inf)
 {
 	/* "game" in MAME and "machine" in MESS */
-	if( ((app_type == APP_MAME) && (xmlStrcmp(game_child->name, (const xmlChar*)"game") == 0)) ||
+	if( !config_hack_driver_root ||
+		((app_type == APP_MAME) && (xmlStrcmp(game_child->name, (const xmlChar*)"game") == 0)) ||
 		((app_type == APP_MESS) && (xmlStrcmp(game_child->name, (const xmlChar*)"machine") == 0)) ) {
 
 		if( !config_use_nonrunnable ) {
@@ -2359,11 +2362,16 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 					}
 				
 					char* real_xpath_expr = NULL;
-					if( app_type == APP_MAME )
-						replace_string(config_xpath_expr, &real_xpath_expr, xpath_placeholder, "/mame/game");
-					else if( app_type == APP_MESS )
-						replace_string(config_xpath_expr, &real_xpath_expr, xpath_placeholder, "/mess/machine");
-				
+					if (config_hack_driver_root) {
+						if (app_type == APP_MAME)
+							replace_string(config_xpath_expr, &real_xpath_expr, xpath_placeholder, "/mame/game");
+						else if (app_type == APP_MESS)
+							replace_string(config_xpath_expr, &real_xpath_expr, xpath_placeholder, "/mess/machine");
+					}
+					else {
+						replace_string(config_xpath_expr, &real_xpath_expr, xpath_placeholder, "/mame/machine");
+					}
+
 					printf("using XPath expression: %s\n", real_xpath_expr);
 
 					xmlNodeSetPtr nodeset = get_xpath_nodeset(doc, (const xmlChar*)real_xpath_expr);

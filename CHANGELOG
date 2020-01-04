@@ -705,7 +705,9 @@
     - use static libraries on Windows
     - adjusted library dependencies
     - updated libxml2 to 2.9.9 (conan only)
-    - add some more "xpath_expr" examples to mame_regtest.xml
+    - added some more "xpath_expr" examples to mame_regtest.xml
+    - support -listxml format of combined MAME/MESS
+    - added "hack_driver_root" to use old MAME/MESS specific -listxml node names
 
     create_report
     - fixed some clang-tidy warnings

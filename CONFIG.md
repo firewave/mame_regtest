@@ -53,3 +53,4 @@
 * _hack_biospath_ - forces the usage of the old -bp parameter (MESS only / necessary until 0.111)
 * _hack_mngwrite_ - forces the usage of the old MNG locations (necessary until 0.???)
 * _hack_pinmame_ - works around issues in the -listxml output of PinMAME (necessary until 0.???)
+* _hack_driver_root_ - forces usage of old MAME/MESS-specific `-listxml` node names (necessary until 0.???)

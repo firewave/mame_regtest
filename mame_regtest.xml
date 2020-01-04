@@ -81,6 +81,7 @@
 		<option name='hack_pinmame' value='0'/>
 		<option name='hack_softwarelist' value='0'/>
 		<option name='hack_nosound' value='0'/>
+		<option name='hack_driver_root' value='0'/>
 	</global>
 	<mess>
 		<option name='executable' value='mess.exe'/>
