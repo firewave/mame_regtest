@@ -30,6 +30,15 @@
 		<!-- 'use_autosave' value='2' equivalent
 			<option name='xpath_expr' value='DRIVER_ROOT/driver[@savestate="supported"]/parent::*'/>
 		-->
+		<!-- test only working drivers
+			<option name='xpath_expr' value='DRIVER_ROOT/driver[@emulation="good"]/parent::*'/>
+		-->
+		<!-- test only sets with softlists
+			<option name='xpath_expr' value='DRIVER_ROOT/device_ref[@name="software_list"]/parent::*'/>
+		-->
+		<!-- test only working sets with softlists
+			<option name='xpath_expr' value='DRIVER_ROOT/driver[@emulation="good"]/preceding-sibling::device_ref[@name="software_list"]/parent::*'/>
+		-->
 	
 		<!-- commandline options -->
 		<option name='str' value='2'/>
