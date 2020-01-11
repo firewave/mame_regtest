@@ -1,3 +1,5 @@
+#### mame_regtest.xml
+
 ##### Input options
 * _executable_ - the name or full path of the executable you want to use
 * _listxml_file_ - the name or full path of the alernative -listxml output you want to use
@@ -14,7 +16,8 @@
 * _device_file_ - use a fixed list of devices instead of the automatic detection based on driver name and device type
 * _use_isbios_ - controls the testing of MAME bios sets
 * _skip_mandatory_ - controls the testing of drivers with mandatory devices, when devices are specified (MESS only)
-* _test_softrest_ - controls the execution of a softreset on each driver (only works with “use_debug”)
+* _test_softreset_ - controls the execution of a softreset on each driver (only works with “use_debug”)
+* _no_execution_ - 
 
 ##### Command-line options
 * _str_ - the value passed to the -str parameter of the executable
@@ -27,6 +30,7 @@
 * _use_dipswitches_ - controls the processing of all available dip switches for a driver (only working with 0.136 and up)
 * _use_configurations_ - controls the processing of all available configurations for a driver (only working with 0.136 and up)
 * _use_softwarelist_ - controls the usage of software lists (MESS only / only working with 0.138 and up)
+* _use_slots_ - 
 * _write_mng_ - controls the writing of MNGs for each driver
 * _write_avi_ - controls the writing of AVIs for each driver
 * _write_wav_ - controls the writing of WAVs for each driver
@@ -44,8 +48,9 @@
 * _valgrind_parameters_ - the parameters, that will be passed to the valgrind calls (–log-file is added by mame_regtest / UNIX only)
 
 ##### Additional options
-* _test_createconfig_ - controls the configuration creation in the output folder (the file is not used as configuration for the tests)
 * _verbose_ - controls the amount of command-line output
+* _use_gdb_ - 
+* _test_frontend_ -
 
 ##### Hacks
 * _hack_debug_ - indicates, that given executable is a debug version for versions, that don't have the debug attribute in the -listxml output (necessary until 0.114)
@@ -53,4 +58,23 @@
 * _hack_biospath_ - forces the usage of the old -bp parameter (MESS only / necessary until 0.111)
 * _hack_mngwrite_ - forces the usage of the old MNG locations (necessary until 0.???)
 * _hack_pinmame_ - works around issues in the -listxml output of PinMAME (necessary until 0.???)
+* _hack_softwarelist_ - 
+* _hack_nosound_ - 
 * _hack_driver_root_ - forces usage of old MAME/MESS-specific `-listxml` node names (necessary until 0.???)
+
+#### create_report.xml
+
+* _report_type_ -
+* _xml_folder_ -
+* _recursive_ -
+* _output_file_ -
+* _wiki_format_ -
+* _ignore_exitcode_4_ -
+* _show_memleaks_ -
+* _show_clipped_ -
+* _group_data_ -
+* _print_stderr_ -
+* _compare_folder_ -
+* _print_stdout_ -
+* _tagmap_threshold_ -
+* _speed_threshold_ -
