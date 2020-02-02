@@ -30,6 +30,10 @@
 * _use_dipswitches_ - controls the processing of all available dip switches for a driver (only working with 0.136 and up)
 * _use_configurations_ - controls the processing of all available configurations for a driver (only working with 0.136 and up)
 * _use_softwarelist_ - controls the usage of software lists (MESS only / only working with 0.138 and up)
+    * _1_ - run all entries of the software list (also uses all parts)
+    * _2_ - only run the first entry of the software list
+    * _3_ - only run the first entry for the available slost (behaves like _2_ when no slots exist)
+    * _4_ - only run the first entry for the available interfaces
 * _use_slots_ - 
 * _write_mng_ - controls the writing of MNGs for each driver
 * _write_avi_ - controls the writing of AVIs for each driver
