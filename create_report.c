@@ -504,12 +504,12 @@ static int create_report_from_filename(const char *const filename, struct report
 		
 									if( (report_error || report_stdout || report_clipped) && stdout_key && xmlStrlen(stdout_key) > 0 )
 									{
-										fprintf(r_cb_data->report_fd, "\n```\n%s```\n", stdout_key);
+										fprintf(r_cb_data->report_fd, "\n```\n%s\n```\n", stdout_key);
 									}
 			
 									if( (report_error || report_memleak || report_stderr || reset_scope_found || runtime_error_found || unexpected_stderr) && stderr_key && xmlStrlen(stderr_key) > 0 )
 									{
-										fprintf(r_cb_data->report_fd, "\n```\n%s```\n", stderr_key);
+										fprintf(r_cb_data->report_fd, "\n```\n%s\n```\n", stderr_key);
 									}
 									
 									if( cmd_key )
