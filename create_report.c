@@ -477,14 +477,14 @@ static int create_report_from_filename(const char *const filename, struct report
 										if( r_cb_data->wiki_format == 1 )
 											fprintf(r_cb_data->report_fd, "===== %s =====\n", sourcefile_key);
 										else if( r_cb_data->wiki_format == 2 )
-											fprintf(r_cb_data->report_fd, "## %s\n", sourcefile_key);
+											fprintf(r_cb_data->report_fd, "#### %s\n", sourcefile_key);
 										/* disable so the header is only written once */
 										write_src_header = 0;
 									}
 									if( r_cb_data->wiki_format == 1 )
 										fprintf(r_cb_data->report_fd, "==== %s ====\n", name_key);
 									else if( r_cb_data->wiki_format == 2 )
-										fprintf(r_cb_data->report_fd, "### %s\n", name_key);
+										fprintf(r_cb_data->report_fd, "##### %s\n", name_key);
 									if( bios_key )
 										fprintf(r_cb_data->report_fd, "  * BIOS: ''%s''\n", bios_key);
 									if( ramsize_key )
@@ -506,14 +506,17 @@ static int create_report_from_filename(const char *const filename, struct report
 									}
 									if( autosave_key )
 										fprintf(r_cb_data->report_fd, " (autosave)");
-									fprintf(r_cb_data->report_fd, "  * Error code: ''%s''\n", exitcode_key);
+									if( r_cb_data->wiki_format == 1 )
+										fprintf(r_cb_data->report_fd, "  * Error code: ''%s''\n", exitcode_key);
+									else if( r_cb_data->wiki_format == 2 )
+										fprintf(r_cb_data->report_fd, "  * Error code: `%s`\n", exitcode_key);
 		
 									if( (report_error || report_stdout || report_clipped) && stdout_key && xmlStrlen(stdout_key) > 0 )
 									{
 										if( r_cb_data->wiki_format == 1 )
 											fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n", stdout_key);
 										else if( r_cb_data->wiki_format == 2 )
-											fprintf(r_cb_data->report_fd, "\n```%s```\n", stdout_key);
+											fprintf(r_cb_data->report_fd, "\n```\n%s```\n", stdout_key);
 									}
 			
 									if( (report_error || report_memleak || report_stderr || reset_scope_found || runtime_error_found) && stderr_key && xmlStrlen(stderr_key) > 0 )
@@ -521,7 +524,7 @@ static int create_report_from_filename(const char *const filename, struct report
 										if( r_cb_data->wiki_format == 1 )
 											fprintf(r_cb_data->report_fd, "<code>\n%s\n</code>\n", stderr_key);
 										else if( r_cb_data->wiki_format == 2 )
-											fprintf(r_cb_data->report_fd, "\n```%s```\n", stderr_key);
+											fprintf(r_cb_data->report_fd, "\n```\n%s```\n", stderr_key);
 									}
 									
 									if( cmd_key )
@@ -529,7 +532,7 @@ static int create_report_from_filename(const char *const filename, struct report
 										if( r_cb_data->wiki_format == 1 )
 											fprintf(r_cb_data->report_fd, "  * Command-Line: <code>%s</code>\n", cmd_key);
 										else if( r_cb_data->wiki_format == 2 )
-											fprintf(r_cb_data->report_fd, "  * Command-Line: ```%s```\n", cmd_key);
+											fprintf(r_cb_data->report_fd, "  * Command-Line:\n```\n%s\n```\n", cmd_key);
 									}
 									
 									fprintf(r_cb_data->report_fd, "\n");
