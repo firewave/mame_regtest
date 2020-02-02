@@ -68,7 +68,12 @@
 
 #### create_report.xml
 
-* _report_type_ -
+* _report_type_ - The type of report to generate
+    * 0 - result report (default)
+    * 1 - comparison report
+    * 2 - speed comparison report
+    * 3 - no longer used
+    * 4 - speed report 
 * _xml_folder_ -
 * _recursive_ -
 * _output_file_ -
@@ -80,5 +85,4 @@
 * _print_stderr_ -
 * _compare_folder_ -
 * _print_stdout_ -
-* _tagmap_threshold_ -
 * _speed_threshold_ -

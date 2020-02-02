@@ -171,12 +171,11 @@ static int config_use_markdown = 0;
 static int config_show_memleaks = 0;
 static int config_show_clipped = 0;
 static int config_group_data = 0;
-static int config_report_type = 0; /* 0 = result report - 1 = comparison report - 2 = speed comparison report - 3 = tagmap report*/
+static int config_report_type = 0;
 static char* config_compare_folder = NULL;
 static int config_print_stdout = 0;
 static char* config_output_folder = NULL;
 static int config_recursive = 0;
-static int config_tagmap_threshold = 0;
 static int config_speed_threshold = 0;
 
 static struct config_entry report_config[] =
@@ -193,7 +192,6 @@ static struct config_entry report_config[] =
 	{ "print_stdout", 		CFG_INT, 		&config_print_stdout },
 	{ "output_folder", 		CFG_STR_PTR, 	&config_output_folder }, /* comparison report specific */
 	{ "recursive", 			CFG_INT, 		&config_recursive },
-	{ "tagmap_threshold", 	CFG_INT, 		&config_tagmap_threshold },
 	{ "speed_threshold", 	CFG_INT, 		&config_speed_threshold },
 	{ NULL, 				CFG_UNK, 		NULL }
 };
@@ -236,7 +234,6 @@ struct report_cb_data
 	struct report_summary summary;
 	const char* output_folder;
 	int recursive;
-	int tagmap_threshold;
 	int speed_threshold;
 };
 
@@ -758,80 +755,7 @@ static int create_report_from_filename(const char *const filename, struct report
 			free(entry_name);
 		}
 		break;
-		
-		case 3:
-		{
-			xmlDocPtr doc = NULL;
-			{
-				char* filecontent = NULL;
-				int read_res = read_file(filename, &filecontent);
-				if( read_res == 0 )
-				{
-					const size_t len = strlen(filecontent);
-					filter_unprintable(filecontent, len);
-					doc = xmlReadMemory(filecontent, (int)len, NULL, "UTF-8", 0);
-					free(filecontent);
-				}
-				else
-				{
-					printf("could not read file '%s' (%s)\n", filename, strerror(read_res));
-				}
 
-			}
-			if( doc ) {
-				xmlNodePtr output_node = doc->children;
-				xmlNodePtr devices_node = NULL; // TODO				
-				PREPARE_KEYS(output_node)
-			
-				xmlNodePtr output_childs = output_node->children;
-				while( output_childs ) {
-					if( output_childs->type == XML_ELEMENT_NODE ) {
-						if( xmlStrcmp(output_childs->name, (const xmlChar*)"result") == 0 ) {
-							xmlChar* stdout_key = xmlGetProp(output_childs, (const xmlChar*)"stdout");
-
-							/* TODO: make this generic for the reports and merge with speed code */
-#ifdef WIN32
-							const char* sep = "\r\n";
-#else
-							const char* sep = "\n";
-#endif
-							char** lines = split_string((const char*)stdout_key, sep);
-							int i = 0;
-							for( ; lines != NULL && lines[i] != NULL; ++i )
-							{
-								if( strstr(lines[i], "tagmap lookups") == NULL )
-									continue;
-								int tagmap_count = 0;
-								int sscanf_res = sscanf(lines[i], "%d tagmap lookups", &tagmap_count);
-								if( sscanf_res != 1 ) {
-									PRINT_INFO(stdout)
-									printf(" - ERROR\n");
-								}
-								if( tagmap_count > 0 && tagmap_count > r_cb_data->tagmap_threshold ) {
-									PRINT_INFO(stdout)
-									printf(" - %d tagmap lookups\n", tagmap_count);
-								}
-							}
-							free_array(lines);
-							
-							xmlFree(stdout_key);
-						}
-						// TODO: set this up differently
-						else if( xmlStrcmp(output_childs->name, (const xmlChar*)"devices") == 0 )
-						{
-							devices_node = output_childs;
-						}
-					}
-					output_childs = output_childs->next;
-				}
-				
-				FREE_KEYS
-		
-				xmlFreeDoc(doc);
-			}
-		}
-		break;
-		
 		case 4:
 		{
 			xmlDocPtr doc = NULL;
@@ -866,7 +790,7 @@ static int create_report_from_filename(const char *const filename, struct report
 
 								int found_speed = 0;
 								/* TODO: use this code in speed comparison */
-								/* TODO: make this generic for the reports and merge with tagmap code */
+								/* TODO: make this generic for the reports and merge with other code */
 	#ifdef WIN32
 								const char* sep = "\r\n";
 	#else
@@ -969,7 +893,6 @@ static void create_report()
 	r_cb_data.print_stdout = config_print_stdout;
 	r_cb_data.output_folder = config_output_folder;
 	r_cb_data.recursive = config_recursive;
-	r_cb_data.tagmap_threshold = config_tagmap_threshold;
 	r_cb_data.speed_threshold = config_speed_threshold;
 	memset(&r_cb_data.summary, 0x00, sizeof(struct report_summary));
 

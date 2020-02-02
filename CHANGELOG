@@ -723,6 +723,8 @@
     - renamed "wiki_format" to "use_markdown"
     - changed extension of "report_10" output to ".md"
     - changed "comparison" report to Markdown format
+    - removed "report_type" 3 (tagmap report)
+    - removed "tagmap_threshold"
 
     create_image_xml
     - fixed some CLion inspection warnings

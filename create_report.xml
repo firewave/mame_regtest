@@ -34,12 +34,6 @@
 		<option name='use_markdown' value='1'/>
 		<option name='group_data' value='1'/>
 	</comparison>
-	<tagmap>
-		<option name='report_type' value='3'/>
-		<option name='xml_folder' value='d:\mess\mrt_output'/>
-		<option name='tagmap_threshold' value='10000'/>
-		<option name='group_data' value='1'/>
-	</tagmap>
 	<speed>
 		<option name='report_type' value='4'/>
 		<option name='xml_folder' value='d:\mess\mrt_output'/>
