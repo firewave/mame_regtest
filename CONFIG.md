@@ -72,7 +72,7 @@
 * _xml_folder_ -
 * _recursive_ -
 * _output_file_ -
-* _wiki_format_ -
+* _use_markdown_ - Generate the report in Markdown format (only for report_type 0)
 * _ignore_exitcode_4_ -
 * _show_memleaks_ -
 * _show_clipped_ -

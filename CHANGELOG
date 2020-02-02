@@ -719,6 +719,10 @@
     - fixed incorrect "executed" count in the summary when "use_autosave" is set to "1"
     - added "executed with autosave" counter to summary
     - fixed/improved output when "wiki_format" is set to "2"
+    - removed support for DocuWiki format ("wiki_format" set to "1")
+    - renamed "wiki_format" to "use_markdown"
+    - changed extension of "report_10" output to ".md"
+    - changed "comparison" report to Markdown format
 
     create_image_xml
     - fixed some CLion inspection warnings
