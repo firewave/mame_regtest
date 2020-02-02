@@ -201,6 +201,7 @@ static struct config_entry report_config[] =
 struct report_summary
 {
 	int executed;
+	int executed_autosave;
 	int errors;
 	int runtime_errors;
 	int memleaks;
@@ -425,13 +426,22 @@ static int create_report_from_filename(const char *const filename, struct report
 			if( doc ) {
 				xmlNodePtr output_node = doc->children;				
 				PREPARE_KEYS(output_node)
+
+				int result_found = 0;
 			
 				xmlNodePtr output_childs = output_node->children;
 				xmlNodePtr devices_node = NULL;
 				while( output_childs ) {
 					if( output_childs->type == XML_ELEMENT_NODE ) {
 						if( xmlStrcmp(output_childs->name, (const xmlChar*)"result") == 0 ) {
-							r_cb_data->summary.executed++;
+							if (!result_found) {
+								r_cb_data->summary.executed++;
+								result_found = 1;
+							}
+							else {
+								r_cb_data->summary.executed_autosave++;
+							}
+
 
 							xmlChar* exitcode_key = xmlGetProp(output_childs, (const xmlChar*)"exitcode");		
 							xmlChar* stderr_key = xmlGetProp(output_childs, (const xmlChar*)"stderr");
@@ -1038,6 +1048,7 @@ static void create_report()
 		else if( config_wiki_format == 2 )
 			fprintf(report_fd, "## Summary\n");
 		fprintf(report_fd, "  * %d executed\n", r_cb_data.summary.executed);
+		fprintf(report_fd, "  * %d executed with autosave\n", r_cb_data.summary.executed_autosave);
 		fprintf(report_fd, "  * %d with errors\n", r_cb_data.summary.errors);
 		fprintf(report_fd, "  * %d with runtime errors\n", r_cb_data.summary.runtime_errors);
 		fprintf(report_fd, "  * %d with missing roms\n", r_cb_data.summary.missing);

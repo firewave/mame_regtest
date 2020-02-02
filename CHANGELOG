@@ -716,6 +716,8 @@
     - fixed Cppcheck warnings
     - fixed some CLion inspection warnings
     - improved error reporting of report type 4 (speed)
+    - fixed incorrect "executed" count in the summary when "use_autosave" is set to "1"
+    - added "executed with autosave" counter to summary
 
     create_image_xml
     - fixed some CLion inspection warnings
