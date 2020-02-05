@@ -26,6 +26,12 @@ if (NOT PROC_RES EQUAL 0)
     message(FATAL_ERROR "venv creation failed")
 endif()
 
+execute_process(COMMAND python -m pip install --upgrade pip
+        RESULT_VARIABLE PROC_RES)
+if (NOT PROC_RES EQUAL 0)
+    message(FATAL_ERROR "pip installation failed")
+endif()
+
 execute_process(COMMAND pip install --upgrade setuptools
         RESULT_VARIABLE PROC_RES)
 if (NOT PROC_RES EQUAL 0)
