@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.9)
 project(mame_regtest)
 
 option(USE_CONAN "Use conan for external dependencies" OFF)
+option(USE_SANITIZERS "Use sanitizers" OFF)
 
 # no system libraries on Windows so default to ON
 if (WIN32)
@@ -38,6 +39,20 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Werror -Weverything)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     add_compile_options(-Werror -Wall -Wextra -Wformat=2 -Wshadow -Wcast-qual -Wwrite-strings -Wunreachable-code -Wpedantic -Wundef)
+endif()
+
+if (USE_SANITIZERS)
+    # TODO: add more additional compiler-specific flags
+    if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        set(SANITITER_FLAGS -fsanitize=address -fsanitize=undefined)
+        add_compile_options(${SANITITER_FLAGS} -fno-omit-frame-pointer)
+        add_definitions(-DNO_ASSERT)
+        add_link_options(${SANITITER_FLAGS})
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+        # TODO: make this work
+        # works only in 32-bit Release builds
+        # add_compile_definitions(/fsanitize=address)
+    endif()
 endif()
 
 add_library(common-static STATIC common.c)
