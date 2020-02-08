@@ -975,20 +975,20 @@ int main(int argc, char *argv[])
 	
 	if( argc != 2 ) {
 		printf("usage: create_report <report_name>\n");
-		exit(1);
+		return 1;
 	}
 	
 	libxml2_init();
 	
 	if( !config_init("create_report.xml", "create_report") ) {
 		printf("aborting\n");
-		exit(1);
+		return 1;
 	}
 
 	if( !config_read(report_config, argv[1]) ) {
 		printf("aborting\n");
 		config_free(report_config);
-		exit(1);
+		return 1;
 	}
 	
 	create_report();

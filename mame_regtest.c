@@ -2462,7 +2462,7 @@ int main(int argc, char *argv[])
 	
 	if( argc > 2) {
 		printf("usage: mame_regtest <configname>\n");
-		exit(1);
+		return 1;
 	}
 
 	snprintf(pid_str, sizeof(pid_str), "%d", getpid());
@@ -2472,7 +2472,7 @@ int main(int argc, char *argv[])
 
 	if( getcwd(current_path, sizeof(current_path)) == NULL ) {
 		fprintf(stderr, "could not get current working path\n");
-		exit(1);
+		return 1;
 	}
 	
 	printf("\n");

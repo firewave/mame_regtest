@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
 	if( argc != 4 ) {
 		printf("usage: create_image_xml <path> <output> <type>\n");
-		exit(0);
+		return 1;
 	}
 	
 	xmlDocPtr images_doc = xmlNewDoc((const xmlChar*)"1.0");

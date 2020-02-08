@@ -711,6 +711,7 @@
     - disabled "test_frontend" and executable existence check when "no_execution" is set to "1"
     - fixed compilation of non-debug build with NO_ASSERT
     - avoided some strlen() usage
+    - replaced some exit() calls with return
 
     create_report
     - fixed some clang-tidy warnings
