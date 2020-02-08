@@ -994,10 +994,6 @@ int main(int argc, char *argv[])
 	create_report();
 	
 	config_free(report_config);
-	
-#ifdef LOG_ALLOC
-	print_leaked_pointers();
-#endif
-	
+
 	return 0;
 }

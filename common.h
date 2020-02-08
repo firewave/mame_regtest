@@ -3,40 +3,6 @@
 
 #include <stdlib.h>
 
-#ifdef LOG_ALLOC
-
-void* mrt_malloc(size_t size);
-char* mrt_strdup(const char* str);
-void* mrt_realloc(void* ptr, size_t size);
-void mrt_free(void *ptr);
-
-#define malloc(size) mrt_malloc(size)
-#define strdup(str) mrt_strdup(str)
-#define realloc(ptr, size) mrt_realloc(ptr, size)
-#define free(ptr) mrt_free(ptr)
-
-xmlDocPtr mrt_xmlNewDoc(const xmlChar* version);
-xmlDocPtr mrt_xmlReadFile(const char* URL, const char* encoding, int options);
-void mrt_xmlFreeDoc(xmlDocPtr ptr);
-
-#define xmlNewDoc mrt_xmlNewDoc
-#define xmlReadFile mrt_xmlReadFile
-#define xmlFreeDoc mrt_xmlFreeDoc
-
-xmlChar* mrt_xmlGetProp(xmlNodePtr node, const xmlChar* name);
-xmlChar* mrt_xmlStrdup(const xmlChar* cur);
-xmlChar* mrt_xmlNodeGetContent(xmlNodePtr cur);
-void mrt_xmlFree(void* ptr);
-
-#define xmlGetProp mrt_xmlGetProp
-#define xmlStrdup mrt_xmlStrdup
-#define xmlNodeGetContent mrt_xmlNodeGetContent
-#define xmlFree mrt_xmlFree
-
-void print_leaked_pointers();
-
-#endif
-
 #include <sys/stat.h>
 
 #include <libxml/xpath.h>
