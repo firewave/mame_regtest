@@ -303,7 +303,7 @@ static void cleanup_driver_info_list(struct driver_info* driv_inf);
 static void append_driver_info(char** str, struct driver_entry* de)
 {
 	append_string(str, de->name);
-	if( strlen(de->postfix) > 0 ) {
+	if( de->postfix[0] != '\0' ) {
 		append_string(str, "_");
 		append_string(str, de->postfix);
 	}
@@ -584,7 +584,7 @@ static void print_driver_info(struct driver_entry* de, FILE* print_fd)
 		return;
 
 	fprintf(print_fd, "%s: %s", de->sourcefile, de->name);
-	if( de->bios && strlen(de->bios) > 0 )
+	if( de->bios && (de->bios[0] != '\0') )
 		fprintf(print_fd, " (bios %s)", de->bios);
 	if( de->ramsize > 0 )
 		fprintf(print_fd, " (ramsize %d)", de->ramsize);
@@ -1066,7 +1066,7 @@ static char* create_commandline(struct driver_entry* de)
 	append_string(&sys, de->name);
 	if( config_use_autosave && de->autosave )
 		append_string(&sys, " -autosave");
-	if( de->bios && strlen(de->bios) > 0 ) {
+	if( de->bios && (de->bios[0] != '\0') ) {
 		append_string(&sys, " -bios ");
 		append_string(&sys, de->bios);
 	}
@@ -1425,7 +1425,7 @@ static void execute_mame2(struct driver_entry* de)
 	xmlNewProp(output_node, (const xmlChar*)"sourcefile", (const xmlChar*)de->sourcefile);
 	if( config_use_autosave && de->autosave )
 		xmlNewProp(output_node, (const xmlChar*)"autosave", (const xmlChar*)"yes");
-	if( de->bios && (strlen(de->bios) > 0) )
+	if( de->bios && (de->bios[0] != '\0') )
 		xmlNewProp(output_node, (const xmlChar*)"bios", (const xmlChar*)de->bios);
 	if( de->ramsize > 0 ) {
 		char tmp[10] = "";
