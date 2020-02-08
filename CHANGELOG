@@ -714,6 +714,7 @@
     - replaced some ext() calls with return
     - added CMake option "USE_SANITIZERS" to enable AddressSanitizer/UndefinedBehaviorSanitizer if supported
     - removed "LOG_ALLOC" in favor of sanitizers
+    - removed makefile - use CMake instead
 
     create_report
     - fixed some clang-tidy warnings
