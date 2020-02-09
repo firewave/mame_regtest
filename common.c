@@ -57,9 +57,6 @@
 #include <zlib.h>
 
 /* libxml2 */
-#ifdef __MINGW32__
-#define IN_LIBXML
-#endif
 #include <libxml/xmlmemory.h>
 #include <libxml/xpath.h>
 

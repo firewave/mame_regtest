@@ -19,9 +19,6 @@
 #endif
 
 /* libxml2 */
-#ifdef __MINGW32__
-#define IN_LIBXML
-#endif
 #include <libxml/parser.h>
 
 static xmlDocPtr global_config_doc = NULL;

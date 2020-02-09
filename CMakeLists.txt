@@ -55,6 +55,10 @@ if (USE_SANITIZERS)
     endif()
 endif()
 
+if (MINWG32)
+    add_compile_definitions(-DIN_LIBXML)
+endif()
+
 add_library(common-static STATIC common.c)
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     target_include_directories(common-static PRIVATE SYSTEM ${CMAKE_BINARY_DIR}/include)
