@@ -249,6 +249,7 @@ static xmlChar* get_attribute_by_xpath(xmlXPathContextPtr xpathCtx, const xmlCha
 	return attr_value;
 }
 
+/* TODO: handle this differently - casts away constness */
 static void convert_br(xmlChar* str)
 {
 	xmlChar* s = NULL;
@@ -841,6 +842,8 @@ static int create_report_from_filename(const char *const filename, struct report
 			}
 		}
 		break;
+
+		/* TODO: report unsupported report type */
 	}
 	
 	return data_written;
