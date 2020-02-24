@@ -716,6 +716,7 @@
     - removed "LOG_ALLOC" in favor of sanitizers
     - removed makefile - use CMake instead
     - moved IN_LIBXML definition for MinGW from source to CMakeList.txt
+    - disabled -Wpadded Clang warning
 
     create_report
     - fixed some clang-tidy warnings
