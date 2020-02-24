@@ -717,6 +717,7 @@
     - removed makefile - use CMake instead
     - moved IN_LIBXML definition for MinGW from source to CMakeList.txt
     - disabled -Wpadded Clang warning
+    - enabled -Wconversion -Wsign-conversion for GCC 10+ only
 
     create_report
     - fixed some clang-tidy warnings
