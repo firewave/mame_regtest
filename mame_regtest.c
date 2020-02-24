@@ -667,6 +667,7 @@ static int read_softlist_entry(const xmlNode* node, struct image_entry** images,
 			if( xmlStrcmp(soft_child->name, (const xmlChar*)"part") == 0 ) {
 				struct image_entry* image = (struct image_entry*)malloc(sizeof(struct image_entry));
 				if( !image ) {
+					/* TODO: log error - and exit */
 					xmlFree(supported);
 					xmlFree(entry_name);
 					free_image_entries(*images);
@@ -678,8 +679,6 @@ static int read_softlist_entry(const xmlNode* node, struct image_entry** images,
 				image->device_file = xmlStrdup(entry_name);
 				if (supported)
 					image->supported = xmlStrdup(supported);
-				else
-					image->supported = NULL;
 				image->device_part = xmlGetProp(soft_child, (const xmlChar*)"name");
 				image->device_interface = xmlGetProp(soft_child, (const xmlChar*)"interface");
 				
@@ -1569,8 +1568,12 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 						{
 							if (images->device_slot == NULL)
 							{
-								if (empty_slot_processed)
-									break;
+								/* TODO: treat this as empty string and process like the rest */
+								if (empty_slot_processed) {
+									if (config_verbose)
+										printf("empty slot already processed - breaking loop\n");
+									break; /* TODO: do we need to continue instead? can a proper slot appear? */
+								}
 								empty_slot_processed = 1;									
 							}						
 							else
@@ -1600,6 +1603,7 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 						else if (config_use_softwarelist == 4)
 						{
 							/* TODO: move to helper function */
+							/* TODO: use a different array when we merge 3 and 4? */
 							if (slots_arr.ptr)
 							{
 								int j = 0;
