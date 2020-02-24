@@ -75,9 +75,7 @@ target_include_directories(config-static SYSTEM PRIVATE ${LIBXML2_INCLUDE_DIR} $
 
 add_executable(mame_regtest mame_regtest.c)
 target_include_directories(mame_regtest SYSTEM PRIVATE ${LIBXML2_INCLUDE_DIR} ${Iconv_INCLUDE_DIR})
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_compile_options(mame_regtest PRIVATE -Wno-reserved-id-macro)
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     target_compile_options(mame_regtest PRIVATE -Wno-format-truncation)
 endif()
 target_link_libraries(mame_regtest PRIVATE Threads::Threads common-static config-static ${LIBXML2_LIBRARIES} ${ZLIB_LIBRARIES})

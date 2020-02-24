@@ -56,9 +56,9 @@
 //#define USE_MRT_SYSTEM
 #endif
 
-#ifndef _MAX_PATH
 #include <limits.h>
-#define _MAX_PATH PATH_MAX
+#ifndef PATH_MAX
+#define PATH_MAX _MAX_PATH
 #endif
 
 #ifdef __GNUC__
@@ -164,7 +164,7 @@ static char* temp_folder = NULL;
 static char* stdout_temp_file = NULL;
 static char* stderr_temp_file = NULL;
 #endif
-static char current_path[_MAX_PATH] = "";
+static char current_path[PATH_MAX] = "";
 static char* dummy_root = NULL;
 static char* pause_file = NULL;
 static char pid_str[10] = "";
