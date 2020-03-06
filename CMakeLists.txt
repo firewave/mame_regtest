@@ -4,6 +4,9 @@ project(mame_regtest)
 option(USE_CONAN "Use conan for external dependencies" OFF)
 option(USE_SANITIZERS "Use sanitizers" OFF)
 
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
 # no system libraries on Windows so default to ON
 if (WIN32)
     message(STATUS "Forcing usage of conan for external dependencies")
