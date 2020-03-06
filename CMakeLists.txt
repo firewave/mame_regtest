@@ -7,6 +7,8 @@ option(USE_SANITIZERS "Use sanitizers" OFF)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # no system libraries on Windows so default to ON
 if (WIN32)
     message(STATUS "Forcing usage of conan for external dependencies")
@@ -108,3 +110,5 @@ target_link_libraries(create_image_xml PRIVATE Threads::Threads common-static ${
 if (WIN32)
     target_link_libraries(create_image_xml PRIVATE ws2_32)
 endif()
+
+include(clang_tidy.cmake)

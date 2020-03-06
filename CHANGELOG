@@ -718,6 +718,8 @@
     - moved IN_LIBXML definition for MinGW from source to CMakeList.txt
     - disabled -Wpadded Clang warning
     - enabled -Wconversion -Wsign-conversion for GCC 10+ only
+    - always create a compilation database
+    - a "run-clang-tidy" target will now be added if the executable is available
 
     create_report
     - fixed some clang-tidy warnings
