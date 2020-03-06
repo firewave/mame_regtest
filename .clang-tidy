@@ -1,2 +1,2 @@
 ---
-Checks:          '*,-abseil-*,-android-*,-cert-*,-cppcoreguidelines-*,-fuchsia-*,-google-*,-hicpp-*,-llvm-*,-linuxkernel-*,-mpi-*,-objc-*,-openmp-*,-zircon-*,-readability-braces-around-statements,-readability-magic-numbers,-bugprone-macro-parentheses,-readability-isolate-declaration'
+Checks:          '*,-abseil-*,-android-*,-cert-*,-cppcoreguidelines-*,-fuchsia-*,-google-*,-hicpp-*,-llvm-*,-linuxkernel-*,-mpi-*,-objc-*,-openmp-*,-zircon-*,-readability-braces-around-statements,-readability-magic-numbers,-bugprone-macro-parentheses,-readability-isolate-declaration,-readability-function-size'
