@@ -496,7 +496,7 @@ static void parse_callback(struct parse_callback_data* pcd)
 
 		if( strstr(pcd->entry_name, ".png") ) {
 			unsigned int IHDR_width, IHDR_height, IDAT_size, IDAT_crc;
-			if( get_png_data(pcd->fullname, &IHDR_width, &IHDR_height, &IDAT_size, &IDAT_crc) ) {
+			if( get_png_data(pcd->fullname, &IHDR_width, &IHDR_height, &IDAT_size, &IDAT_crc) == 1 ) {
 				snprintf(tmp, sizeof(tmp), "%u", IHDR_width);
 				xmlNewProp(filenode, (const xmlChar*)"png_width", (const xmlChar*)tmp);
 				snprintf(tmp, sizeof(tmp), "%u", IHDR_height);
