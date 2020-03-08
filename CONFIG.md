@@ -32,7 +32,7 @@
 * _use_softwarelist_ - controls the usage of software lists (MESS only / only working with 0.138 and up)
     * _1_ - run all entries of the software list (also uses all parts)
     * _2_ - only run the first entry of the software list
-    * _3_ - only run the first entry for the available slost (behaves like _2_ when no slots exist)
+    * _3_ - only run the first entry for the available slots (behaves like _2_ when no slots exist)
     * _4_ - only run the first entry for the available interfaces
 * _use_slots_ - 
 * _write_mng_ - controls the writing of MNGs for each driver
