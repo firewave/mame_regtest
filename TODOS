@@ -40,7 +40,7 @@ mame_regtest
 			- mark the different autosave calls (load / save)
 			- store both output file states in case of autosave
 		- make it possible to set affinity of a run (SetProcessAffinityMask() / sched_setaffinity())
-		- add signal/abort handler and cleanup in it
+		- add signal handler and clean up in it
 		- take a look at messtest for "hardreset" tests and extended image testing
 		- image testing
 			- attribute to disable an image entry in the XML
@@ -51,19 +51,14 @@ mame_regtest
 				- use folder node in-between to be able to switch folders
 			- read images from folder with same name as device (look for XML first / specify folder in XML?)
 			- add option with folder for device XMLs?
-		- add XPath support for software lists
 		- measure the real time necessary for the execution to detect slowdowns
 		- all bios/ramsize/configuration/dipswitch combinations
 			- call function with array
 			- process the first entry and call itself with a smaller array
 		- try to create append_to_array() based on split_string()
-		- handle multiple software lists in hack
-		- log info about softwarelist entries without matching interface
-		- how to specify a specific device in softwarelist tests?
 		- document all the exitcodes in README
 		- avoid duplicated cleanup code for dips and configurations - use generic function
 		- make pointer array dynamic
-		- test again with LOG_ALLOC and *all* features enabled
 		- prepare softwarelists before processing the data and store the path in the driver_info
 			- add append flag to copy_file()
 		- run without XML creation
@@ -114,22 +109,13 @@ mame_regtest
 			- add drmemory support
 			- add windbg support
 		- how to support "slot in slot"?
-		- add support to run a select list of softlist items
 		- create testset for mandatory devices, that don't have a softlist
 		- add option to disable "verifysoftware" on older versions
 		- add filename to PNG and MNG parsing errors
-		- how to get rid of empty line when -listsoftware is written?
 		- get rid of execute_mame() result? only used in one place
-		- how to use single entries from each softwarelists - not just the first?
-			- add an option how many entries from each softlist to process when "use_softwarelist" is set (remove use_softwarelist=2?)
 		- extract MNG frame and do a pngcmp
 		- scan existing result and only run sets/combinations, that caused an error
-		- do not proceed when software list could not be written
 		- change EOL in SVN to native
-		- write all -listsoftware entries on start-up so they are verified before the test begins
-			- abort the test when anything fails?
-			- avoid multiple writing of softwarelists by saving them under the internal name and load them by that?
-		- use XPath to more easily filter entries out of softlist
 		-
 			mame_regtest.c:2247:20: warning: declaration of âxmlBufâ shadows a global declaration [-Wshadow]
 In file included from /usr/include/libxml2/libxml/parser.h:16:0,
@@ -137,14 +123,8 @@ In file included from /usr/include/libxml2/libxml/parser.h:16:0,
 /usr/include/libxml2/libxml/tree.h:88:27: warning: shadowed declaration is here [-Wshadow]
 		- add core dump handling/enabling
 			- multi custom commands
-		- load -listsoftware XML on start-up to check for schema errors
 		- lookup interface via slots names?
-		- make software fitering optional
 		- remove use_sound and use_throttle
-		- add switch to test softlist entries with and without interface
-		- also run a softlist entry with empty slot with use_softwarelist=3
-		- make running with all parts another mode as well
-			- split up the "use_softwarelist" a bit - it's getting confusing
 		- group execution by sourcefile
 		- magictg.xml
 Entity: line 3: parser error : invalid character in attribute value
@@ -196,44 +176,43 @@ Entity: line 14: parser error : Extra content at the end of the document
 			^
 		- review the default osdprocessors handling
 		- add "validate_only" option
-		- part not in wiki report
 		- error code 4 has no impact in statistics
 		- add "quiet" mode to report generation
-		- do not just check the interface on which device slot to run the sotware list entry, but also the extension (see aim65)
-		- add option to skip unsupported softlist entries
 		- use -debugger internal
 		- add a flag to the debugger to not break at all (prevent internal breakpoint hangs)
 		- store timing information and generate reports on how much time in a testrun is spent on which drivers/sets
-		- generate a report in the format I would send to the list
 		- add option to use grouped execution
-		- test differently sized software entries?
 		- do not show stdout in report entries, that don't need it (e.g. fatalerror)
-		- merge "use_softwarelist" modes 3 and 4?
 		- "ignore_exitcode_4" no longer working?
-		- always call softlist entries with softlist name prefix
-		- process entries from each softlist
-		- make the compatible softlist handling a hack for older versions?
-		- ignore nodump roms in software lists - amiga_workbench
-		- add wav/avi/png/mng valiation
-			- ffmpeg -v error -i file.avi -f null - 2>error.log
-			- avconv
+            - only makes sense when "skip_mandatory" is false
+		- add AVI/WAV/PNG valiation
+		    - sudo apt-get install ffmpeg
+		    - ffprobe aviwrite.avi -hide_banner
+		    Input #0, avi, from 'aviwrite.avi':
+              Duration: 00:00:10.02, start: 0.000000, bitrate: 112272 kb/s
+                Stream #0:0: Video: rawvideo, bgr24, 320x240, 110776 kb/s, 60 fps, 60 tbr, 60 tbn, 60 tbc
+                Stream #0:1: Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, 2 channels, s16, 1536 kb/s
+            - ffprobe wavwrite.wav -hide_banner
+            Input #0, wav, from 'wavwrite.wav':
+              Duration: 00:00:10.00, bitrate: 1536 kb/s
+                Stream #0:0: Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, 2 channels, s16, 1536 kb/s
+            - ffprobe final.png -hide_banner
+            Input #0, png_pipe, from 'final.png':
+              Duration: N/A, bitrate: N/A
+                Stream #0:0: Video: png, rgb24(pc), 320x240, 25 tbr, 25 tbn, 25 tbc
+		- add MNG valiation
+		    - ffprobe does not work properly for mng
+		    - ffprobe mngwrite.mng -hide_banner
+            [png @ 0x7fffb9c07e00] IHDR after IDAT
+            Input #0, image2, from 'mngwrite.mng':
+              Duration: 00:00:00.04, start: 0.000000, bitrate: 192862 kb/s
+                Stream #0:0: Video: png, rgb24(pc), 320x240, 25 tbr, 25 tbn, 25 tbc
 		- add -listnetwork
 		- add sanity checks before adding attributes to avoid invalid XMLs being created
-		- remove memory leak checking code in favor of LeakSanitizer? no available for Windows yet
-		- release package lacks the DLLs
+		- remove memory leak checking code in favor of LeakSanitizer? not available for Windows yet
 		- Value internal not supported for option debugger - falling back to auto
 		- make SDL_VIDEODRIVER=dummy work again
 		- support debugger rewind
-		- add use_softwarelist mode which only uses supported entries
-		- add use_softwarelist mode which doesn't run the set without software
-		- speed up parsing of software lists (use xpath?)
-		- make use_softwarelist boolean and split up the modes into multiple settings so they can be combined
-			- per interface
-			- all entries
-			- one entry per softlist (not possible since the information is missing)
-			- only software supported by region
-			- run the set without software
-		- are completey unsupported software lists properly handled by -listsoftware? (support="no" on top level)
 		- add DrMemory support
 		- add LUA script support?
 		- add GitHub CI file
@@ -241,6 +220,51 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- make some of the command-line options configurable from the outside
 		    - like -list*- configure to just capture the output
 		        <cmdopt cmd="-listnetwork" output="listnetwork.txt"/>
+		- asoccer seems to store wrong filesize for wavwrite.wav
+		- remove create_image_xml and related code? only software from the softlists should be used
+		- write filtered XML of test run in output folder
+		- store configuration of test run in output folder
+		- test with all alternative layouts
+		- make it possible to actually pause/interrupt a testrun and resume it afterwards
+		- make conan work with clang-cl
+
+	software lists:
+		- write all -listsoftware entries on start-up so they are verified before the test begins
+			- abort the test when anything fails?
+			- avoid multiple writing of softwarelists by saving them under the internal name and load them by that?
+		- add XPath support for software lists
+		- test differently sized software entries?
+		- how to get rid of empty line when -listsoftware is written?
+		- how to specify a specific device in softwarelist tests?
+		- handle multiple software lists in hack
+		- log info about softwarelist entries without matching interface
+		- add support to run a select list of softlist items
+		- use XPath to more easily filter entries out of softlist
+		- do not proceed when software list could not be written
+		- load -listsoftware XML on start-up to check for schema errors
+		- make software filtering optional
+		- add switch to test softlist entries with and without interface
+		- also run a softlist entry with empty slot with use_softwarelist=3 - FIXED?
+		- add option to skip unsupported softlist entries
+		    - always done?
+		- do not just check the interface on which device slot to run the sotware list entry, but also the extension (see aim65)
+		- always call softlist entries with softlist name prefix
+		- process entries from each softlist
+		- make the compatible softlist handling a hack for older versions?
+	    - ignore nodump roms in software lists - amiga_workbench
+		- speed up parsing of software lists (use xpath?)
+		- make use_softwarelist boolean and split up the modes into multiple settings so they can be combined
+			- per interface
+			- all entries
+			- one entry per softlist (not possible since the information is missing)
+			- only software supported by region
+			- run the set without software
+			- make running with all parts another mode as well
+        - how to use single entries from each softwarelists - not just the first?
+            - add an option how many entries from each softlist to process when "use_softwarelist" is set (remove use_softwarelist=2?)
+        - add use_softwarelist mode which only uses supported entries
+        - add use_softwarelist mode which doesn't run the set without software
+		- are completey unsupported software lists properly handled by -listsoftware? (supported="no" on top level)
 
 	internal:
 		- call parse_directory() in execute_mame() / call clear_directory() in execute_mame2()
@@ -265,9 +289,7 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- use macros FREE(), XMLFREE() etc. which includes the setting to NULL
 		- port mrt_system() to non-windows systems
 		- replace the counts in the structures with NULL check instead
-		- fix LOG_ALLOC
 		- profile it with Visual Studio and callgrind
-		- remove LOG_ALLOC?
 
 	issues/bugs/errorhandling:
 		- avoid duplicated slashes
@@ -281,7 +303,7 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- bail out when any of the postfix counters would overflow
 
 	documentation:
-		- wiki
+		- CONFIG.md
 			- the different builds
 			- how the results are created
 			- the machine the tests are run on
@@ -295,13 +317,12 @@ Entity: line 14: parser error : Extra content at the end of the document
 			- verify the version number for software lists
 			- add link to configuration on main mame_regtest page
 		- document upper limit of dipswitches/devices/etc. of 100000
+		- document how to pause
 
 	compilation:
 		- fix compilation on systems, that already have a htonl() function
 			- #undef htonl might help
 		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER? LSB_FIRST?)
-		- make doesn't work when the additional files already exist and you compile by target (e.g. mame_regtest.exe)
-		- removed the external libraries from the repository and fetch them from somewhere for the Windows builds
 
 	conan
 	    - look at virtual* generators
@@ -327,7 +348,7 @@ Entity: line 14: parser error : Extra content at the end of the document
 				- new files
 				- stdout/stderr differs
 		- add documentation for configuration
-		- HTML report
+		- HTML report - use Markdown instead
 			- create HTML report (different variants)
 				Unexpected Returnvalues (sourcefile - driver - returncode - details [flags, stdout])
 				Untested Games (sourcefile - driver)
@@ -342,8 +363,6 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- extract differing frames (also for HTML report)
 		- show PNG differences (use pngcmp) - FIXED?
 		- expose the data (collect the necessary XMLs and add them to a subfolder?)
-		- wiki syntax
-			| row1 | row 2 |
 		- create an intermediate format to process, so it's not necessary to process all output again when a new version comes out
 			- add option to merge the output to a report
 		- properly handle sets with autosave (use index in XPath to access the second set of nodes when both support autosave)
@@ -372,7 +391,6 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- add optional to list OPTIONAL warnings
 		- add option to print negative exitcodes in hex
 		- add reports, that parse -log output for like "unmapped writes" and stuff
-		- add HTML version of the error report
 		- filter gdb output
 			- stdout
 				- "[New Thread"
@@ -392,9 +410,22 @@ Entity: line 14: parser error : Extra content at the end of the document
 			hyperscan.c: hs - Average speed: 0.00%
 			octopus.c: octopus - Average speed: 0.00%
 		- make the pngcmp path configurable so the file doesn't need to be copied
+		    - not packaged with MAME yet
 		- add option to ignore missing roms in report
 		- support an output file for the speed etc. report
-			
+		    - integrate speed report into report_10
+		- part not in wiki report
+		- generate a report in the format I would send to the list
+		- add more information about the testrun to the report
+		    - mame version
+		    - etc.
+		- make it possible to generate a completely readable report of the testrun
+		    - images
+		    - all outputs
+		- add a TOC to the Markdown report
+		- document the reports in more detail
+		- is there an LF in the stderr output or does te report add that?
+
 	create_image_xml
 		- add more output to create_image_xml
 		
@@ -414,3 +445,13 @@ Entity: line 14: parser error : Extra content at the end of the document
 		http://mess.redump.net/tools:mame_regtest
 		- rename existing configurations to .example.xml
 		- remove makefile
+		- compile MAME with _GLIBCXX_ASSERTIONS
+		- Error opening translation file English
+		- "Average speed" missing in stdout of some sets
+		- run with -nodrc to find bugs in interpreters
+		    - sanitizers cannot find bugs in UML
+		    - add an option to always do this?
+		- print output folder
+		- create proper releases with changelog in GitHub
+		- change CHANGELOG to Markdown
+		- add build instructions to README.md
