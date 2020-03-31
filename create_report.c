@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #ifdef __GNUC__
 #include <unistd.h>
@@ -882,7 +883,7 @@ static void create_report_cb(struct parse_callback_data* pcd)
 	}
 }
 
-static void create_report()
+static int create_report()
 {
 	FILE* report_fd = NULL;
 
@@ -901,7 +902,10 @@ static void create_report()
 
 	if( config_report_type == 0 ) {
 		report_fd = fopen(config_output_file, "wb");
-		/* TODO: check result */
+		if (!report_fd) {
+			printf("could not open file '%s' (%s) - aborting\n", config_output_file, strerror(errno));
+			return 1;
+		}
 		if( config_use_markdown == 1 )
 			fprintf(report_fd, "# mame_regtest result\n");
 	}
@@ -913,7 +917,10 @@ static void create_report()
 		mrt_mkdir(config_output_folder);
 		/* TODO: check result */
 		report_fd = fopen(outputfile, "wb");
-		/* TODO: check result */
+		if (!report_fd) {
+			printf("could not open file '%s' (%s) - aborting\n", outputfile, strerror(errno));
+			return 1;
+		}
 		free(outputfile);
 		outputfile = NULL;
 		
@@ -927,9 +934,12 @@ static void create_report()
 	}
 	else if ( config_report_type == 2 ) {
 		report_fd = fopen(config_output_file, "wb");
-		/* TODO: check result */
+		if (!report_fd) {
+			printf("could not open file '%s' (%s) - aborting\n", config_output_file, strerror(errno));
+			return 1;
+		}
 	}
-		
+
 	r_cb_data.report_fd = report_fd;
 	
 	char** folders = split_string(config_xml_folder, ";");
@@ -973,6 +983,8 @@ static void create_report()
 	{ 
 		fclose(report_fd);
 	}
+
+	return 0;
 }
 
 int main(int argc, char *argv[])
@@ -997,9 +1009,9 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	
-	create_report();
+	const int res = create_report();
 	
 	config_free(report_config);
 
-	return 0;
+	return res;
 }

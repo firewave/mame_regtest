@@ -738,6 +738,8 @@
     - changed "comparison" report to Markdown format
     - removed "report_type" 3 (tagmap report)
     - removed "tagmap_threshold"
+    - added checks for fopen() calls and reported error when it fails
+    - return a result from create_report()
 
     create_image_xml
     - fixed some CLion inspection warnings
