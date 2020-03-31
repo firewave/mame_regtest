@@ -59,7 +59,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         add_compile_options(-Wconversion -Wsign-conversion)
         # TODO: always enable when all warnings are fixed
         if (USE_GCC_ANALYZER)
-            add_compile_options(-fanalyzer)
+            add_compile_options(-fanalyzer -Wno-error)
         endif()
     endif()
 endif()
