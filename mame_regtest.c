@@ -779,7 +779,9 @@ static int get_MHDR_data(FILE* in_fd, unsigned int* MHDR_width, unsigned int* MH
 		*MHDR_height = htonl(height);
 
 		fseek(in_fd, reversed_chunk_size - (2 * sizeof(unsigned int)), SEEK_CUR); /* jump remaining MHDR chunk */
+		/* TODO: check result */
 		fseek(in_fd, 4, SEEK_CUR); /* jump CRC */
+		/* TODO: check result */
 
 		return 1;
 	}
@@ -824,7 +826,9 @@ static int get_IHDR_data(FILE* in_fd, unsigned int* IHDR_width, unsigned int* IH
 		*IHDR_height = htonl(height);
 		
 		fseek(in_fd, reversed_chunk_size - (2 * sizeof(unsigned int)), SEEK_CUR); /* jump remaining IHDR chunk */
+		/* TODO: check result */
 		fseek(in_fd, 4, SEEK_CUR); /* jump CRC */
+		/* TODO: check result */
 		
 		return 1;
 	}
@@ -854,6 +858,7 @@ static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, uns
 
 		if( memcmp(IDAT_name, chunk_name, 4) == 0 ) {
 			fseek(in_fd, reversed_chunk_size, SEEK_CUR); /* jump IDAT chunk */
+			/* TODO: check result */
 			
 			unsigned int chunk_crc = 0;
 			if( fread(&chunk_crc, sizeof(unsigned int), 1, in_fd) != 1 ) {
@@ -868,18 +873,24 @@ static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, uns
 
 		if( memcmp(IEND_name, chunk_name, 4) == 0 ) {
 			fseek(in_fd, reversed_chunk_size, SEEK_CUR); /* jump IEND chunk */
+			/* TODO: check result */
 			fseek(in_fd, 4, SEEK_CUR); /* jump CRC */
+			/* TODO: check result */
 			return 0;
 		}
 
 		if( memcmp(MEND_name, chunk_name, 4) == 0 ) {
 			fseek(in_fd, reversed_chunk_size, SEEK_CUR); /* jump MEND chunk */
+			/* TODO: check result */
 			fseek(in_fd, 4, SEEK_CUR); /* jump CRC */
+			/* TODO: check result */
 			return 2;
 		}
 
 		fseek(in_fd, reversed_chunk_size, SEEK_CUR); /* jump chunk */
+		/* TODO: check result */
 		fseek(in_fd, 4, SEEK_CUR); /* jump CRC */
+		/* TODO: check result */
 	}
 }
 
@@ -892,6 +903,7 @@ static int get_png_data(const char* png_name, unsigned int *IHDR_width, unsigned
 	}
 
 	fseek(png_fd, 0, SEEK_SET);
+	/* TODO: check result */
 
 	unsigned char sig[8] = "";
 	
@@ -932,6 +944,7 @@ static void open_mng_and_skip_sig(const char* mng_name, FILE** mng_fd)
 	}
 
 	fseek(*mng_fd, 0, SEEK_SET);
+	/* TODO: check result */
 
 	unsigned char sig[8] = "";
 
