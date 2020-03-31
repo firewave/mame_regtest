@@ -63,6 +63,8 @@
 
 #ifdef __GNUC__
 #define ATTR_NORETURN __attribute__((noreturn))
+#elif defined(_MSC_VER)
+#define ATTR_NORETURN __declspec(noreturn)
 #else
 #define ATTR_NORETURN
 #endif
@@ -293,7 +295,7 @@ static struct config_entry mrt_config[] =
 static int get_png_data(const char* png_name, unsigned int *IHDR_width, unsigned int* IHDR_height, unsigned int *IDAT_size, unsigned int* IDAT_crc);
 static void open_mng_and_skip_sig(const char* mng_name, FILE** mng_fd);
 static int internal_get_next_IDAT_data(FILE* in_fd, unsigned int *IDAT_size, unsigned int* IDAT_crc);
-static void cleanup_and_exit(int exitcode, const char* errstr) ATTR_NORETURN;
+static void ATTR_NORETURN cleanup_and_exit(int exitcode, const char* errstr);
 static int get_MHDR_data(FILE* in_fd, unsigned int* MHDR_width, unsigned int* MHDR_height);
 static void cleanup_driver_info_list(struct driver_info* driv_inf);
 
