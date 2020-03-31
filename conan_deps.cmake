@@ -45,6 +45,7 @@ if (NOT PROC_RES EQUAL 0)
 endif()
 
 conan_check(VERSION 1.0.0 REQUIRED)
+# TODO: make the build type configurable - "missing" might be enough for normal development
 if (MINGW)
     configure_file(${CMAKE_SOURCE_DIR}/default_with_cmake ${CMAKE_BINARY_DIR}/.conan/profiles/default_with_cmake COPYONLY)
     conan_cmake_run(CONANFILE conanfile.txt

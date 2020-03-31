@@ -78,6 +78,7 @@ static void build_group_cb(struct parse_callback_data* pcd)
 				struct group_data** gd_list = bg_cb_data->gd_list;
 
 				struct driver_data* new_dd = (struct driver_data*)malloc(sizeof(struct driver_data));
+				/* TODO: check result */
 				new_dd->filename = strdup(pcd->fullname);
 				new_dd->next = NULL;
 
@@ -99,6 +100,7 @@ static void build_group_cb(struct parse_callback_data* pcd)
 				
 				if( !found_srcfile ) {
 					struct group_data* new_gd_entry = (struct group_data*)malloc(sizeof(struct group_data));
+					/* TODO: check result */
 					new_gd_entry->srcfile = sourcefile_key;
 					new_gd_entry->drivers = new_dd;
 					new_gd_entry->next = NULL;
@@ -585,7 +587,8 @@ static int create_report_from_filename(const char *const filename, struct report
 					xmlChar* name = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)"/output", (const xmlChar*)"name");
 					xmlChar* srcfile = get_attribute_by_xpath(xpathCtx1, (const xmlChar*)"/output", (const xmlChar*)"sourcefile");
 					char* entry_name_base = get_filename_base(entry_name);
-					
+					/* TODO: check result */
+
 					char* png_path = NULL;
 					append_string(&png_path, FILESLASH);
 					append_string(&png_path, (const char*)entry_name_base);
@@ -898,6 +901,7 @@ static void create_report()
 
 	if( config_report_type == 0 ) {
 		report_fd = fopen(config_output_file, "wb");
+		/* TODO: check result */
 		if( config_use_markdown == 1 )
 			fprintf(report_fd, "# mame_regtest result\n");
 	}
@@ -909,6 +913,7 @@ static void create_report()
 		mrt_mkdir(config_output_folder);
 		/* TODO: check result */
 		report_fd = fopen(outputfile, "wb");
+		/* TODO: check result */
 		free(outputfile);
 		outputfile = NULL;
 		
@@ -922,6 +927,7 @@ static void create_report()
 	}
 	else if ( config_report_type == 2 ) {
 		report_fd = fopen(config_output_file, "wb");
+		/* TODO: check result */
 	}
 		
 	r_cb_data.report_fd = report_fd;

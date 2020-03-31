@@ -238,7 +238,7 @@ void parse_directory(const char* dirname,
 					}
 				}
 				else
-					printf("parse_directory() - could not stat '%s'\n", tmp_de);
+					printf("parse_directory() - could not stat '%s'\n", tmp_de); /* TODO: propagate error */
 
 				free(tmp_de);
 			}
@@ -254,7 +254,7 @@ void parse_directory(const char* dirname,
 		(callback)(&pcd);
 	}
 	else
-		printf("parse_directory() - could not open '%s'\n", dirname);
+		printf("parse_directory() - could not open '%s'\n", dirname); /* TODO: propagate error */
 }
 
 int is_absolute_path(const char* path)
@@ -325,7 +325,7 @@ static void clear_callback(struct parse_callback_data* pcd)
 	else if( pcd->type == ENTRY_END ) {
 		int* delete_root = (int*)pcd->user_data;
 		if( *delete_root )
-			rmdir(pcd->dirname);
+			rmdir(pcd->dirname); /* TODO: check result */
 	}
 }
 
@@ -400,6 +400,7 @@ char* get_directory(const char* filepath)
 	if( pos ) {
 		const ptrdiff_t len = pos - filepath;
 		result = (char*)malloc((size_t)len+1);
+		/* TODO: check result */
 		strncpy(result, filepath, (size_t)len);
 		result[len] = '\0';
 	}
@@ -450,6 +451,7 @@ static char** command_to_argv(const char* command)
 				in_quote = 0;
 
 				argv = (char**)realloc(argv, sizeof(char*) * (argc+2));
+				/* TODO: check result */
 				argv[argc] = strdup(temp);
 				free(temp);
 				temp = NULL;
@@ -464,6 +466,7 @@ static char** command_to_argv(const char* command)
 				if( parts[i][len-1] == '"' )
 				{
 					argv = (char**)realloc(argv, sizeof(char*) * (argc+2));
+					/* TODO: check result */
 					append_string_n(&temp, parts[i]+1, len-2);
 					argv[argc] = strdup(temp);
 					free(temp);
@@ -479,6 +482,7 @@ static char** command_to_argv(const char* command)
 			else
 			{
 				argv = (char**)realloc(argv, sizeof(char*) * (argc+2));
+				/* TODO: check result */
 				argv[argc] = strdup(parts[i]);
 				argc++;
 			}
@@ -656,6 +660,7 @@ void filter_unprintable(char* str, size_t len)
 void append_to_array(struct mrt_array* arr, void* to_append)
 {
 	arr->ptr = (void**)realloc(arr->ptr, sizeof(void*) * (arr->size+2));
+	/* TODO: check result */
 	arr->ptr[arr->size] = to_append;
 	arr->size = arr->size+1;
 	arr->ptr[arr->size] = NULL;
