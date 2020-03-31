@@ -446,6 +446,7 @@
 	- remember the default ram and bios options for future usage
 	- implemented ATTR_NORETURN for Visual Studio
 	- added CMake option USE_VS_ANALYZE to enable Visual Studio Code Analysis
+	- added CMake option USE_GCC_ANALYZER to enable GCC Static Analysis
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)
