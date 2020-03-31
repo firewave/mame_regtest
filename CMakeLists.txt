@@ -3,6 +3,7 @@ project(mame_regtest)
 
 option(USE_CONAN "Use conan for external dependencies" OFF)
 option(USE_SANITIZERS "Use sanitizers" OFF)
+option(USE_VS_ANALYZE "Use Visual Studio Code Analysis" OFF)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -37,7 +38,13 @@ endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-    add_compile_options(/W4 /WX)
+    add_compile_options(/W4)
+    # TODO: always enable when all warnings are fixed
+    if (USE_VS_ANALYZE)
+        add_compile_options(/analyze)
+    else()
+        add_compile_options(/WX)
+    endif()
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
