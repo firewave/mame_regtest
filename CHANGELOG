@@ -444,9 +444,6 @@
 	- avoid duplicated runs for sets with bios and ram options
 	- added "size" and "crc" for all file entry in output XML for completeness and verification of output data
 	- remember the default ram and bios options for future usage
-	- implemented ATTR_NORETURN for Visual Studio
-	- added CMake option USE_VS_ANALYZE to enable Visual Studio Code Analysis
-	- added CMake option USE_GCC_ANALYZER to enable GCC Static Analysis
 
 	create_report
 	- added option "report_type" (0 = result report / 1 = comparison report)
@@ -723,6 +720,9 @@
     - enabled -Wconversion -Wsign-conversion for GCC 10+ only
     - always create a compilation database
     - a "run-clang-tidy" target will now be added if the executable is available
+    - implemented ATTR_NORETURN for Visual Studio
+    - added CMake option USE_VS_ANALYZE to enable Visual Studio Code Analysis
+    - added CMake option USE_GCC_ANALYZER to enable GCC Static Analysis
 
     create_report
     - fixed some clang-tidy warnings
