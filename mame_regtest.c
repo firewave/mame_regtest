@@ -1422,7 +1422,7 @@ static void execute_mame2(struct driver_entry* de)
 	if( de->bios && (de->bios[0] != '\0') )
 		xmlNewProp(output_node, (const xmlChar*)"bios", (const xmlChar*)de->bios);
 	if( de->ramsize > 0 ) {
-		char tmp[10] = "";
+		char tmp[11] = "";
 		sprintf(tmp, "%d", de->ramsize);
 		xmlNewProp(output_node, (const xmlChar*)"ramsize", (const xmlChar*)tmp);
 	}
