@@ -147,6 +147,7 @@ error:
 	{
 		fclose(fd);
 	}
+	/* TODO: this will return the errno of fclose() */
 	return errno;
 }
 
