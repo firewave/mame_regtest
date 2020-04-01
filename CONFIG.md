@@ -81,6 +81,7 @@
 * _ignore_exitcode_4_ -
 * _show_memleaks_ -
 * _show_clipped_ -
+* _unexpected_stderr_ - Treat any output in stderr as error (only for report_type 0)
 * _group_data_ -
 * _print_stderr_ -
 * _compare_folder_ -

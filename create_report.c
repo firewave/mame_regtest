@@ -177,6 +177,7 @@ static int config_print_stdout = 0;
 static char* config_output_folder = NULL;
 static int config_recursive = 0;
 static int config_speed_threshold = 0;
+static int config_unexpected_stderr = 0;
 
 static struct config_entry report_config[] =
 {
@@ -193,6 +194,7 @@ static struct config_entry report_config[] =
 	{ "output_folder", 		CFG_STR_PTR, 	&config_output_folder }, /* comparison report specific */
 	{ "recursive", 			CFG_INT, 		&config_recursive },
 	{ "speed_threshold", 	CFG_INT, 		&config_speed_threshold },
+	{ "unexpected_stderr", 	CFG_INT, 		&config_unexpected_stderr },
 	{ NULL, 				CFG_UNK, 		NULL }
 };
 
@@ -206,6 +208,7 @@ struct report_summary
 	int clipped;
 	int mandatory;
 	int missing;
+	int unexpected_stderr;
 };
 
 static void summary_incr(struct report_summary* summary, const xmlChar* exitcode_key)
@@ -235,6 +238,7 @@ struct report_cb_data
 	const char* output_folder;
 	int recursive;
 	int speed_threshold;
+	int unexpected_stderr;
 };
 
 /* TODO - handle multiple occurances */
@@ -453,7 +457,84 @@ static int create_report_from_filename(const char *const filename, struct report
 							int reset_scope_found = stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"called within reset scope by");
 							/* TODO: make it optional */
 							int runtime_error_found = stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"runtime error");
-							
+							int unexpected_stderr = 0;
+							if (config_unexpected_stderr && stderr_key != NULL)
+							{
+								/* TODO: make this generic for the reports and merge with speed code */
+#ifdef WIN32
+								const char* sep = "\r\n";
+#else
+								const char* sep = "\n";
+#endif
+								char** lines = split_string((const char*)stderr_key, sep);
+								int i = 0;
+								for( ; lines != NULL && lines[i] != NULL; ++i )
+								{
+									/*
+									 	examples:
+										datum.bin ROM NEEDS REDUMP
+									 	865jaa02.chd CHD NEEDS REDUMP
+									*/
+									if( strstr(lines[i], " NEEDS REDUMP") != NULL )
+										continue;
+
+									/*
+										examples:
+										dolphin_moni.rom NOT FOUND (NO GOOD DUMP KNOWN) (tried in dauphin dauphin)
+									 	bbh2sp_v2.02.09.chd NOT FOUND
+									*/
+									if( strstr(lines[i], " NOT FOUND") != NULL )
+										continue;
+
+									/*
+										examples:
+										sun-8212.ic3 NO GOOD DUMP KNOWN
+									*/
+									if( strstr(lines[i], " NO GOOD DUMP KNOWN") != NULL )
+										continue;
+
+									if( strstr(lines[i], "WARNING: the machine might not run correctly.") != NULL )
+										continue;
+
+									if( strstr(lines[i], "Fatal error: Required files are missing, the machine cannot be run.") != NULL )
+										continue;
+
+									/*
+									 	will appear as the last stderror entry - do not treat it as unexpected
+
+									 	examples:
+										-----------------------------------------------------
+										Exception at EIP=00000000059e1763 (video_manager::begin_recording_avi(char const*, unsigned int, screen_device*)+0x0043): ACCESS VIOLATION
+										While attempting to read memory at 0000000000000000
+										-----------------------------------------------------
+									*/
+									if( strstr(lines[i], "-----------------------------------------------------") != NULL )
+										break;
+
+                                    /*
+                                         will appear as the last stderror entry - do not treat it as unexpected
+
+                                         examples:
+                                        =================================================================
+										==21396==ERROR: AddressSanitizer: allocator is out of memory trying to allocate 0xf0d2000 bytes
+                                    */
+                                    if( strstr(lines[i], "=================================================================") != NULL )
+                                        break;
+
+									/* TODO: remove this after it is fixed */
+									if( strstr(lines[i], "Value internal not supported for option debugger - falling back to auto") != NULL )
+										continue;
+
+									/* TODO: remove this after it is fixed */
+									if( strstr(lines[i], "Error opening translation file English") != NULL )
+										continue;
+
+									unexpected_stderr = 1;
+									break;
+								}
+								free_array(lines);
+							}
+
 							summary_incr(&r_cb_data->summary, exitcode_key);
 							if(memleak_found)
 								r_cb_data->summary.memleaks++;
@@ -461,6 +542,8 @@ static int create_report_from_filename(const char *const filename, struct report
 								r_cb_data->summary.clipped++;
 							if(runtime_error_found)
 								r_cb_data->summary.runtime_errors++;
+							if(unexpected_stderr)
+								r_cb_data->summary.unexpected_stderr++;
 
 							int report_error = (error_found && !mandatory_found);
 							int report_memleak = (memleak_found && r_cb_data->show_memleaks);
@@ -468,7 +551,7 @@ static int create_report_from_filename(const char *const filename, struct report
 							int report_stderr = (r_cb_data->print_stderr && stderr_key && xmlStrlen(stderr_key) > 0);
 							int report_clipped = (r_cb_data->show_clipped && clipped_found);
 							
-							if( report_error || report_memleak || report_stdout || report_stderr || report_clipped || reset_scope_found || runtime_error_found ) {
+							if( report_error || report_memleak || report_stdout || report_stderr || report_clipped || reset_scope_found || runtime_error_found || unexpected_stderr ) {
 								if( r_cb_data->use_markdown )
 								{
 									if( write_src_header ) {
@@ -505,7 +588,7 @@ static int create_report_from_filename(const char *const filename, struct report
 										fprintf(r_cb_data->report_fd, "\n```\n%s\n```\n", stdout_key);
 									}
 			
-									if( (report_error || report_memleak || report_stderr || reset_scope_found || runtime_error_found) && stderr_key && xmlStrlen(stderr_key) > 0 )
+									if( (report_error || report_memleak || report_stderr || reset_scope_found || runtime_error_found || unexpected_stderr) && stderr_key && xmlStrlen(stderr_key) > 0 )
 									{
 										fprintf(r_cb_data->report_fd, "\n```\n%s\n```\n", stderr_key);
 									}
@@ -898,6 +981,7 @@ static int create_report()
 	r_cb_data.output_folder = config_output_folder;
 	r_cb_data.recursive = config_recursive;
 	r_cb_data.speed_threshold = config_speed_threshold;
+	r_cb_data.unexpected_stderr = config_unexpected_stderr;
 	memset(&r_cb_data.summary, 0x00, sizeof(struct report_summary));
 
 	if( config_report_type == 0 ) {
@@ -973,6 +1057,7 @@ static int create_report()
 		fprintf(report_fd, "  * %d with missing roms\n", r_cb_data.summary.missing);
 		fprintf(report_fd, "  * %d with memory leaks\n", r_cb_data.summary.memleaks);
 		fprintf(report_fd, "  * %d with sound clipping\n", r_cb_data.summary.clipped);
+		fprintf(report_fd, "  * %d with unexpected stderr messages\n", r_cb_data.summary.unexpected_stderr);
 		fprintf(report_fd, "  * %d with missing mandatory devices\n", r_cb_data.summary.mandatory);
 	}
 	
