@@ -651,7 +651,7 @@ void filter_unprintable(char* str, size_t len)
 	size_t i = 0;
 	for(; i < len; ++i)
 	{
-		int c = str[i];
+		int c = (unsigned char)str[i];
 		if(isspace(c) || isprint(c))
 			continue;
 		str[i] = ' ';
