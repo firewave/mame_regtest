@@ -115,6 +115,7 @@ int read_file(const char* file, char** content)
 				if( fseek(fd, 0, SEEK_SET) == 0)
 				{
 					*content = (char*)malloc((size_t)filesize + 1);
+					/* TODO: check result */
 					size_t num_read = fread(*content, 1, (size_t)filesize, fd);
 					if( num_read == (size_t)filesize )
 					{
@@ -308,6 +309,7 @@ char* get_filename_base(const char* filepath)
 
     const ptrdiff_t len = pos2 - pos1;
 	result = (char*)malloc((size_t)len+1);
+	/* TODO: check result */
 	strncpy(result, pos1, (size_t)len);
 	result[len] = '\0';
 
