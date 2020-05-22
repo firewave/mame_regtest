@@ -468,7 +468,7 @@ static void clear_callback_2(struct parse_callback_data* pcd)
 	else if( pcd->type == ENTRY_END ) {
 		int* delete_root = (int*)pcd->user_data;
 		if( *delete_root )
-			rmdir(pcd->dirname);
+			rmdir(pcd->dirname); /* TODO: check result */
 	}
 }
 
@@ -477,7 +477,7 @@ static void clear_directory_2(const char* dirname, int delete_root)
 	parse_directory(dirname, 0, clear_callback_2, (void*)&delete_root);
 
 	if( delete_root )
-		rmdir(dirname);
+		rmdir(dirname); /* TODO: check result */
 }
 
 static void parse_callback(struct parse_callback_data* pcd)

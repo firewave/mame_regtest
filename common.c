@@ -84,6 +84,7 @@ void append_string_n(char** str, const char* str_to_append, size_t applen)
 		length = strlen(*str);
 
 	*str = (char*)realloc(*str, length+applen+1);
+	/* TODO: check result */
 	memcpy(*str+length, str_to_append, applen);
 	(*str)[length+applen] = '\0';
 }
@@ -340,7 +341,7 @@ void clear_directory(const char* dirname, int delete_root)
 	parse_directory(dirname, 0, clear_callback, (void*)&delete_root);
 
 	if( delete_root )
-		rmdir(dirname);
+		rmdir(dirname); /* TODO: check result */
 }
 
 void calc_crc32(const char* file, unsigned long* crc)
@@ -370,6 +371,7 @@ char** split_string(const char* str, const char* delims)
 	while(pch != NULL)
 	{
 		strings = (char**)realloc(strings, sizeof(char*) * (i+2));
+		/* TODO: check result */
 		strings[i] = strdup(pch);
 		pch = strtok(NULL, delims);
 		i++;
