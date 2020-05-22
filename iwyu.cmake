@@ -1,0 +1,5 @@
+find_program(IWYU_TOOL NAMES iwyu_tool)
+message(STATUS "IWYU_TOOL=${IWYU_TOOL}")
+if (IWYU_TOOL)
+    add_custom_target(run-iwyu ${IWYU_TOOL} -p ${CMAKE_BINARY_DIR} -j ${NPROC_HALF})
+endif()

@@ -2,8 +2,8 @@
 #define COMMON_H_
 
 #include <stdlib.h>
-
 #include <sys/stat.h>
+#include <endian.h>
 
 #include <libxml/xpath.h>
 

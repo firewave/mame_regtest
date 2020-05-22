@@ -723,6 +723,9 @@
     - implemented ATTR_NORETURN for Visual Studio
     - added CMake option USE_VS_ANALYZE to enable Visual Studio Code Analysis
     - added CMake option USE_GCC_ANALYZER to enable GCC Static Analysis
+    - added processorcount.cmake to get the available threads for the system via NPROC and NPROC_HALF
+    - added iwyu.cmake and add an "run-iwyu" if the "iwyu_tool" executable is available
+    - adjusted some includes based on include-what-you-use
 
     create_report
     - fixed some clang-tidy warnings

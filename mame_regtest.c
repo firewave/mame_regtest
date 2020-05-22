@@ -37,8 +37,7 @@
 #endif
 
 #ifndef WIN32
-#include <arpa/inet.h>
-#include <sys/wait.h>
+#include <netinet/in.h>
 #define USE_VALGRIND 1
 #else
 #define USE_VALGRIND 0

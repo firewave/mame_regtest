@@ -123,4 +123,6 @@ if (WIN32)
     target_link_libraries(create_image_xml PRIVATE ws2_32)
 endif()
 
+include(processorcount.cmake)
 include(clang_tidy.cmake)
+include(iwyu.cmake)
