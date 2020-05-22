@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 #include <sys/stat.h>
-#include <endian.h>
 
 #include <libxml/xpath.h>
 
@@ -23,6 +22,10 @@ int mrt_getch(void);
 #define FILESLASH "\\"
 #else
 #define FILESLASH "/"
+#endif
+
+#ifndef _WIN32
+#include <endian.h>
 #endif
 
 #if !defined(LITTLE_ENDIAN) && !defined(BIG_ENDIAN)
