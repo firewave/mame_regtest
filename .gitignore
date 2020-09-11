@@ -1,3 +1,5 @@
 # CLion
 /.idea/
 /cmake-build-*/
+/ClangBuildAnalyzer-build/
+/ClangBuildAnalyzer-master/
