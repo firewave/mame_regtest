@@ -2540,6 +2540,11 @@ int main(int argc, char *argv[])
 	if( config_verbose )
 		printf("executable: %s\n", config_mame_exe);
 
+	if( !config_output_folder ) {
+		fprintf(stderr, "no 'output_folder' configured\n");
+		cleanup_and_exit(1, "aborting");
+	}
+
 	if( access(config_output_folder, F_OK) == 0 ) {
 		if( !config_clear_output_folder ) {
 			fprintf(stderr, "output folder '%s' already exists\n", config_output_folder);
