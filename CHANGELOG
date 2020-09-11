@@ -726,6 +726,8 @@
     - added processorcount.cmake to get the available threads for the system via NPROC and NPROC_HALF
     - added iwyu.cmake and add an "run-iwyu" if the "iwyu_tool" executable is available
     - adjusted some includes based on include-what-you-use
+    - added ClangBuildAnalyzer.sh for build time analysis (requires a Clang compiler)
+        - run it by passing the build command you want to analyze - e.g. "./ClangBuildAnalyzer.sh make clean all"
 
     create_report
     - fixed some clang-tidy warnings
