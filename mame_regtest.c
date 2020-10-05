@@ -1454,11 +1454,9 @@ static void execute_mame2(struct driver_entry* de)
 		
 		/* TODO: add part */
 		struct image_entry* images = de->images;
-		if (images) {
-			if( (images->device_briefname && xmlStrlen(images->device_briefname) > 0) &&
-				(images->device_file && xmlStrlen(images->device_file) > 0) ) {
-				xmlNewProp(devices_node, images->device_briefname, images->device_file);
-			}
+		if( (images->device_briefname && xmlStrlen(images->device_briefname) > 0) &&
+			(images->device_file && xmlStrlen(images->device_file) > 0) ) {
+			xmlNewProp(devices_node, images->device_briefname, images->device_file);
 		}
 	}
 	if( de->slot && de->slot->name && de->slotoption ) {
