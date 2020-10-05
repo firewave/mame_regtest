@@ -728,6 +728,7 @@
     - adjusted some includes based on include-what-you-use
     - added ClangBuildAnalyzer.sh for build time analysis (requires a Clang compiler)
         - run it by passing the build command you want to analyze - e.g. "./ClangBuildAnalyzer.sh make clean all"
+    - added cppcheck.cmake and add a "run-cppcheck" target if the "cppcheck" executable is available
 
     create_report
     - fixed some clang-tidy warnings
