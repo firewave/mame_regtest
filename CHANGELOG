@@ -730,6 +730,8 @@
         - run it by passing the build command you want to analyze - e.g. "./ClangBuildAnalyzer.sh make clean all"
     - added cppcheck.cmake and add a "run-cppcheck" target if the "cppcheck" executable is available
     - fixed Cppcheck warning
+    - cleaned up README.md
+    - merged README into README.md
 
     create_report
     - fixed some clang-tidy warnings

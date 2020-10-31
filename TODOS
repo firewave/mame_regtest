@@ -455,3 +455,4 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- create proper releases with changelog in GitHub
 		- change CHANGELOG to Markdown
 		- add build instructions to README.md
+		- clean up README.md
