@@ -1,4 +1,4 @@
-find_program(CLANG_TIDY NAMES clang-tidy clang-tidy-10 clang-tidy-9 clang-tidy-8)
+find_program(CLANG_TIDY NAMES clang-tidy clang-tidy-11 clang-tidy-10 clang-tidy-9 clang-tidy-8)
 message(STATUS "CLANG_TIDY=${CLANG_TIDY}")
 if (CLANG_TIDY)
     # TODO: read files from compilation database
