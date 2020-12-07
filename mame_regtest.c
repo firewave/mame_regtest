@@ -11,6 +11,7 @@
 
 #ifdef __GNUC__
 #include <unistd.h>
+#include <errno.h>
 #endif
 
 #ifdef _MSC_VER
@@ -467,8 +468,11 @@ static void clear_callback_2(struct parse_callback_data* pcd)
 	}
 	else if( pcd->type == ENTRY_END ) {
 		int* delete_root = (int*)pcd->user_data;
-		if( *delete_root )
-			rmdir(pcd->dirname); /* TODO: check result */
+		if( *delete_root ) {
+			if ( rmdir(pcd->dirname) == -1 ) {
+				cleanup_and_exit(errno, "clearing root failed"); /* TODO: add pcd->dirname */
+			}
+		}
 	}
 }
 
@@ -476,8 +480,11 @@ static void clear_directory_2(const char* dirname, int delete_root)
 {
 	parse_directory(dirname, 0, clear_callback_2, (void*)&delete_root);
 
-	if( delete_root )
-		rmdir(dirname); /* TODO: check result */
+	if( delete_root ) {
+		if ( rmdir(dirname) == -1 ) {
+			cleanup_and_exit(errno, "clearing directory failed"); /* TODO: add dirname */
+		}
+	}
 }
 
 static void parse_callback(struct parse_callback_data* pcd)
@@ -2021,7 +2028,9 @@ static int parse_listxml_element_cfg(xmlNodePtr game_children, struct driver_inf
 						xmlChar* dipvalue_value = xmlGetProp(dipswitch_children, (const xmlChar*)"value");
 
 						struct dipvalue_info* new_dipvalue = (struct dipvalue_info*)malloc(sizeof(struct dipvalue_info));
-						/* TODO: check allocation */
+						if (!new_dipvalue) {
+							cleanup_and_exit(1, "allocating dipvalue_info failed");
+						}
 						memset(new_dipvalue, 0x00, sizeof(struct dipvalue_info));
 
 						if( dipvalue_name ) new_dipvalue->name = dipvalue_name;
@@ -2272,7 +2281,9 @@ static void parse_listxml_element(const xmlNode* game_child, struct driver_info*
 				
 				if( config_use_slots && (xmlStrcmp(game_children->name, (const xmlChar*)"slot") == 0) ) {
 					struct slot_info* new_slot_info = (struct slot_info*)malloc(sizeof(struct slot_info));
-					/* TODO: check allocation */
+					if (!new_slot_info) {
+						cleanup_and_exit(1, "allocating slot_info failed");
+					}
 					memset(new_slot_info, 0x00, sizeof(struct slot_info));
 				
 					xmlChar* slot_name = xmlGetProp(game_children, (const xmlChar*)"name");
