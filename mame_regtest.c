@@ -2433,6 +2433,7 @@ static void parse_listxml(const char* filename, struct driver_info** driv_inf)
 
 						if( config_print_xpath_results ) {
 							FILE *xpath_result_fd = mrt_fopen("xpath_results.xml", "w");
+							/* TODO: check result */
 							fprintf(xpath_result_fd, "<xpath_result>\n");
 							xmlBufferDump(xpath_result_fd, xmlBuf);
 							fprintf(xpath_result_fd, "</xpath_result>\n");
