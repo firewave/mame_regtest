@@ -236,7 +236,6 @@ struct report_cb_data
 	int print_stdout;
 	struct report_summary summary;
 	const char* output_folder;
-	int recursive;
 	int speed_threshold;
 	int unexpected_stderr;
 };
@@ -458,7 +457,7 @@ static int create_report_from_filename(const char *const filename, struct report
 							/* TODO: make it optional */
 							int runtime_error_found = stderr_key && xmlStrstr(stderr_key, (const xmlChar*)"runtime error");
 							int unexpected_stderr = 0;
-							if (config_unexpected_stderr && stderr_key != NULL)
+							if (r_cb_data->unexpected_stderr && stderr_key != NULL)
 							{
 								/* TODO: make this generic for the reports and merge with speed code */
 #ifdef WIN32
@@ -692,7 +691,7 @@ static int create_report_from_filename(const char *const filename, struct report
 					append_string(&path2, png_path);
 					
 					char* outpath = NULL;
-					append_string(&outpath, config_output_folder);
+					append_string(&outpath, r_cb_data->output_folder);
 					append_string(&outpath, FILESLASH);
 					append_string(&outpath, entry_name_base);
 					append_string(&outpath, "_diff.png");
@@ -979,7 +978,6 @@ static int create_report()
 	r_cb_data.compare_folder = config_compare_folder;
 	r_cb_data.print_stdout = config_print_stdout;
 	r_cb_data.output_folder = config_output_folder;
-	r_cb_data.recursive = config_recursive;
 	r_cb_data.speed_threshold = config_speed_threshold;
 	r_cb_data.unexpected_stderr = config_unexpected_stderr;
 	memset(&r_cb_data.summary, 0x00, sizeof(struct report_summary));

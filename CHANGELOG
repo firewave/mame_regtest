@@ -750,6 +750,7 @@
     - added checks for fopen() calls and reported error when it fails
     - return a result from create_report()
     - added option "unexpected_stderr" to check for unexpected stderr messages
+    - properly access configuration via report_cb_data
 
     create_image_xml
     - fixed some CLion inspection warnings
