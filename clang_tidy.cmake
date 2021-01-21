@@ -1,6 +1,5 @@
-find_program(CLANG_TIDY NAMES clang-tidy clang-tidy-11 clang-tidy-10 clang-tidy-9 clang-tidy-8)
-message(STATUS "CLANG_TIDY=${CLANG_TIDY}")
-if (CLANG_TIDY)
-    # TODO: read files from compilation database
-    add_custom_target(run-clang-tidy ${CLANG_TIDY} -p=${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/*.c)
+find_program(RUN_CLANG_TIDY NAMES run-clang-tidy run-clang-tidy-11 run-clang-tidy-10 run-clang-tidy-9 run-clang-tidy-8)
+message(STATUS "RUN_CLANG_TIDY=${RUN_CLANG_TIDY}")
+if (RUN_CLANG_TIDY)
+    add_custom_target(run-clang-tidy ${RUN_CLANG_TIDY} -q -p=${CMAKE_BINARY_DIR} -j ${NPROC_HALF})
 endif()
