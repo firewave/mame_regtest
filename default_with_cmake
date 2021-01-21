@@ -1,4 +1,4 @@
 include(default)
 
 [build_requires]
-cmake_installer/3.16.1@conan/stable
+cmake/3.19.2
