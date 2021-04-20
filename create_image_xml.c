@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 
 /* libxml2 */
 #include <libxml/parser.h>

@@ -2,7 +2,6 @@
 #define COMMON_H_
 
 #include <stdlib.h>
-#include <sys/stat.h>
 
 #include <libxml/xpath.h>
 
