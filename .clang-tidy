@@ -1,3 +1,3 @@
 ---
-Checks:          '*,-abseil-*,-altera-*,-android-*,-cert-*,-cppcoreguidelines-*,-fuchsia-*,-google-*,-hicpp-*,-llvm-*,-llvmlibc-*,-linuxkernel-*,-mpi-*,-objc-*,-openmp-*,-zircon-*,-readability-braces-around-statements,-readability-magic-numbers,-bugprone-macro-parentheses,-readability-isolate-declaration,-readability-function-size,-readability-function-cognitive-complexity,-misc-no-recursion'
+Checks:          '*,-abseil-*,-altera-*,-android-*,-cert-*,-cppcoreguidelines-*,-fuchsia-*,-google-*,-hicpp-*,-llvm-*,-llvmlibc-*,-linuxkernel-*,-mpi-*,-objc-*,-openmp-*,-zircon-*,-readability-braces-around-statements,-readability-magic-numbers,-bugprone-macro-parentheses,-readability-isolate-declaration,-readability-function-size,-readability-function-cognitive-complexity,-misc-no-recursion,-concurrency-mt-unsafe,-readability-identifier-length,-performance-no-int-to-ptr,-bugprone-easily-swappable-parameters'
 HeaderFilterRegex: '.*'
