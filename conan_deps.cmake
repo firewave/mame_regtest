@@ -1,3 +1,4 @@
+# TODO: add logging of each step
 set(CONAN_SYSTEM_INCLUDES ON)
 set(ENV{CONAN_USER_HOME} "${CMAKE_BINARY_DIR}")
 
@@ -23,25 +24,25 @@ endif()
 execute_process(COMMAND ${PYTHON_EXECUTABLE} -m venv ${CONAN_VENV_PATH}
         RESULT_VARIABLE PROC_RES)
 if (NOT PROC_RES EQUAL 0)
-    message(FATAL_ERROR "venv creation failed")
+    message(FATAL_ERROR "venv creation failed - ${PROC_RES}")
 endif()
 
 execute_process(COMMAND python -m pip install --upgrade pip
         RESULT_VARIABLE PROC_RES)
 if (NOT PROC_RES EQUAL 0)
-    message(FATAL_ERROR "pip installation failed")
+    message(FATAL_ERROR "pip installation failed - ${PROC_RES}")
 endif()
 
 execute_process(COMMAND pip install --upgrade setuptools
         RESULT_VARIABLE PROC_RES)
 if (NOT PROC_RES EQUAL 0)
-    message(FATAL_ERROR "setuptools installation failed")
+    message(FATAL_ERROR "setuptools installation failed - ${PROC_RES}")
 endif()
 
 execute_process(COMMAND pip install --upgrade conan
         RESULT_VARIABLE PROC_RES)
 if (NOT PROC_RES EQUAL 0)
-    message(FATAL_ERROR "conan installation failed")
+    message(FATAL_ERROR "conan installation failed - ${PROC_RES}")
 endif()
 
 conan_check(VERSION 1.0.0 REQUIRED)
@@ -50,7 +51,7 @@ conan_check(VERSION 1.0.0 REQUIRED)
 execute_process(COMMAND conan remove --locks
         RESULT_VARIABLE PROC_RES)
 if (NOT PROC_RES EQUAL 0)
-    message(FATAL_ERROR "conan lock removal failed")
+    message(FATAL_ERROR "conan lock removal failed - ${PROC_RES}")
 endif()
 
 # TODO: make the build type configurable - "missing" might be enough for normal development
