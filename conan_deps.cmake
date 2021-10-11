@@ -56,6 +56,12 @@ if (NOT PROC_RES EQUAL 0)
     message(FATAL_ERROR "conan lock removal failed - ${PROC_RES}")
 endif()
 
+# workaround for "WARN: settings.yml is locally modified, can't be updated" false positive - only the default is ever created and it is never touched
+if (EXISTS "${CMAKE_BINARY_DIR}/.conan/settings.yml.new")
+    message(STATUS "Finish settings.yml migration")
+    file(RENAME "${CMAKE_BINARY_DIR}/.conan/settings.yml.new" "${CMAKE_BINARY_DIR}/.conan/settings.yml")
+endif()
+
 # TODO: make the build type configurable - "missing" might be enough for normal development
 if (MINGW)
     configure_file(${CMAKE_SOURCE_DIR}/default_with_cmake ${CMAKE_BINARY_DIR}/.conan/profiles/default_with_cmake COPYONLY)
