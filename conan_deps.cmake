@@ -63,7 +63,8 @@ if (MINGW)
             SETTINGS compiler.threads=posix
             BUILD_TYPE "CONANFILE"
             BASIC_SETUP NO_OUTPUT_DIRS
-            BUILD outdated)
+            BUILD outdated
+            UPDATE)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     configure_file(${CMAKE_SOURCE_DIR}/default_with_cmake ${CMAKE_BINARY_DIR}/.conan/profiles/default_with_cmake COPYONLY)
     conan_cmake_run(CONANFILE conanfile.txt
@@ -71,10 +72,12 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
             PROFILE_AUTO arch compiler compiler.version compiler.runtime compiler.libcxx compiler.toolset
             BUILD_TYPE "CONANFILE"
             BASIC_SETUP NO_OUTPUT_DIRS
-            BUILD outdated)
+            BUILD outdated
+            UPDATE)
 else()
     conan_cmake_run(CONANFILE conanfile.txt
             BUILD_TYPE "None"
             BASIC_SETUP NO_OUTPUT_DIRS
-            BUILD outdated)
+            BUILD outdated
+            UPDATE)
 endif()
