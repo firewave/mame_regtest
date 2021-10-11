@@ -704,7 +704,7 @@
     - properly include external includes
     - use static libraries on Windows
     - adjusted library dependencies
-    - updated libxml2 to 2.9.10 (conan only)
+    - updated libxml2 to 2.9.12 (conan only)
     - added some more "xpath_expr" examples to mame_regtest.xml
     - support -listxml format of combined MAME/MESS
     - added "hack_driver_root" to use old MAME/MESS specific -listxml node names

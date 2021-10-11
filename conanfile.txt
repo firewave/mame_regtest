@@ -1,5 +1,5 @@
 [requires]
-libxml2/2.9.10
+libxml2/2.9.12
 zlib/1.2.11
 
 [options]
