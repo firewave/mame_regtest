@@ -18,6 +18,7 @@ if (WIN32)
 endif()
 
 if (USE_CONAN)
+    message(STATUS "Using conan for external dependencies")
     include(conan_deps.cmake)
 endif()
 
@@ -32,9 +33,12 @@ find_package(LibXml2 REQUIRED)
 find_package(ZLIB REQUIRED)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    file(DOWNLOAD https://github.com/tronkko/dirent/raw/1.23.2/include/dirent.h ${CMAKE_BINARY_DIR}/include/dirent.h
-            EXPECTED_HASH SHA256=ce4cc82a7e1b1a2d9df607c893fc95b03847783d271bce86bb97ee5f2c42b82f
-            TLS_VERIFY ON)
+    if(NOT EXISTS "${CMAKE_BINARY_DIR}/include/dirent.h")
+        message(STATUS "Downloading dirent.h from https://github.com/tronkko/dirent")
+        file(DOWNLOAD https://github.com/tronkko/dirent/raw/1.23.2/include/dirent.h ${CMAKE_BINARY_DIR}/include/dirent.h
+                EXPECTED_HASH SHA256=ce4cc82a7e1b1a2d9df607c893fc95b03847783d271bce86bb97ee5f2c42b82f
+                TLS_VERIFY ON)
+    endif()
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
