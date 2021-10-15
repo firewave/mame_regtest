@@ -4,5 +4,5 @@ zlib/1.2.11
 
 [options]
 libxml2:iconv=False
-libxml2:include_utils=False
+libxml2:include_utils=True
 libxml2:legacy=False
