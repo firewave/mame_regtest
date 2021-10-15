@@ -23,24 +23,10 @@ else()
 endif()
 
 message(STATUS "Setting up Python virtuelenv")
-execute_process(COMMAND ${PYTHON_EXECUTABLE} -m venv ${CONAN_VENV_PATH}
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -m venv --upgrade-deps ${CONAN_VENV_PATH}
         RESULT_VARIABLE PROC_RES)
 if (NOT PROC_RES EQUAL 0)
     message(FATAL_ERROR "venv creation failed - ${PROC_RES}")
-endif()
-
-message(STATUS "Setting up pip Python package")
-execute_process(COMMAND python -m pip install --upgrade pip
-        RESULT_VARIABLE PROC_RES)
-if (NOT PROC_RES EQUAL 0)
-    message(FATAL_ERROR "pip installation failed - ${PROC_RES}")
-endif()
-
-message(STATUS "Setting up setuptools Python package")
-execute_process(COMMAND pip install --upgrade setuptools
-        RESULT_VARIABLE PROC_RES)
-if (NOT PROC_RES EQUAL 0)
-    message(FATAL_ERROR "setuptools installation failed - ${PROC_RES}")
 endif()
 
 message(STATUS "Setting up conan Python package")
