@@ -3,6 +3,26 @@ libxml2/2.9.12
 zlib/1.2.11
 
 [options]
+libxml2:c14n=False
+libxml2:catalog=False
+libxml2:docbook=False
+libxml2:ftp=False
+libxml2:http=False
+libxml2:html=False
 libxml2:iconv=False
 libxml2:include_utils=True
+libxml2:iso8859x=False
 libxml2:legacy=False
+libxml2:pattern=False
+libxml2:push=False
+libxml2:reader=False
+libxml2:regexps=False
+libxml2:sax1=False
+libxml2:schemas=False
+libxml2:schematron=False
+libxml2:threads=False
+libxml2:valid=False
+libxml2:writer=False
+libxml2:xinclude=False
+libxml2:xptr=False
+libxml2:zlib=True
