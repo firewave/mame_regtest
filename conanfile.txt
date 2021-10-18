@@ -25,4 +25,4 @@ libxml2:valid=False
 libxml2:writer=False
 libxml2:xinclude=False
 libxml2:xptr=False
-libxml2:zlib=True
+libxml2:zlib=False

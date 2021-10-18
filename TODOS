@@ -326,9 +326,6 @@ Entity: line 14: parser error : Extra content at the end of the document
 
 	conan
 	    - look at virtual* generators
-	    - building libxml2 without zlib is broken
-        gcc.exe -Wl,--major-image-version,2 -Wl,--minor-image-version,9 -Wl,-L,bin.mingw -Wl,-L,S:\GitHub\mame_regtest\cmake-build-debug-mingw\.conan\data\libxml2\2.9.9\_\_\package\dbc97e02589c20e3ca37b15d05c8e5853fae244f\lib  -shared -Wl,--dll -Wl,--out-implib,bin.mingw/libxml2.lib -o bin.mingw/libxml2.dll int.mingw/buf.o int.mingw/c14n.o int.mingw/catalog.o int.mingw/chvalid.o int.mingw/debugXML.o int.mingw/dict.o int.mingw/DOCBparser.o int.mingw/encoding.o int.mingw/entities.o int.mingw/error.o int.mingw/globals.o int.mingw/hash.o int.mingw/HTMLparser.o int.mingw/HTMLtree.o int.mingw/legacy.o int.mingw/list.o int.mingw/nanoftp.o int.mingw/nanohttp.o int.mingw/parser.o int.mingw/parserInternals.o int.mingw/pattern.o int.mingw/relaxng.o int.mingw/SAX.o int.mingw/SAX2.o int.mingw/schematron.o int.mingw/threads.o int.mingw/tree.o int.mingw/uri.o int.mingw/valid.o int.mingw/xinclude.o int.mingw/xlink.o int.mingw/xmlIO.o int.mingw/xmlmemory.o int.mingw/xmlreader.o int.mingw/xmlregexp.o int.mingw/xmlmodule.o int.mingw/xmlsave.o int.mingw/xmlschemas.o int.mingw/xmlschemastypes.o int.mingw/xmlunicode.o int.mingw/xmlwriter.o int.mingw/xpath.o int.mingw/xpointer.o int.mingw/xmlstring.o  -lwsock32 -lws2_32 -lwsock32 -lws2_32 -lkernel32 -L
-        gcc.exe: error: missing argument to '-L'
         - libxml2 should not compile tests in conan recipe
         - cmake cannot find libxml2_a.lib for Visual Studio
         - use CONAN_LIBS_LIBXML2 to avoid explicit ws2_32 usage
