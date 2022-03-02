@@ -17,19 +17,20 @@ include(${CMAKE_BINARY_DIR}/conan.cmake)
 find_package(PythonInterp REQUIRED)
 
 set(CONAN_VENV_PATH ${CMAKE_BINARY_DIR}/.conan-venv)
-if (WIN32)
-    set(CONAN_VENV_BIN ${CONAN_VENV_PATH}/Scripts)
-    set(ENV{PATH} "${CONAN_VENV_BIN};$ENV{PATH}")
-else()
-    set(CONAN_VENV_BIN ${CONAN_VENV_PATH}/bin)
-    set(ENV{PATH} "${CONAN_VENV_BIN}:$ENV{PATH}")
-endif()
 
 message(STATUS "Setting up Python virtuelenv")
 execute_process(COMMAND ${PYTHON_EXECUTABLE} -m venv --upgrade-deps ${CONAN_VENV_PATH}
         RESULT_VARIABLE PROC_RES)
 if (NOT PROC_RES EQUAL 0)
     message(FATAL_ERROR "venv creation failed - ${PROC_RES}")
+endif()
+
+if (WIN32)
+    set(CONAN_VENV_BIN ${CONAN_VENV_PATH}/Scripts)
+    set(ENV{PATH} "${CONAN_VENV_BIN};$ENV{PATH}")
+else()
+    set(CONAN_VENV_BIN ${CONAN_VENV_PATH}/bin)
+    set(ENV{PATH} "${CONAN_VENV_BIN}:$ENV{PATH}")
 endif()
 
 message(STATUS "Setting up conan Python package")
