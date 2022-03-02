@@ -33,10 +33,14 @@ find_package(LibXml2 REQUIRED)
 find_package(ZLIB REQUIRED)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    if(NOT EXISTS "${CMAKE_BINARY_DIR}/include/dirent.h")
+    set(DIRENT_H_HASH_EXPECTED "ce4cc82a7e1b1a2d9df607c893fc95b03847783d271bce86bb97ee5f2c42b82f")
+    if(EXISTS "${CMAKE_BINARY_DIR}/include/dirent.h")
+        file(SHA256 "${CMAKE_BINARY_DIR}/include/dirent.h" DIRENT_H_HASH_FOUND)
+    endif()
+    if(NOT EXISTS "${CMAKE_BINARY_DIR}/include/dirent.h" OR NOT "${DIRENT_H_HASH_FOUND}" STREQUAL "${DIRENT_H_HASH_EXPECTED}")
         message(STATUS "Downloading dirent.h from https://github.com/tronkko/dirent")
         file(DOWNLOAD https://github.com/tronkko/dirent/raw/1.23.2/include/dirent.h ${CMAKE_BINARY_DIR}/include/dirent.h
-                EXPECTED_HASH SHA256=ce4cc82a7e1b1a2d9df607c893fc95b03847783d271bce86bb97ee5f2c42b82f
+                EXPECTED_HASH SHA256=${DIRENT_H_HASH_EXPECTED}
                 TLS_VERIFY ON)
     endif()
 endif()
