@@ -58,7 +58,6 @@
 #include <zlib.h>
 
 /* libxml2 */
-#include <libxml/xmlmemory.h>
 #include <libxml/xpath.h>
 
 #include "common.h"
