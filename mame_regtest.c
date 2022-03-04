@@ -345,7 +345,7 @@ static void strip_sampleof_pinmame(const char* listxml_in, const char* listxml_o
 }
 
 /* TODO: how to set "callstr" for non-de calls? */
-static void get_executable(char** sys, struct driver_entry* de, const char* callstr, const char* parameters)
+static void get_executable(char** sys, const struct driver_entry* de, const char* callstr, const char* parameters)
 {
 #if !USE_VALGRIND
 	/* shut up compiler */
