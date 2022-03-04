@@ -2,6 +2,7 @@
 
 /* libxml2 */
 #include <libxml/parser.h>
+#include <libxml/xmlstring.h>
 
 #include "common.h"
 

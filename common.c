@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -55,9 +56,11 @@
 #endif
 
 /* zlib */
+#include <zconf.h>
 #include <zlib.h>
 
 /* libxml2 */
+#include <libxml/globals.h>
 #include <libxml/xpath.h>
 
 #include "common.h"

@@ -1,6 +1,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #ifdef __GNUC__
@@ -19,7 +20,9 @@
 #endif
 
 /* libxml2 */
+#include <libxml/globals.h>
 #include <libxml/parser.h>
+#include <libxml/xmlstring.h>
 
 static xmlDocPtr global_config_doc = NULL;
 static xmlNodePtr global_config_root = NULL;

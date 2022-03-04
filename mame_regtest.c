@@ -46,8 +46,10 @@
 #endif
 
 /* libxml2 */
+#include <libxml/globals.h>
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
+#include <libxml/xmlstring.h>
 
 /* local */
 #include "common.h"

@@ -19,7 +19,11 @@
 #endif
 
 /* libxml2 */
+#include <libxml/entities.h>
+#include <libxml/globals.h>
 #include <libxml/parser.h>
+#include <libxml/tree.h>
+#include <libxml/xmlstring.h>
 #include <libxml/xpath.h>
 
 /* local */
