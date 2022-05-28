@@ -85,3 +85,10 @@ else()
             BUILD outdated
             UPDATE)
 endif()
+
+message(STATUS "Removing conan build and source folders")
+execute_process(COMMAND conan remove "*" --builds --src --force
+        RESULT_VARIABLE PROC_RES)
+if (NOT PROC_RES EQUAL 0)
+    message(FATAL_ERROR "conan build and source folder removal failed - ${PROC_RES}")
+endif()
