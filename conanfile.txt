@@ -1,6 +1,6 @@
 [requires]
 libxml2/2.9.12
-zlib/1.2.11
+zlib/1.2.12
 
 [options]
 libxml2:c14n=False

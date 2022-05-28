@@ -732,6 +732,7 @@
     - fixed Cppcheck warning
     - cleaned up README.md
     - merged README into README.md
+    - updated zlib to 1.2.12 (conan only)
 
     create_report
     - fixed some clang-tidy warnings
