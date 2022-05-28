@@ -110,6 +110,7 @@ static void config_read_option_str_ptr(const xmlNode* config_node, const char* o
 		if( *value )
 			free(*value);
 		*value = strdup((const char*)opt);
+		/* TODO: check result */
 		xmlFree(opt);
 		opt = NULL;
 	}

@@ -85,6 +85,7 @@ static void build_group_cb(struct parse_callback_data* pcd)
 				struct driver_data* new_dd = (struct driver_data*)malloc(sizeof(struct driver_data));
 				/* TODO: check result */
 				new_dd->filename = strdup(pcd->fullname);
+				/* TODO: check result */
 				new_dd->next = NULL;
 
 				xmlNodePtr output_node = doc->children;

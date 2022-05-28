@@ -369,13 +369,15 @@ char** split_string(const char* str, const char* delims)
 	size_t i = 0;
 
 	char* cpy = strdup(str);
-	
+	/* TODO: check result */
+
 	char* pch = strtok(cpy, delims);
 	while(pch != NULL)
 	{
 		strings = (char**)realloc(strings, sizeof(char*) * (i+2));
 		/* TODO: check result */
 		strings[i] = strdup(pch);
+		/* TODO: check result */
 		pch = strtok(NULL, delims);
 		i++;
 	}
@@ -419,6 +421,7 @@ char* get_directory(const char* filepath)
 void replace_string(const char* input, char** output, const char* old_str, const char* new_str)
 {	
 	char* str_copy = strdup(input);
+	/* TODO: check result */
 	char* pos = strstr(str_copy, old_str);
 	while( pos != NULL )
 	{
@@ -460,7 +463,8 @@ static char** command_to_argv(const char* command)
 
 				argv = (char**)realloc(argv, sizeof(char*) * (argc+2));
 				/* TODO: check result */
-				argv[argc] = strdup(temp);
+				argv[argc] = strdup(temp);  /* TODO: unnecessary */
+				/* TODO: check result */
 				free(temp);
 				temp = NULL;
 				argc++;
@@ -476,7 +480,8 @@ static char** command_to_argv(const char* command)
 					argv = (char**)realloc(argv, sizeof(char*) * (argc+2));
 					/* TODO: check result */
 					append_string_n(&temp, parts[i]+1, len-2);
-					argv[argc] = strdup(temp);
+					argv[argc] = strdup(temp); /* TODO: unnecssary */
+					/* TODO: check result */
 					free(temp);
 					temp = NULL;
 					argc++;
@@ -492,6 +497,7 @@ static char** command_to_argv(const char* command)
 				argv = (char**)realloc(argv, sizeof(char*) * (argc+2));
 				/* TODO: check result */
 				argv[argc] = strdup(parts[i]);
+				/* TODO: check result */
 				argc++;
 			}
 		}
