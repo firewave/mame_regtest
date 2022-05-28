@@ -1,13 +1,13 @@
 set(CONAN_SYSTEM_INCLUDES ON)
 set(ENV{CONAN_USER_HOME} "${CMAKE_BINARY_DIR}")
 
-set(CONAN_CMAKE_HASH_EXPECTED "3bef79da16c2e031dc429e1dac87a08b9226418b300ce004cc125a82687baeef")
+set(CONAN_CMAKE_HASH_EXPECTED "5cdb3042632da3efff558924eecefd580a0e786863a857ca097c3d1d43df5dcd")
 if(EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
     file(SHA256 "${CMAKE_BINARY_DIR}/conan.cmake" CONAN_CMAKE_HASH_FOUND)
 endif()
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake" OR NOT "${CONAN_CMAKE_HASH_FOUND}" STREQUAL "${CONAN_CMAKE_HASH_EXPECTED}")
     message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-    file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/0.17.0/conan.cmake" "${CMAKE_BINARY_DIR}/conan.cmake"
+    file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/0.18.1/conan.cmake" "${CMAKE_BINARY_DIR}/conan.cmake"
             EXPECTED_HASH SHA256=${CONAN_CMAKE_HASH_EXPECTED}
             TLS_VERIFY ON)
 endif()
