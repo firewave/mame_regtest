@@ -1,4 +1,4 @@
-find_program(RUN_CLANG_TIDY NAMES run-clang-tidy run-clang-tidy-13 run-clang-tidy-12 run-clang-tidy-11 run-clang-tidy-10 run-clang-tidy-9 run-clang-tidy-8)
+find_program(RUN_CLANG_TIDY NAMES run-clang-tidy run-clang-tidy-14 run-clang-tidy-13 run-clang-tidy-12 run-clang-tidy-11 run-clang-tidy-10 run-clang-tidy-9 run-clang-tidy-8)
 if (NOT RUN_CLANG_TIDY)
     find_program(RUN_CLANG_TIDY NAMES run-clang-tidy.py HINTS /usr/share/clang)
 endif()
