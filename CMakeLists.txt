@@ -60,6 +60,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Werror -Weverything)
     # we do not care about padding
     add_compile_options(-Wno-padded)
+    # we do not care about backwards compatibility (started with Clang 14)
+    add_compile_options(-Wno-declaration-after-statement)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     add_compile_options(-Werror -Wall -Wextra -Wformat=2 -Wshadow -Wcast-qual -Wwrite-strings -Wunreachable-code -Wpedantic -Wundef)
     # these warnings produce false positives before GCC 10
