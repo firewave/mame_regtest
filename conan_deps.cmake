@@ -69,7 +69,7 @@ if (MINGW)
             BASIC_SETUP NO_OUTPUT_DIRS
             BUILD outdated
             UPDATE)
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     configure_file(${CMAKE_SOURCE_DIR}/default_with_cmake ${CMAKE_BINARY_DIR}/.conan/profiles/default_with_cmake COPYONLY)
     conan_cmake_run(CONANFILE conanfile.txt
             PROFILE default_with_cmake

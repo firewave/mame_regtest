@@ -24,7 +24,7 @@ endif()
 
 find_package(Threads REQUIRED)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # CMake cannot find the static library for Visual Studio so provide it
     set(LIBXML2_LIBRARY ${CONAN_LIBXML2_ROOT}/lib/libxml2_a.lib)
 endif()
@@ -32,7 +32,7 @@ find_package(LibXml2 REQUIRED)
 
 find_package(ZLIB REQUIRED)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(DIRENT_H_HASH_EXPECTED "ce4cc82a7e1b1a2d9df607c893fc95b03847783d271bce86bb97ee5f2c42b82f")
     if(EXISTS "${CMAKE_BINARY_DIR}/include/dirent.h")
         file(SHA256 "${CMAKE_BINARY_DIR}/include/dirent.h" DIRENT_H_HASH_FOUND)
@@ -45,7 +45,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     endif()
 endif()
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_compile_options(/W4)
     # TODO: always enable when all warnings are fixed
@@ -62,7 +62,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Wno-padded)
     # we do not care about backwards compatibility (started with Clang 14)
     add_compile_options(-Wno-declaration-after-statement)
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-Werror -Wall -Wextra -Wformat=2 -Wshadow -Wcast-qual -Wwrite-strings -Wunreachable-code -Wpedantic -Wundef)
     # these warnings produce false positives before GCC 10
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "10.0.1")
@@ -76,12 +76,12 @@ endif()
 
 if (USE_SANITIZERS)
     # TODO: add more additional compiler-specific flags
-    if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         set(SANITITER_FLAGS -fsanitize=address -fsanitize=undefined)
         add_compile_options(${SANITITER_FLAGS} -fno-omit-frame-pointer)
         add_definitions(-DNO_ASSERT)
         add_link_options(${SANITITER_FLAGS})
-    elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
         # TODO: make this work
         # works only in 32-bit Release builds
         # add_compile_definitions(/fsanitize=address)
@@ -93,10 +93,10 @@ if (MINWG32)
 endif()
 
 add_library(common-obj OBJECT common.c)
-if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_include_directories(common-obj PRIVATE SYSTEM ${CMAKE_BINARY_DIR}/include)
 endif()
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(common-obj PRIVATE -Wno-sign-conversion)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(common-obj PRIVATE -Wno-sign-conversion)
@@ -108,7 +108,7 @@ target_include_directories(config-obj SYSTEM PRIVATE ${LIBXML2_INCLUDE_DIR} ${Ic
 
 add_executable(mame_regtest mame_regtest.c $<TARGET_OBJECTS:common-obj> $<TARGET_OBJECTS:config-obj>)
 target_include_directories(mame_regtest SYSTEM PRIVATE ${LIBXML2_INCLUDE_DIR} ${Iconv_INCLUDE_DIR})
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(mame_regtest PRIVATE -Wno-format-truncation -Wno-sign-conversion)
 endif()
 target_link_libraries(mame_regtest PRIVATE Threads::Threads ${LIBXML2_LIBRARIES} ${ZLIB_LIBRARIES})
