@@ -970,7 +970,7 @@ static void create_report_cb(struct parse_callback_data* pcd)
 	}
 }
 
-static int create_report()
+static int create_report(void)
 {
 	FILE* report_fd = NULL;
 
