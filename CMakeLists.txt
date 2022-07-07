@@ -77,10 +77,10 @@ endif()
 if (USE_SANITIZERS)
     # TODO: add more additional compiler-specific flags
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        set(SANITITER_FLAGS -fsanitize=address -fsanitize=undefined)
-        add_compile_options(${SANITITER_FLAGS} -fno-omit-frame-pointer)
+        set(SANITIZER_FLAGS -fsanitize=address -fsanitize=undefined)
+        add_compile_options(${SANITIZER_FLAGS} -fno-omit-frame-pointer)
         add_definitions(-DNO_ASSERT)
-        add_link_options(${SANITITER_FLAGS})
+        add_link_options(${SANITIZER_FLAGS})
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
         # TODO: make this work
         # works only in 32-bit Release builds
