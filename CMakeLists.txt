@@ -94,7 +94,7 @@ endif()
 
 add_library(common-obj OBJECT common.c)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    target_include_directories(common-obj PRIVATE SYSTEM ${CMAKE_BINARY_DIR}/include)
+    target_include_directories(common-obj SYSTEM PRIVATE ${CMAKE_BINARY_DIR}/include)
 endif()
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(common-obj PRIVATE -Wno-sign-conversion)
