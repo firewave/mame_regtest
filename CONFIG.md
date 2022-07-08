@@ -65,6 +65,7 @@
 * _hack_softwarelist_ - 
 * _hack_nosound_ - 
 * _hack_driver_root_ - forces usage of old MAME/MESS-specific `-listxml` node names (necessary until 0.???)
+* _hack_str_snapname_ - omits `-snapname` parameter since `-str` hard-coded `final.png` name (necessary until 0.236)
 
 #### create_report.xml
 

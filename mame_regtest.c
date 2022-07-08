@@ -242,6 +242,7 @@ static int config_use_slots = 0;
 static int config_no_execution = 0;
 static int config_hack_nosound = 0;
 static int config_hack_driver_root = 0;
+static int config_hack_str_snapname = 0;
 
 static struct config_entry mrt_config[] =
 {
@@ -292,6 +293,7 @@ static struct config_entry mrt_config[] =
 	{ "no_execution",			CFG_INT,		&config_no_execution },
 	{ "hack_nosound",			CFG_INT,		&config_hack_nosound },
 	{ "hack_driver_root",		CFG_INT,		&config_hack_driver_root },
+	{ "hack_str_snapname",		CFG_INT,		&config_hack_str_snapname },
 	{ NULL,						CFG_UNK,		NULL }
 };
 
@@ -1179,6 +1181,9 @@ static char* create_commandline(struct driver_entry* de)
 	if( config_hack_pinmame ) {
 		append_string(&sys, " -skip_disclaimer");
 		append_string(&sys, " -skip_gameinfo");
+	}
+	if( !config_hack_str_snapname ) {
+		append_string(&sys, " -snapname %g/final.png");
 	}
 	
 	return sys;
@@ -2690,6 +2695,7 @@ int main(int argc, char *argv[])
 		printf("hack_pinmame: %d\n", config_hack_pinmame);
 		printf("hack_softwarelist: %d\n", config_hack_softwarelist);
 		printf("hack_nosound: %d\n", config_hack_nosound);
+		printf("hack_str_snapname: %d\n", config_hack_str_snapname);
 
 		printf("\n"); /* for output formating */
 	}
