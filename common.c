@@ -463,9 +463,7 @@ static char** command_to_argv(const char* command)
 
 				argv = (char**)realloc(argv, sizeof(char*) * (argc+2));
 				/* TODO: check result */
-				argv[argc] = strdup(temp);  /* TODO: unnecessary */
-				/* TODO: check result */
-				free(temp);
+				argv[argc] = temp;
 				temp = NULL;
 				++argc;
 			}
@@ -480,9 +478,7 @@ static char** command_to_argv(const char* command)
 					argv = (char**)realloc(argv, sizeof(char*) * (argc+2));
 					/* TODO: check result */
 					append_string_n(&temp, parts[i]+1, len-2);
-					argv[argc] = strdup(temp); /* TODO: unnecssary */
-					/* TODO: check result */
-					free(temp);
+					argv[argc] = temp;
 					temp = NULL;
 					++argc;
 					in_quote = 0;
