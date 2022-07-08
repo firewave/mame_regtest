@@ -475,13 +475,14 @@ static char** command_to_argv(const char* command)
 				size_t len = strlen(parts[i]);
 				if( parts[i][len-1] == '"' )
 				{
+					append_string_n(&temp, parts[i]+1, len-2);
+					in_quote = 0;
+
 					argv = (char**)realloc(argv, sizeof(char*) * (argc+2));
 					/* TODO: check result */
-					append_string_n(&temp, parts[i]+1, len-2);
 					argv[argc] = temp;
 					temp = NULL;
 					++argc;
-					in_quote = 0;
 				}
 				else
 				{
