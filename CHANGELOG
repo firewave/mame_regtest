@@ -734,6 +734,7 @@
     - merged README into README.md
     - updated zlib to 1.2.12 (conan only)
     - disabled "-Wdeclaration-after-statement" for Clang since it just warns about backwards compatibility
+    - use pre-increment consistently
 
     create_report
     - fixed some clang-tidy warnings

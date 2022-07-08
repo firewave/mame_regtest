@@ -1651,8 +1651,8 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 						snprintf(de->postfix, sizeof(de->postfix), "%ssfw%05dpart%05d", initial_postfix, software_count, part_count);
 
 						execute_mame2(de);
-						
-						part_count++;
+
+						++part_count;
 						images = images->next;
 					}
 					
@@ -1662,10 +1662,10 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 					snprintf(de->postfix, sizeof(de->postfix), "%s", initial_postfix);
 					
 					if (part_count != 0)
-						software_processed++;
+						++software_processed;
 
 					/* TODO: store the software entry processed so even with only the slot executed it will match the order of a full run? */
-					software_count++;
+					++software_count;
 				}
 					
 				// TODO: move to helper function
@@ -1737,8 +1737,8 @@ static void execute_mame3(struct driver_entry* de, struct driver_info* actual_dr
 						de->images = NULL;
 						
 						snprintf(de->postfix, sizeof(de->postfix), "%s", initial_postfix);
-						
-						software_count++;
+
+						++software_count;
 					}
 
 					device_node = device_node->next;

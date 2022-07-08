@@ -222,11 +222,11 @@ static void summary_incr(struct report_summary* summary, const xmlChar* exitcode
 		return;
 
 	if( xmlStrcmp(exitcode_key, (const xmlChar*)"2") == 0 )
-		summary->missing++;
+		++summary->missing;
 	else if( xmlStrcmp(exitcode_key, (const xmlChar*)"4") == 0 )
-		summary->mandatory++;
+		++summary->mandatory;
 	else
-		summary->errors++;
+		++summary->errors;
 }
 
 struct report_cb_data
@@ -397,7 +397,7 @@ xmlStrrstr (xmlChar const *haystack, xmlChar const *needle)
 	while ((p = xmlStrstr (p, needle)) != NULL)
 	{
 	  last_match = p;
-	  p++;
+	  ++p;
 	}
 
 	return last_match;
@@ -441,11 +441,11 @@ static int create_report_from_filename(const char *const filename, struct report
 					if( output_childs->type == XML_ELEMENT_NODE ) {
 						if( xmlStrcmp(output_childs->name, (const xmlChar*)"result") == 0 ) {
 							if (!result_found) {
-								r_cb_data->summary.executed++;
+								++r_cb_data->summary.executed;
 								result_found = 1;
 							}
 							else {
-								r_cb_data->summary.executed_autosave++;
+								++r_cb_data->summary.executed_autosave;
 							}
 
 
@@ -541,13 +541,13 @@ static int create_report_from_filename(const char *const filename, struct report
 
 							summary_incr(&r_cb_data->summary, exitcode_key);
 							if(memleak_found)
-								r_cb_data->summary.memleaks++;
+								++r_cb_data->summary.memleaks;
 							if(clipped_found)
-								r_cb_data->summary.clipped++;
+								++r_cb_data->summary.clipped;
 							if(runtime_error_found)
-								r_cb_data->summary.runtime_errors++;
+								++r_cb_data->summary.runtime_errors;
 							if(unexpected_stderr)
-								r_cb_data->summary.unexpected_stderr++;
+								++r_cb_data->summary.unexpected_stderr;
 
 							int report_error = (error_found && !mandatory_found);
 							int report_memleak = (memleak_found && r_cb_data->show_memleaks);

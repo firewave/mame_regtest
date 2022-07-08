@@ -379,7 +379,7 @@ char** split_string(const char* str, const char* delims)
 		strings[i] = strdup(pch);
 		/* TODO: check result */
 		pch = strtok(NULL, delims);
-		i++;
+		++i;
 	}
 
 	if( strings != NULL )
@@ -467,7 +467,7 @@ static char** command_to_argv(const char* command)
 				/* TODO: check result */
 				free(temp);
 				temp = NULL;
-				argc++;
+				++argc;
 			}
 		}
 		else {
@@ -484,7 +484,7 @@ static char** command_to_argv(const char* command)
 					/* TODO: check result */
 					free(temp);
 					temp = NULL;
-					argc++;
+					++argc;
 					in_quote = 0;
 				}
 				else
@@ -498,7 +498,7 @@ static char** command_to_argv(const char* command)
 				/* TODO: check result */
 				argv[argc] = strdup(parts[i]);
 				/* TODO: check result */
-				argc++;
+				++argc;
 			}
 		}
 	}
