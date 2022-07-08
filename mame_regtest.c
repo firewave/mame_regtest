@@ -456,23 +456,31 @@ static FILE* mrt_fopen(const char* filename, const char* attr)
 	return result;
 }
 
-static void clear_callback_2(struct parse_callback_data* pcd)
+static void clear_callback_snap(struct parse_callback_data* pcd)
 {
-	/* do not delete the -log, valgrind or snapshot output */
-	if( pcd->type == ENTRY_FILE && strstr(pcd->entry_name, "valgrind") == NULL && strcmp(pcd->entry_name, "error.log") != 0 && strcmp(pcd->entry_name, "final.png") != 0 ) {
+	if( pcd->type == ENTRY_FILE ) {
 		remove(pcd->fullname);
 	}
-	/* do not delete the "snap" folder */
+}
+
+static void clear_callback_2(struct parse_callback_data* pcd)
+{
+	/* do not delete the -log or valgrind */
+	if( pcd->type == ENTRY_FILE && strstr(pcd->entry_name, "valgrind") == NULL && strcmp(pcd->entry_name, "error.log") != 0 ) {
+		remove(pcd->fullname);
+	}
 	else if( pcd->type == ENTRY_DIR_END ) {
-		int delete_root;
-		if( strcmp(pcd->entry_name, "snap") != 0 )
-			delete_root = 1;
-		else
-			delete_root = 0;
-		parse_directory(pcd->fullname, 0, clear_callback_2, (void*)&delete_root);
+		/* do not delete the "snap" folder */
+		if( strcmp(pcd->entry_name, "snap") == 0 ) {
+			parse_directory(pcd->fullname, 0, clear_callback_snap, NULL);
+		}
+		else {
+			int delete_root = 1;
+			parse_directory(pcd->fullname, 0, clear_callback_2, (void*)&delete_root);
+		}
 	}
 	else if( pcd->type == ENTRY_END ) {
-		int* delete_root = (int*)pcd->user_data;
+		const int* delete_root = (const int*)pcd->user_data;
 		if( *delete_root ) {
 			if ( rmdir(pcd->dirname) == -1 ) {
 				cleanup_and_exit(errno, "clearing root failed"); /* TODO: add pcd->dirname */
