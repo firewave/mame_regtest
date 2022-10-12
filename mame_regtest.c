@@ -1181,7 +1181,7 @@ static char* create_commandline(struct driver_entry* de)
 			append_string(&sys, " -biospath "); /* old biospath for MESS */
 		append_quoted_string(&sys, config_rompath_folder);
 	}
-	if( (app_type == APP_MESS) && config_hashpath_folder && (*config_hashpath_folder != 0) )
+	if( (!config_hack_driver_root || (app_type == APP_MESS)) && config_hashpath_folder && (*config_hashpath_folder != 0) )
 	{
 		append_string(&sys, " -hashpath "); /* hashpath for MESS */
 		append_quoted_string(&sys, config_hashpath_folder);
@@ -2212,7 +2212,7 @@ static void parse_listxml_element(const xmlNode* game_child, struct driver_info*
 					goto next;
 			}
 
-			if( app_type == APP_MESS ) {
+			if( !config_hack_driver_root || (app_type == APP_MESS) ) {
 				if( config_use_ramsize && (xmlStrcmp(game_children->name, (const xmlChar*)"ramoption") == 0) ) {
 					xmlChar* ram_content = xmlNodeGetContent(game_children);
 					if( ram_content ) {
