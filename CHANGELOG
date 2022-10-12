@@ -756,6 +756,7 @@
     - return a result from create_report()
     - added option "unexpected_stderr" to check for unexpected stderr messages
     - properly access configuration via report_cb_data
+    - removed "ignore_exitcode_4" left-overs
 
     create_image_xml
     - fixed some CLion inspection warnings

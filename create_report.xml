@@ -7,7 +7,6 @@
 		<option name='output_file' value='d:\report_10.md'/>
         <option name='print_stderr' value='1'/>
         <option name='use_markdown' value='1'/>
-		<option name='ignore_exitcode_4' value='1'/>
 		<option name='show_memleaks' value='1'/>
 		<option name='show_clipped' value='1'/>
 		<option name='unexpected_stderr' value='1'/>
@@ -17,14 +16,12 @@
 		<option name='xml_folder' value='d:\mess\mrt_output'/>
 		<option name='output_file' value='d:\stdout_file.txt'/>
 		<option name='print_stdout' value='1'/>
-		<option name='ignore_exitcode_4' value='1'/>
 		<option name='group_data' value='1'/>
 	</stdout_file>
 	<stderr_file>
 		<option name='xml_folder' value='d:\mess\mrt_output'/>
 		<option name='output_file' value='d:\stderr_file.txt'/>
 		<option name='print_stderr' value='1'/>
-		<option name='ignore_exitcode_4' value='1'/>
 		<option name='group_data' value='1'/>
 	</stderr_file>
 	<comparison>

@@ -183,8 +183,6 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- store timing information and generate reports on how much time in a testrun is spent on which drivers/sets
 		- add option to use grouped execution
 		- do not show stdout in report entries, that don't need it (e.g. fatalerror)
-		- "ignore_exitcode_4" no longer working?
-            - only makes sense when "skip_mandatory" is false
 		- add AVI/WAV/PNG valiation
 		    - sudo apt-get install ffmpeg
 		    - ffprobe aviwrite.avi -hide_banner
