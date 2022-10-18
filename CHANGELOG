@@ -737,6 +737,7 @@
     - use pre-increment consistently
     - added "hack_str_snapname" for older versions which have the snapname hard-coded to "final.png" with "-str"
     - removed unnecessary strdup() calls from command_to_argv()
+    - use attribute defaults from DTD when parsing "-listxml" and "-listsoftware"
 
     create_report
     - fixed some clang-tidy warnings
