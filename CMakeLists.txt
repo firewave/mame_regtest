@@ -28,7 +28,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # CMake cannot find the static library for Visual Studio so provide it
     set(LIBXML2_LIBRARY ${CONAN_LIBXML2_ROOT}/lib/libxml2_a.lib)
 endif()
-find_package(LibXml2 2.9 REQUIRED)
+find_package(LibXml2 REQUIRED)
 
 find_package(ZLIB REQUIRED)
 

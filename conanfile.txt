@@ -1,11 +1,10 @@
 [requires]
-libxml2/2.9.14
+libxml2/2.10.3
 zlib/1.2.13
 
 [options]
 libxml2:c14n=False
 libxml2:catalog=False
-libxml2:docbook=False
 libxml2:ftp=False
 libxml2:http=False
 libxml2:html=False
