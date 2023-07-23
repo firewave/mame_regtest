@@ -34,7 +34,7 @@ else()
 endif()
 
 message(STATUS "Setting up conan Python package")
-execute_process(COMMAND pip install --upgrade conan
+execute_process(COMMAND pip install --upgrade conan<2.0
         RESULT_VARIABLE PROC_RES)
 if (NOT PROC_RES EQUAL 0)
     message(FATAL_ERROR "conan installation failed - ${PROC_RES}")

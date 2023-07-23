@@ -321,6 +321,7 @@ Entity: line 14: parser error : Extra content at the end of the document
 		- fix compilation on systems, that already have a htonl() function
 			- #undef htonl might help
 		- change LITTLE_ENDIAN/BIG_ENDIAN defines - they are both defined on some systems (maybe BYTE_ORDER? LSB_FIRST?)
+		- fix build with conan 2.x
 
 	conan
 	    - look at virtual* generators
